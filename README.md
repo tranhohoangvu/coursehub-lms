@@ -53,6 +53,33 @@ This project demonstrates core backend engineering principles, including databas
 
 ---
 
+## 🏗️ Deployment & Architecture Model
+
+```mermaid
+graph LR
+    U[User]
+
+    subgraph Client
+        FE[React App<br/>Vercel]
+    end
+
+    subgraph Server
+        BE[Node.js + Express API<br/>Render]
+    end
+
+    subgraph Data Layer
+        DB[(PostgreSQL<br/>Supabase)]
+    end
+
+    U --> FE
+    FE -->|HTTPS / REST API| BE
+    BE -->|SQL Query| DB
+    DB -->|Result Set| BE
+    BE -->|JSON Response| FE
+```
+
+---
+
 ## 📂 Directory Structure
 
 ```text
