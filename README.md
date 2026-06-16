@@ -10,6 +10,10 @@
 
 This project demonstrates core backend engineering principles, including database schema design, JWT-based Role-Based Access Control (RBAC), raw SQL query optimization using the native `pg` driver (no ORM like Prisma/Sequelize), and modular MVC architecture.
 
+🌐 **Live Demo Links:**
+*   **Frontend (Vercel):** [https://coursehub-lms-eight.vercel.app](https://coursehub-lms-eight.vercel.app)
+*   **Backend API (Render):** [https://coursehub-lms.onrender.com](https://coursehub-lms.onrender.com)
+
 > [!NOTE]
 > **Lightweight & High-Performance Design:** This codebase intentionally avoids Docker and heavy ORMs (like Prisma) to ensure rapid cold-start times, eliminate engine-download bottlenecks in network-restricted environments, and demonstrate low-level database mastery.
 
