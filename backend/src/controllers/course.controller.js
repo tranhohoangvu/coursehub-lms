@@ -15,6 +15,8 @@ const lessonSchema = z.object({
   content: z.string().min(3),
   order: z.coerce.number().int().min(1).optional(),
   isPreview: z.boolean().optional(),
+  videoUrl: z.string().optional().nullable(),
+  resourceUrl: z.string().optional().nullable(),
 });
 
 function courseFromRow(row) {
@@ -42,6 +44,8 @@ function lessonFromRow(row) {
     content: row.content,
     order: row.lesson_order,
     isPreview: row.is_preview,
+    videoUrl: row.video_url,
+    resourceUrl: row.resource_url,
     courseId: row.course_id,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -159,9 +163,17 @@ export async function createLesson(req, res) {
   if (req.user.role !== "ADMIN" && course.instructor_id !== req.user.id) return res.status(403).json({ message: "Forbidden" });
 
   const result = await query(
-    `INSERT INTO lessons (title, content, lesson_order, is_preview, course_id)
-     VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-    [data.title, data.content, data.order || 1, data.isPreview || false, course.id]
+    `INSERT INTO lessons (title, content, lesson_order, is_preview, video_url, resource_url, course_id)
+     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+    [
+      data.title,
+      data.content,
+      data.order || 1,
+      data.isPreview || false,
+      data.videoUrl || null,
+      data.resourceUrl || null,
+      course.id
+    ]
   );
   res.status(201).json(lessonFromRow(result.rows[0]));
 }
