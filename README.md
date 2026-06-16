@@ -24,10 +24,12 @@ This project demonstrates core backend engineering principles, including databas
     *   `INSTRUCTOR`: Create and manage course content, lessons, and curriculums.
     *   `STUDENT`: Browse catalog, enroll in courses, track learning progress, and write reviews.
 
-### 📚 Course & Curriculum Management
-*   Detailed course page featuring curriculum breakdowns, lessons, and progress tracking.
-*   Interactive review system for courses with ratings and comments.
-*   Dynamic enrollment state and learning progress tracking per student.
+### 📚 Course & Learning Management
+*   **Udemy-style Classroom Workspace:** A premium split-screen layout showcasing the interactive syllabus navigation sidebar on the right, and the active study workspace on the left.
+*   **Embedded Video Player & Resources:** Stream YouTube video lessons directly inside the workspace and access attached learning resources (documentation, PDF slides, etc.).
+*   **URL-Synchronized Navigation:** Map active courses and lessons to query params (`/my-courses?courseId=...&lessonId=...`), enabling standard browser Back/Forward navigation.
+*   **Interactive Syllabus & Progress Bars:** Real-time progress bars calculating and displaying course completion percentages as students check off lessons.
+*   **Course Reviews:** Interactive rating and comment system enabling students to leave course feedback.
 
 ### 🛒 Cart & Mock Checkout
 *   Persistent shopping cart stored in database and synced across devices.
