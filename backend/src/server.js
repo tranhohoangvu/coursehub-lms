@@ -14,7 +14,13 @@ import { errorHandler, notFound } from "./middlewares/error.js";
 const app = express();
 const port = process.env.PORT || 5000;
 
-app.use(cors({ origin: process.env.CLIENT_URL || "http://localhost:5173", credentials: true }));
+// Sanitize CLIENT_URL to remove trailing slash if present
+let clientOrigin = process.env.CLIENT_URL || "http://localhost:5173";
+if (clientOrigin.endsWith("/")) {
+  clientOrigin = clientOrigin.slice(0, -1);
+}
+
+app.use(cors({ origin: clientOrigin, credentials: true }));
 app.use(express.json());
 app.use(morgan("dev"));
 
