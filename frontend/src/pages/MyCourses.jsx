@@ -1,11 +1,23 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { api } from "../api/client.js";
+
+function getYouTubeId(url) {
+  if (!url) return null;
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11) ? match[2] : null;
+}
 
 export default function MyCourses() {
   const [items, setItems] = useState([]);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
+
+  // Classroom workspace search parameters (URL-based state for back button compatibility)
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeCourseId = searchParams.get("courseId");
+  const activeLessonId = searchParams.get("lessonId");
 
   useEffect(() => {
     api("/courses/mine")
@@ -59,6 +71,190 @@ export default function MyCourses() {
     );
   }
 
+  // -------------------------------------------------------------
+  // CLASSROOM WORKSPACE VIEW
+  // -------------------------------------------------------------
+  if (activeCourseId) {
+    const activeCourseItem = items.find((item) => item.course.id === activeCourseId);
+    if (activeCourseItem) {
+      const course = activeCourseItem.course;
+      const lessons = course.lessons || [];
+      const completedLessons = lessons.filter((l) => l.completed).length;
+      const totalLessons = lessons.length;
+      const progressPercent = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
+      
+      // Determine current active lesson
+      const currentLesson = lessons.find((l) => l.id === activeLessonId) || lessons[0] || null;
+      const youtubeId = currentLesson ? getYouTubeId(currentLesson.videoUrl) : null;
+
+      return (
+        <div>
+          {/* Workspace Header */}
+          <div className="classroom-header">
+            <div className="classroom-title-area">
+              <button 
+                className="btn secondary" 
+                style={{ alignSelf: "flex-start", marginBottom: "8px", padding: "6px 12px", display: "flex", alignItems: "center", gap: "6px" }}
+                onClick={() => setSearchParams({})}
+              >
+                ← Back to My Learning
+              </button>
+              <h1 style={{ margin: 0, fontSize: "24px" }}>{course.title}</h1>
+            </div>
+            
+            <div style={{ display: "flex", alignItems: "center", gap: "16px", minWidth: "260px" }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ height: "6px", background: "#e2e8f0", borderRadius: "99px", overflow: "hidden", marginBottom: "4px" }}>
+                  <div style={{ width: `${progressPercent}%`, height: "100%", background: "var(--success)", transition: "width 0.4s ease" }}></div>
+                </div>
+                <span style={{ fontSize: "12px", color: "var(--text-muted)", fontWeight: "600" }}>
+                  {progressPercent}% Complete ({completedLessons}/{totalLessons} lessons)
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {message && <p className="success" style={{ marginBottom: "24px" }}>{message}</p>}
+
+          {lessons.length === 0 ? (
+            <div className="card" style={{ textAlign: "center", padding: "48px 24px" }}>
+              <p style={{ color: "var(--text-muted)", fontStyle: "italic" }}>No lessons are available for this course.</p>
+            </div>
+          ) : (
+            <div className="classroom-layout">
+              {/* Left Column: Video and lesson detail */}
+              <div>
+                {currentLesson ? (
+                  <div className="classroom-main">
+                    {youtubeId ? (
+                      <div className="video-container">
+                        <iframe
+                          src={`https://www.youtube.com/embed/${youtubeId}?autoplay=0&rel=0`}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          title={currentLesson.title}
+                        ></iframe>
+                      </div>
+                    ) : currentLesson.videoUrl ? (
+                      <div style={{ background: "#f1f5f9", padding: "24px", borderRadius: "var(--radius-md)", marginBottom: "24px", textAlign: "center" }}>
+                        <p style={{ marginBottom: "12px", color: "var(--text-muted)" }}>This lesson contains an external video link:</p>
+                        <a href={currentLesson.videoUrl} target="_blank" rel="noopener noreferrer" className="btn" style={{ display: "inline-flex" }}>
+                          Watch Video on YouTube
+                        </a>
+                      </div>
+                    ) : null}
+
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "16px", marginBottom: "20px", flexWrap: "wrap" }}>
+                      <h2 style={{ margin: 0, fontSize: "22px", fontWeight: "800" }}>
+                        {currentLesson.order}. {currentLesson.title}
+                      </h2>
+                      
+                      <div>
+                        {currentLesson.completed ? (
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                            <span className="badge success" style={{ padding: "8px 16px" }}>✓ Completed</span>
+                            <button 
+                              className="btn secondary" 
+                              style={{ borderColor: "var(--danger)", color: "var(--danger)", padding: "8px 16px" }}
+                              onClick={() => toggleLessonCompletion(course.id, currentLesson.id, true)}
+                            >
+                              Mark Incomplete
+                            </button>
+                          </div>
+                        ) : (
+                          <button 
+                            className="btn" 
+                            style={{ background: "var(--success)", padding: "8px 16px" }}
+                            onClick={() => toggleLessonCompletion(course.id, currentLesson.id, false)}
+                          >
+                            ✓ Complete Lesson
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="divider" style={{ margin: "16px 0" }}></div>
+
+                    <h3 style={{ fontSize: "16px", marginBottom: "8px", color: "var(--text-main)" }}>Lesson Content</h3>
+                    <p style={{ whiteSpace: "pre-wrap", color: "var(--text-muted)", fontSize: "15px", lineHeight: "1.7", marginBottom: "24px" }}>
+                      {currentLesson.content}
+                    </p>
+
+                    {currentLesson.resourceUrl && (
+                      <div className="resource-box">
+                        <div className="resource-box-info">
+                          <svg style={{ width: "24px", height: "24px", color: "var(--primary)" }} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                          <div>
+                            <strong style={{ display: "block", fontSize: "14px" }}>Learning Resources</strong>
+                            <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>Download additional materials for this lesson</span>
+                          </div>
+                        </div>
+                        <a href={currentLesson.resourceUrl} target="_blank" rel="noopener noreferrer" className="btn secondary" style={{ fontSize: "12px", padding: "8px 16px" }}>
+                          Download Resource
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="card" style={{ padding: "48px", textAlign: "center", color: "var(--text-muted)" }}>
+                    <p>Select a lesson from the syllabus to start learning!</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Right Column: Syllabus Sidebar */}
+              <div className="classroom-sidebar">
+                <h3 style={{ margin: 0 }}>Course Syllabus</h3>
+                <div style={{ maxHeight: "60vh", overflowY: "auto", marginTop: "16px" }}>
+                  {lessons.map((lesson) => {
+                    const isActive = lesson.id === activeLessonId || (!activeLessonId && lesson.id === currentLesson?.id);
+                    return (
+                      <div 
+                        key={lesson.id} 
+                        className={`workspace-lesson-row ${isActive ? "active" : ""}`}
+                        onClick={() => setSearchParams({ courseId: activeCourseId, lessonId: lesson.id })}
+                      >
+                        <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1, minWidth: 0 }}>
+                          {lesson.completed ? (
+                            <svg style={{ width: "16px", height: "16px", color: "var(--success)", flexShrink: 0 }} fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                          ) : (
+                            <div style={{ width: "16px", height: "16px", border: "2px solid #cbd5e1", borderRadius: "50%", flexShrink: 0 }}></div>
+                          )}
+                          <span style={{ 
+                            fontSize: "13px", 
+                            fontWeight: "500", 
+                            whiteSpace: "nowrap", 
+                            overflow: "hidden", 
+                            textOverflow: "ellipsis",
+                            textDecoration: lesson.completed ? "line-through" : "none",
+                            color: isActive ? "var(--primary-dark)" : (lesson.completed ? "var(--text-muted)" : "var(--text-main)")
+                          }}>
+                            {lesson.order}. {lesson.title}
+                          </span>
+                        </div>
+                        
+                        {lesson.isPreview && (
+                          <span className="badge success" style={{ fontSize: "9px", padding: "2px 6px", marginLeft: "8px" }}>Free</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+  }
+
+  // -------------------------------------------------------------
+  // DASHBOARD LIST VIEW (STANDARD VIEW)
+  // -------------------------------------------------------------
   return (
     <div>
       <h1 style={{ marginBottom: "24px" }}>My Learning</h1>
@@ -92,7 +288,21 @@ export default function MyCourses() {
                     style={{ width: "160px", height: "100px", objectFit: "cover", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)" }}
                   />
                   <div style={{ flex: 1, minWidth: "250px" }}>
-                    <h2 style={{ margin: "0 0 8px 0", fontSize: "22px", fontWeight: "800" }}>{item.course.title}</h2>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "12px", marginBottom: "8px" }}>
+                      <h2 style={{ margin: 0, fontSize: "22px", fontWeight: "800" }}>{item.course.title}</h2>
+                      
+                      <button 
+                        className="btn" 
+                        style={{ padding: "8px 16px", fontSize: "13px" }}
+                        onClick={() => {
+                          const firstUncompleted = lessons.find((l) => !l.completed) || lessons[0];
+                          setSearchParams({ courseId: item.course.id, lessonId: firstUncompleted?.id || "" });
+                        }}
+                      >
+                        Resume Course
+                      </button>
+                    </div>
+                    
                     <p style={{ fontSize: "14px", color: "var(--text-muted)", marginBottom: "16px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
                       {item.course.description}
                     </p>
@@ -113,7 +323,7 @@ export default function MyCourses() {
                 </div>
 
                 <h3 style={{ fontSize: "16px", marginBottom: "12px", borderBottom: "1px solid var(--border-color)", paddingBottom: "8px", color: "var(--text-main)" }}>
-                  Course Syllabus
+                  Course Syllabus (Click to study a lesson)
                 </h3>
 
                 <div className="lesson-list">
@@ -124,13 +334,18 @@ export default function MyCourses() {
                       <div 
                         className="row syllabus-row" 
                         key={lesson.id} 
+                        onClick={() => {
+                          setSearchParams({ courseId: item.course.id, lessonId: lesson.id });
+                        }}
                         style={{ 
                           justifyContent: "space-between", 
                           padding: "12px 16px", 
                           background: lesson.completed ? "#f8fafc" : "white", 
                           border: "1px solid var(--border-color)", 
                           borderRadius: "var(--radius-md)",
-                          opacity: lesson.completed ? 0.75 : 1
+                          opacity: lesson.completed ? 0.85 : 1,
+                          cursor: "pointer",
+                          transition: "var(--transition-smooth)"
                         }}
                       >
                         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
@@ -146,27 +361,29 @@ export default function MyCourses() {
                           </span>
                         </div>
                         
-                        {lesson.completed ? (
-                          <div className="action-btn-wrapper" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                            <span className="badge success" style={{ fontSize: "11px" }}>Completed</span>
+                        <div className="action-btn-wrapper" style={{ display: "flex", alignItems: "center", gap: "8px" }} onClick={(e) => e.stopPropagation()}>
+                          {lesson.completed ? (
+                            <>
+                              <span className="badge success" style={{ fontSize: "11px" }}>Completed</span>
+                              <button 
+                                className="btn secondary" 
+                                style={{ padding: "6px 12px", fontSize: "12px", borderColor: "var(--danger)", color: "var(--danger)", background: "transparent" }} 
+                                onClick={() => toggleLessonCompletion(item.course.id, lesson.id, true)}
+                                title="Mark this lesson as incomplete"
+                              >
+                                Reset
+                              </button>
+                            </>
+                          ) : (
                             <button 
                               className="btn secondary" 
-                              style={{ padding: "6px 12px", fontSize: "12px", borderColor: "var(--danger)", color: "var(--danger)", background: "transparent" }} 
-                              onClick={() => toggleLessonCompletion(item.course.id, lesson.id, true)}
-                              title="Mark this lesson as incomplete"
+                              style={{ padding: "6px 12px", fontSize: "12px" }} 
+                              onClick={() => toggleLessonCompletion(item.course.id, lesson.id, false)}
                             >
-                              Reset
+                              Mark as Complete
                             </button>
-                          </div>
-                        ) : (
-                          <button 
-                            className="btn secondary action-btn-wrapper" 
-                            style={{ padding: "6px 12px", fontSize: "12px" }} 
-                            onClick={() => toggleLessonCompletion(item.course.id, lesson.id, false)}
-                          >
-                            Mark as Complete
-                          </button>
-                        )}
+                          )}
+                        </div>
                       </div>
                     ))
                   )}
