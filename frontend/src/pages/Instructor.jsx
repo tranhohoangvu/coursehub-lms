@@ -10,7 +10,7 @@ export default function Instructor() {
     status: "PUBLISHED",
   });
   const [createdCourse, setCreatedCourse] = useState(null);
-  const [lesson, setLesson] = useState({ title: "", content: "", order: 1, isPreview: false });
+  const [lesson, setLesson] = useState({ title: "", content: "", order: 1, isPreview: false, videoUrl: "", resourceUrl: "" });
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
@@ -43,7 +43,7 @@ export default function Instructor() {
       const data = await api(`/courses/${createdCourse.id}/lessons`, { method: "POST", body: JSON.stringify(lesson) });
       setMessage(`Lesson "${data.title}" added successfully!`);
       setTimeout(() => setMessage(""), 5000);
-      setLesson({ title: "", content: "", order: lesson.order + 1, isPreview: false });
+      setLesson({ title: "", content: "", order: lesson.order + 1, isPreview: false, videoUrl: "", resourceUrl: "" });
     } catch (err) {
       setError(err.message);
     }
@@ -68,37 +68,37 @@ export default function Instructor() {
           <form className="form" onSubmit={createCourse}>
             <div className="form-group">
               <label className="form-label">Course Title</label>
-              <input 
-                className="input" 
-                required 
-                placeholder="e.g. Master React in 30 Days" 
-                value={course.title} 
-                onChange={(e) => setCourseField("title", e.target.value)} 
+              <input
+                className="input"
+                required
+                placeholder="e.g. Master React in 30 Days"
+                value={course.title}
+                onChange={(e) => setCourseField("title", e.target.value)}
               />
             </div>
-            
+
             <div className="form-group">
               <label className="form-label">Description</label>
-              <textarea 
-                className="input" 
-                required 
-                placeholder="Write a concise overview of what students will learn..." 
-                value={course.description} 
-                onChange={(e) => setCourseField("description", e.target.value)} 
+              <textarea
+                className="input"
+                required
+                placeholder="Write a concise overview of what students will learn..."
+                value={course.description}
+                onChange={(e) => setCourseField("description", e.target.value)}
               />
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
               <div className="form-group">
                 <label className="form-label">Price (VND)</label>
-                <input 
-                  className="input" 
-                  type="number" 
-                  required 
+                <input
+                  className="input"
+                  type="number"
+                  required
                   min={0}
-                  placeholder="Price" 
-                  value={course.price} 
-                  onChange={(e) => setCourseField("price", Number(e.target.value))} 
+                  placeholder="Price"
+                  value={course.price}
+                  onChange={(e) => setCourseField("price", Number(e.target.value))}
                 />
               </div>
               <div className="form-group">
@@ -112,11 +112,11 @@ export default function Instructor() {
 
             <div className="form-group">
               <label className="form-label">Thumbnail Image URL</label>
-              <input 
-                className="input" 
-                placeholder="https://image-host.com/my-thumbnail.png" 
-                value={course.thumbnailUrl} 
-                onChange={(e) => setCourseField("thumbnailUrl", e.target.value)} 
+              <input
+                className="input"
+                placeholder="https://image-host.com/my-thumbnail.png"
+                value={course.thumbnailUrl}
+                onChange={(e) => setCourseField("thumbnailUrl", e.target.value)}
               />
             </div>
 
@@ -145,44 +145,64 @@ export default function Instructor() {
           <form className="form" onSubmit={createLesson} style={{ opacity: createdCourse ? 1 : 0.6, pointerEvents: createdCourse ? "auto" : "none" }}>
             <div className="form-group">
               <label className="form-label">Lesson Title</label>
-              <input 
-                className="input" 
-                required 
-                placeholder="e.g. Introduction to React components" 
-                value={lesson.title} 
-                onChange={(e) => setLessonField("title", e.target.value)} 
+              <input
+                className="input"
+                required
+                placeholder="e.g. Introduction to React components"
+                value={lesson.title}
+                onChange={(e) => setLessonField("title", e.target.value)}
               />
             </div>
 
             <div className="form-group">
               <label className="form-label">Lesson Content / URL</label>
-              <textarea 
-                className="input" 
-                required 
-                placeholder="Enter description, text content, or video streaming links for this lesson..." 
-                value={lesson.content} 
-                onChange={(e) => setLessonField("content", e.target.value)} 
+              <textarea
+                className="input"
+                required
+                placeholder="Enter description, text content, or video streaming links for this lesson..."
+                value={lesson.content}
+                onChange={(e) => setLessonField("content", e.target.value)}
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">YouTube Video Link (Optional)</label>
+              <input
+                className="input"
+                placeholder="e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                value={lesson.videoUrl || ""}
+                onChange={(e) => setLessonField("videoUrl", e.target.value)}
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Resource Attachment Link (Optional)</label>
+              <input
+                className="input"
+                placeholder="e.g. https://resource-host.com/slides.pdf"
+                value={lesson.resourceUrl || ""}
+                onChange={(e) => setLessonField("resourceUrl", e.target.value)}
               />
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", alignItems: "center" }}>
               <div className="form-group">
                 <label className="form-label">Lesson Order</label>
-                <input 
-                  className="input" 
-                  type="number" 
+                <input
+                  className="input"
+                  type="number"
                   min={1}
-                  required 
-                  value={lesson.order} 
-                  onChange={(e) => setLessonField("order", Number(e.target.value))} 
+                  required
+                  value={lesson.order}
+                  onChange={(e) => setLessonField("order", Number(e.target.value))}
                 />
               </div>
               <label className="row" style={{ marginTop: "20px", cursor: "pointer", fontSize: "14px", fontWeight: "600" }}>
-                <input 
-                  type="checkbox" 
-                  style={{ width: "18px", height: "18px", accentColor: "var(--primary)" }} 
-                  checked={lesson.isPreview} 
-                  onChange={(e) => setLessonField("isPreview", e.target.checked)} 
+                <input
+                  type="checkbox"
+                  style={{ width: "18px", height: "18px", accentColor: "var(--primary)" }}
+                  checked={lesson.isPreview}
+                  onChange={(e) => setLessonField("isPreview", e.target.checked)}
                 />
                 Preview Lesson
               </label>
