@@ -35,6 +35,8 @@ CREATE TABLE IF NOT EXISTS lessons (
   content TEXT NOT NULL,
   lesson_order INTEGER NOT NULL DEFAULT 1,
   is_preview BOOLEAN NOT NULL DEFAULT false,
+  video_url TEXT,
+  resource_url TEXT,
   course_id UUID NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
