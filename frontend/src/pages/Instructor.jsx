@@ -1,18 +1,38 @@
 import { useState } from "react";
 import { api } from "../api/client.js";
+import {
+  GraduationCap,
+  BookPlus,
+  ListPlus,
+  Sparkles,
+  CheckCircle2,
+  Video,
+  FileText,
+  DollarSign,
+  Eye,
+  Plus
+} from "lucide-react";
 
 export default function Instructor() {
   const [course, setCourse] = useState({
     title: "",
     description: "",
     price: 0,
-    thumbnailUrl: "https://placehold.co/600x400?text=Course",
+    thumbnailUrl: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&auto=format&fit=crop&q=80",
     status: "PUBLISHED",
   });
   const [createdCourse, setCreatedCourse] = useState(null);
-  const [lesson, setLesson] = useState({ title: "", content: "", order: 1, isPreview: false, videoUrl: "", resourceUrl: "" });
+  const [lesson, setLesson] = useState({
+    title: "",
+    content: "",
+    order: 1,
+    isPreview: false,
+    videoUrl: "",
+    resourceUrl: ""
+  });
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   function setCourseField(name, value) {
     setCourse((prev) => ({ ...prev, [name]: value }));
@@ -25,64 +45,88 @@ export default function Instructor() {
   async function createCourse(e) {
     e.preventDefault();
     try {
+      setIsSubmitting(true);
       setError("");
       const data = await api("/courses", { method: "POST", body: JSON.stringify(course) });
       setCreatedCourse(data);
-      setMessage("Course created successfully!");
-      setTimeout(() => setMessage(""), 5000);
+      setMessage(`Course "${data.title}" created successfully! Now add lessons to build your curriculum.`);
+      setTimeout(() => setMessage(""), 6000);
     } catch (err) {
       setError(err.message);
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
   async function createLesson(e) {
     e.preventDefault();
-    if (!createdCourse) return setError("Create a course first");
+    if (!createdCourse) return setError("Please create and submit a course first.");
     try {
+      setIsSubmitting(true);
       setError("");
       const data = await api(`/courses/${createdCourse.id}/lessons`, { method: "POST", body: JSON.stringify(lesson) });
-      setMessage(`Lesson "${data.title}" added successfully!`);
+      setMessage(`Lesson "${data.title}" added to curriculum successfully!`);
       setTimeout(() => setMessage(""), 5000);
       setLesson({ title: "", content: "", order: lesson.order + 1, isPreview: false, videoUrl: "", resourceUrl: "" });
     } catch (err) {
       setError(err.message);
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
   return (
     <div>
-      <h1 style={{ marginBottom: "8px" }}>Instructor Dashboard</h1>
-      <p style={{ color: "var(--text-muted)", marginBottom: "32px" }}>
-        Design high-quality educational experiences. Manage your course curriculum and lessons in one dashboard.
-      </p>
+      {/* Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "16px", marginBottom: "32px" }}>
+        <div>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "6px" }}>
+            <div style={{ width: "36px", height: "36px", borderRadius: "var(--radius-sm)", background: "var(--primary-light)", color: "var(--primary)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <GraduationCap size={20} />
+            </div>
+            <h1 style={{ margin: 0, fontSize: "28px", fontWeight: "800", letterSpacing: "-0.6px" }}>
+              Instructor Teaching Studio
+            </h1>
+          </div>
+          <p style={{ margin: 0, fontSize: "14px", color: "var(--text-muted)" }}>
+            Publish interactive developer courses, build video curriculum, and share resources with students worldwide.
+          </p>
+        </div>
+      </div>
 
-      {message && <p className="success" style={{ marginBottom: "24px" }}>{message}</p>}
-      {error && <p className="error" style={{ marginBottom: "24px" }}>{error}</p>}
+      {message && <div className="success" style={{ marginBottom: "24px" }}>{message}</div>}
+      {error && <div className="error" style={{ marginBottom: "24px" }}>{error}</div>}
 
-      <div className="grid" style={{ alignItems: "start" }}>
-        {/* Create Course Form Card */}
+      <div className="grid" style={{ alignItems: "start", gap: "32px" }}>
+        {/* Step 1: Create Course Details Form Card */}
         <div className="card">
-          <h2 style={{ fontSize: "20px", fontWeight: "700", marginTop: 0, marginBottom: "20px", color: "var(--text-main)" }}>
-            1. Create Course Details
-          </h2>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "20px", paddingBottom: "14px", borderBottom: "1px solid var(--border-color)" }}>
+            <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: "linear-gradient(135deg, #4f46e5 0%, #8b5cf6 100%)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", fontWeight: "800" }}>
+              1
+            </div>
+            <h2 style={{ fontSize: "18px", fontWeight: "800", margin: 0, color: "var(--text-main)" }}>
+              Create Course Metadata
+            </h2>
+          </div>
+
           <form className="form" onSubmit={createCourse}>
             <div className="form-group">
               <label className="form-label">Course Title</label>
               <input
                 className="input"
                 required
-                placeholder="e.g. Master React in 30 Days"
+                placeholder="e.g. Master Full-Stack PostgreSQL & Node.js"
                 value={course.title}
                 onChange={(e) => setCourseField("title", e.target.value)}
               />
             </div>
 
             <div className="form-group">
-              <label className="form-label">Description</label>
+              <label className="form-label">Description & Syllabus Overview</label>
               <textarea
                 className="input"
                 required
-                placeholder="Write a concise overview of what students will learn..."
+                placeholder="Describe what key developer capabilities and projects students will build..."
                 value={course.description}
                 onChange={(e) => setCourseField("description", e.target.value)}
               />
@@ -90,22 +134,23 @@ export default function Instructor() {
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
               <div className="form-group">
-                <label className="form-label">Price (VND)</label>
+                <label className="form-label">Tuition Price (VND)</label>
                 <input
                   className="input"
                   type="number"
                   required
                   min={0}
-                  placeholder="Price"
+                  placeholder="0 for Free"
                   value={course.price}
                   onChange={(e) => setCourseField("price", Number(e.target.value))}
                 />
               </div>
+
               <div className="form-group">
-                <label className="form-label">Status</label>
+                <label className="form-label">Publishing Status</label>
                 <select className="input" value={course.status} onChange={(e) => setCourseField("status", e.target.value)}>
-                  <option value="DRAFT">Draft</option>
-                  <option value="PUBLISHED">Published</option>
+                  <option value="DRAFT">Draft Mode</option>
+                  <option value="PUBLISHED">Published Live</option>
                 </select>
               </div>
             </div>
@@ -114,31 +159,37 @@ export default function Instructor() {
               <label className="form-label">Thumbnail Image URL</label>
               <input
                 className="input"
-                placeholder="https://image-host.com/my-thumbnail.png"
+                placeholder="https://images.unsplash.com/photo-..."
                 value={course.thumbnailUrl}
                 onChange={(e) => setCourseField("thumbnailUrl", e.target.value)}
               />
             </div>
 
-            <button className="btn" style={{ marginTop: "10px", height: "46px" }}>
-              Create Course
+            <button className="btn btn-glow" style={{ marginTop: "12px", height: "46px" }} disabled={isSubmitting}>
+              <BookPlus size={16} /> {isSubmitting ? "Creating Course..." : "Create Course"}
             </button>
           </form>
         </div>
 
-        {/* Add Lesson Form Card */}
+        {/* Step 2: Add Syllabus Lessons Card */}
         <div className="card">
-          <h2 style={{ fontSize: "20px", fontWeight: "700", marginTop: 0, marginBottom: "20px", color: "var(--text-main)" }}>
-            2. Add Syllabus Lessons
-          </h2>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "20px", paddingBottom: "14px", borderBottom: "1px solid var(--border-color)" }}>
+            <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: createdCourse ? "#10b981" : "#94a3b8", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", fontWeight: "800" }}>
+              2
+            </div>
+            <h2 style={{ fontSize: "18px", fontWeight: "800", margin: 0, color: "var(--text-main)" }}>
+              Add Curriculum Lessons
+            </h2>
+          </div>
 
           {createdCourse ? (
-            <div style={{ background: "var(--primary-light)", color: "var(--primary-dark)", padding: "12px 16px", borderRadius: "var(--radius-md)", fontSize: "14px", marginBottom: "20px", fontWeight: "500" }}>
-              Adding lessons to: <strong>{createdCourse.title}</strong>
+            <div style={{ background: "var(--primary-light)", color: "var(--primary-dark)", padding: "12px 16px", borderRadius: "var(--radius-md)", fontSize: "13.5px", marginBottom: "20px", fontWeight: "600", display: "flex", alignItems: "center", gap: "8px" }}>
+              <CheckCircle2 size={16} style={{ color: "var(--primary)" }} />
+              <span>Target Course: <strong>{createdCourse.title}</strong></span>
             </div>
           ) : (
-            <div style={{ background: "#f1f5f9", color: "var(--text-muted)", padding: "16px", borderRadius: "var(--radius-md)", fontSize: "14px", marginBottom: "20px", textAlign: "center" }}>
-              Please fill out and submit the course creation form on the left first to start building lessons.
+            <div style={{ background: "#f8fafc", border: "1px dashed var(--border-color)", color: "var(--text-muted)", padding: "16px", borderRadius: "var(--radius-md)", fontSize: "13px", marginBottom: "20px", textAlign: "center" }}>
+              Submit course details on the left first to enable the lesson builder.
             </div>
           )}
 
@@ -148,38 +199,38 @@ export default function Instructor() {
               <input
                 className="input"
                 required
-                placeholder="e.g. Introduction to React components"
+                placeholder="e.g. 1. Architecture Overview & Setup"
                 value={lesson.title}
                 onChange={(e) => setLessonField("title", e.target.value)}
               />
             </div>
 
             <div className="form-group">
-              <label className="form-label">Lesson Content / URL</label>
+              <label className="form-label">Lesson Content / Notes</label>
               <textarea
                 className="input"
                 required
-                placeholder="Enter description, text content, or video streaming links for this lesson..."
+                placeholder="Detailed explanations, code snippets, or instructions..."
                 value={lesson.content}
                 onChange={(e) => setLessonField("content", e.target.value)}
               />
             </div>
 
             <div className="form-group">
-              <label className="form-label">YouTube Video Link (Optional)</label>
+              <label className="form-label">YouTube Video URL (Optional)</label>
               <input
                 className="input"
-                placeholder="e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                placeholder="https://www.youtube.com/watch?v=..."
                 value={lesson.videoUrl || ""}
                 onChange={(e) => setLessonField("videoUrl", e.target.value)}
               />
             </div>
 
             <div className="form-group">
-              <label className="form-label">Resource Attachment Link (Optional)</label>
+              <label className="form-label">Resource Link (Optional)</label>
               <input
                 className="input"
-                placeholder="e.g. https://resource-host.com/slides.pdf"
+                placeholder="https://github.com/... or slide deck link"
                 value={lesson.resourceUrl || ""}
                 onChange={(e) => setLessonField("resourceUrl", e.target.value)}
               />
@@ -187,7 +238,7 @@ export default function Instructor() {
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", alignItems: "center" }}>
               <div className="form-group">
-                <label className="form-label">Lesson Order</label>
+                <label className="form-label">Lesson Order Index</label>
                 <input
                   className="input"
                   type="number"
@@ -197,19 +248,20 @@ export default function Instructor() {
                   onChange={(e) => setLessonField("order", Number(e.target.value))}
                 />
               </div>
-              <label className="row" style={{ marginTop: "20px", cursor: "pointer", fontSize: "14px", fontWeight: "600" }}>
+
+              <label style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "22px", cursor: "pointer", fontSize: "13.5px", fontWeight: "600" }}>
                 <input
                   type="checkbox"
                   style={{ width: "18px", height: "18px", accentColor: "var(--primary)" }}
                   checked={lesson.isPreview}
                   onChange={(e) => setLessonField("isPreview", e.target.checked)}
                 />
-                Preview Lesson
+                Free Preview Lesson
               </label>
             </div>
 
-            <button className="btn secondary" style={{ marginTop: "10px", height: "46px", borderColor: "var(--primary)", color: "var(--primary)" }}>
-              + Add Lesson to Curriculum
+            <button className="btn success" style={{ marginTop: "12px", height: "46px" }} disabled={isSubmitting}>
+              <Plus size={16} /> Add Lesson to Syllabus
             </button>
           </form>
         </div>
