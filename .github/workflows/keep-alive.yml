@@ -1,0 +1,23 @@
+name: Keep Database & Server Alive
+
+on:
+  schedule:
+    # Runs every day at 00:00 UTC (07:00 AM VN time)
+    - cron: '0 0 * * *'
+  workflow_dispatch: # Allows manual trigger via GitHub Actions UI
+
+jobs:
+  ping:
+    name: Ping Backend API
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping CourseHub API (Query Database)
+        run: |
+          echo "Pinging CourseHub Backend API..."
+          STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://coursehub-lms.onrender.com/api/courses)
+          echo "Response HTTP Status: $STATUS_CODE"
+          if [ "$STATUS_CODE" -ge 200 ] && [ "$STATUS_CODE" -lt 400 ]; then
+            echo "Ping successful! Database and backend are active."
+          else
+            echo "Warning: Received HTTP status $STATUS_CODE"
+          fi
