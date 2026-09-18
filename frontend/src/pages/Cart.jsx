@@ -1,56 +1,72 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../api/client.js";
+import { useCart } from "../context/CartContext.jsx";
+import { useToast } from "../context/ToastContext.jsx";
 import {
   ShoppingCart,
   Trash2,
   ArrowRight,
-  ShieldCheck,
   Tag,
   CheckCircle2,
   Sparkles,
   Lock,
-  ArrowLeft,
   CreditCard
 } from "lucide-react";
 
 export default function Cart() {
+  const { refreshCartCount } = useCart();
+  const { showToast } = useToast();
   const [cart, setCart] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+  const [removingId, setRemovingId] = useState(null);
   const [couponCode, setCouponCode] = useState("");
   const [discountPercent, setDiscountPercent] = useState(0);
   const [couponAppliedMsg, setCouponAppliedMsg] = useState("");
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   async function loadCart() {
-    const data = await api("/cart");
-    setCart(data);
+    try {
+      setLoading(true);
+      const data = await api("/cart");
+      setCart(data);
+    } catch (err) {
+      showToast(err.message, "error");
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
-    loadCart().catch((err) => setError(err.message));
+    loadCart();
   }, []);
 
   async function removeItem(courseId) {
     try {
+      setRemovingId(courseId);
+      // Wait for animation to play before actually removing
+      await new Promise((resolve) => setTimeout(resolve, 280));
       await api(`/cart/items/${courseId}`, { method: "DELETE" });
+      await refreshCartCount();
       loadCart();
     } catch (err) {
-      setError(err.message);
+      showToast(err.message, "error");
+    } finally {
+      setRemovingId(null);
     }
   }
 
   async function checkout() {
     try {
       setIsCheckingOut(true);
-      setError("");
       setMessage("");
       const order = await api("/orders/checkout", { method: "POST" });
       setMessage(`Payment and enrollment successful! Order Reference #${order.id}`);
+      await refreshCartCount();
       loadCart();
     } catch (err) {
-      setError(err.message);
+      showToast(err.message, "error");
     } finally {
       setIsCheckingOut(false);
     }
@@ -67,26 +83,42 @@ export default function Cart() {
     }
   }
 
-  if (!cart) {
+  if (loading) {
     return (
-      <div style={{ textAlign: "center", padding: "100px 24px", color: "var(--text-muted)" }}>
-        <div
-          style={{
-            display: "inline-block",
-            width: "44px",
-            height: "44px",
-            border: "4px solid var(--border-color)",
-            borderTopColor: "var(--primary)",
-            borderRadius: "50%",
-            animation: "spin 1s linear infinite",
-            marginBottom: "16px"
-          }}
-        ></div>
-        <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
-        <p style={{ fontWeight: "600" }}>Loading your shopping cart...</p>
+      <div>
+        <h1 style={{ margin: "0 0 6px 0", fontSize: "28px", fontWeight: "800", letterSpacing: "-0.6px" }}>Shopping Cart</h1>
+        <p style={{ margin: "0 0 28px 0", fontSize: "14px", color: "var(--text-muted)" }}>Review your selected courses before completing your enrollment.</p>
+        <div className="detail-grid">
+          <div style={{ display: "grid", gap: "16px" }}>
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="card" style={{ display: "flex", gap: "20px", alignItems: "center", padding: "20px" }}>
+                <div className="skeleton" style={{ width: "120px", height: "75px", borderRadius: "var(--radius-sm)", flexShrink: 0 }} />
+                <div style={{ flex: 1, display: "grid", gap: "10px" }}>
+                  <div className="skeleton skeleton-line short" />
+                  <div className="skeleton skeleton-line medium tall" />
+                  <div className="skeleton skeleton-line" style={{ width: "45%" }} />
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px", alignItems: "flex-end" }}>
+                  <div className="skeleton skeleton-line" style={{ width: "80px", height: "20px" }} />
+                  <div className="skeleton skeleton-line" style={{ width: "80px", height: "32px" }} />
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="card skeleton-card" style={{ padding: "28px" }}>
+            <div style={{ display: "grid", gap: "16px" }}>
+              <div className="skeleton skeleton-line tall full" />
+              <div className="skeleton skeleton-line medium" />
+              <div className="skeleton skeleton-line full" />
+              <div className="skeleton" style={{ height: "48px", borderRadius: "var(--radius-md)" }} />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
+
+  if (!cart) return null;
 
   const rawTotal = cart.items.reduce((sum, item) => sum + Number(item.course.price || 0), 0);
   const discountAmount = Math.round((rawTotal * discountPercent) / 100);
@@ -104,7 +136,7 @@ export default function Cart() {
         </p>
       </div>
 
-      {error && <div className="error" style={{ marginBottom: "24px" }}>{error}</div>}
+
       {message && (
         <div
           style={{
@@ -168,7 +200,7 @@ export default function Cart() {
 
               return (
                 <div
-                  className="card cart-item-card"
+                  className={`card cart-item-card ${removingId === item.courseId ? "cart-item-removing" : ""}`}
                   key={item.id}
                   style={{
                     display: "flex",
