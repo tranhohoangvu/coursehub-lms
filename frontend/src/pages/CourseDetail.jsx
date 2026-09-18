@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { api } from "../api/client.js";
 import { useAuth } from "../context/AuthContext.jsx";
+import { useCart } from "../context/CartContext.jsx";
+import { useToast } from "../context/ToastContext.jsx";
 import {
   Star,
   ShoppingCart,
@@ -16,37 +18,61 @@ import {
   Sparkles,
   Send,
   MessageSquare,
-  Flame
+  GraduationCap
 } from "lucide-react";
+
+function getYouTubeId(url) {
+  if (!url) return null;
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  return match && match[2].length === 11 ? match[2] : null;
+}
 
 export default function CourseDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { user } = useAuth();
+  const { refreshCartCount } = useCart();
+  const { showToast } = useToast();
   const [course, setCourse] = useState(null);
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+  const [isEnrolled, setIsEnrolled] = useState(false);
   const [review, setReview] = useState({ rating: 5, comment: "" });
   const [hoverRating, setHoverRating] = useState(0);
   const [addingToCart, setAddingToCart] = useState(false);
+  const [previewLesson, setPreviewLesson] = useState(null);
 
   async function loadCourse() {
     const data = await api(`/courses/${id}`);
     setCourse(data);
   }
 
+  async function checkEnrollment() {
+    if (!user) return;
+    try {
+      const mine = await api("/courses/mine");
+      const found = mine.some((item) => item.course?.id === id || item.course?.id === String(id));
+      setIsEnrolled(found);
+    } catch {
+      setIsEnrolled(false);
+    }
+  }
+
   useEffect(() => {
-    loadCourse().catch((err) => setError(err.message));
+    loadCourse().catch((err) => showToast(err.message, "error"));
   }, [id]);
+
+  useEffect(() => {
+    checkEnrollment();
+  }, [user, id]);
 
   async function addToCart() {
     try {
       setAddingToCart(true);
-      setMessage("");
-      setError("");
       await api("/cart/items", { method: "POST", body: JSON.stringify({ courseId: id }) });
-      setMessage("Course added to your cart successfully!");
+      await refreshCartCount();
+      showToast("Course added to your cart!", "success");
     } catch (err) {
-      setError(err.message);
+      showToast(err.message, "error");
     } finally {
       setAddingToCart(false);
     }
@@ -56,11 +82,11 @@ export default function CourseDetail() {
     e.preventDefault();
     try {
       await api(`/courses/${id}/reviews`, { method: "POST", body: JSON.stringify(review) });
-      setMessage("Thank you for your feedback! Review submitted.");
+      showToast("Thank you! Review submitted.", "success");
       loadCourse();
       setReview({ rating: 5, comment: "" });
     } catch (err) {
-      setError(err.message);
+      showToast(err.message, "error");
     }
   }
 
@@ -94,35 +120,42 @@ export default function CourseDetail() {
             marginBottom: "16px"
           }}
         ></div>
-        <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
         <p style={{ fontWeight: "600" }}>Loading course details...</p>
       </div>
     );
   }
 
   const isFree = Number(course.price) === 0;
-  const avgRating = course.reviews?.length
-    ? (course.reviews.reduce((sum, r) => sum + r.rating, 0) / course.reviews.length).toFixed(1)
-    : "5.0";
+  // Use real average rating from backend
+  const avgRating = course.averageRating > 0
+    ? course.averageRating.toFixed(1)
+    : (course.reviews?.length
+        ? (course.reviews.reduce((sum, r) => sum + r.rating, 0) / course.reviews.length).toFixed(1)
+        : null);
+
+  const previewLessons = course.lessons?.filter((l) => l.isPreview) || [];
 
   return (
     <div>
       {/* Breadcrumb Back Navigation */}
       <div style={{ marginBottom: "20px" }}>
-        <Link
-          to="/"
+        <button
+          onClick={() => navigate(-1)}
           style={{
             display: "inline-flex",
             alignItems: "center",
             gap: "6px",
             fontSize: "14px",
             fontWeight: "600",
-            color: "var(--text-muted)"
+            color: "var(--text-muted)",
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            padding: 0
           }}
-          className="hover-primary"
         >
-          <ArrowLeft size={16} /> Back to Catalog
-        </Link>
+          <ArrowLeft size={16} /> Back
+        </button>
       </div>
 
       {/* Hero Header Banner */}
@@ -134,6 +167,11 @@ export default function CourseDetail() {
           <span className="badge cyan" style={{ fontSize: "11px" }}>
             <Sparkles size={12} /> Bestseller
           </span>
+          {isEnrolled && (
+            <span className="badge success" style={{ fontSize: "11px" }}>
+              <CheckCircle2 size={12} /> Enrolled
+            </span>
+          )}
         </div>
 
         <h1>{course.title}</h1>
@@ -145,7 +183,7 @@ export default function CourseDetail() {
         <div style={{ display: "flex", alignItems: "center", gap: "24px", flexWrap: "wrap", fontSize: "14px", color: "#e2e8f0" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
             <Star size={16} fill="#fbbf24" style={{ color: "#fbbf24" }} />
-            <strong>{avgRating}</strong>
+            <strong>{avgRating || "New"}</strong>
             <span style={{ color: "#94a3b8" }}>({course.reviews?.length || 0} reviews)</span>
           </div>
 
@@ -198,10 +236,10 @@ export default function CourseDetail() {
           <div style={{ marginBottom: "40px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "16px" }}>
               <h2 style={{ margin: 0, fontSize: "22px", fontWeight: "800" }}>
-                Curriculum & Lessons ({course.lessons?.length || 0})
+                Curriculum &amp; Lessons ({course.lessons?.length || 0})
               </h2>
               <span style={{ fontSize: "13px", color: "var(--text-muted)", fontWeight: "600" }}>
-                Interactive Syllabus
+                {previewLessons.length > 0 ? `${previewLessons.length} Free Previews` : "Interactive Syllabus"}
               </span>
             </div>
 
@@ -212,36 +250,65 @@ export default function CourseDetail() {
                   <p style={{ margin: 0 }}>No lessons published for this course yet.</p>
                 </div>
               ) : (
-                course.lessons.map((lesson) => (
-                  <div key={lesson.id} className="lesson-item-card">
-                    <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-                      <div className="lesson-number-circle">
-                        {lesson.order}
-                      </div>
-                      <div>
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", marginBottom: "2px" }}>
-                          <strong style={{ fontSize: "15px", color: "var(--text-main)" }}>
-                            {lesson.title}
-                          </strong>
-                          {lesson.isPreview && (
-                            <span className="badge success" style={{ fontSize: "10px", padding: "2px 8px" }}>
-                              Free Preview
-                            </span>
+                course.lessons.map((lesson) => {
+                  const youtubeId = getYouTubeId(lesson.videoUrl);
+                  const isPreviewLesson = lesson.isPreview;
+                  const isActive = previewLesson?.id === lesson.id;
+
+                  return (
+                    <div key={lesson.id} className="lesson-item-card">
+                      <div style={{ display: "flex", alignItems: "center", gap: "16px", flex: 1, minWidth: 0 }}>
+                        <div className="lesson-number-circle">
+                          {lesson.order}
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", marginBottom: "2px" }}>
+                            <strong style={{ fontSize: "15px", color: "var(--text-main)" }}>
+                              {lesson.title}
+                            </strong>
+                            {isPreviewLesson && (
+                              <span className="badge success" style={{ fontSize: "10px", padding: "2px 8px" }}>
+                                Free Preview
+                              </span>
+                            )}
+                          </div>
+                          {lesson.content && (
+                            <p style={{ margin: 0, fontSize: "13px", color: "var(--text-muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                              {lesson.content}
+                            </p>
+                          )}
+                          {/* Inline preview player */}
+                          {isPreviewLesson && isActive && youtubeId && (
+                            <div style={{ marginTop: "12px", borderRadius: "var(--radius-md)", overflow: "hidden", aspectRatio: "16/9" }}>
+                              <iframe
+                                src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0`}
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                                title={lesson.title}
+                                style={{ width: "100%", height: "100%", border: 0 }}
+                              />
+                            </div>
                           )}
                         </div>
-                        {lesson.content && (
-                          <p style={{ margin: 0, fontSize: "13px", color: "var(--text-muted)" }}>
-                            {lesson.content}
-                          </p>
+                      </div>
+
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
+                        {isPreviewLesson ? (
+                          <button
+                            className="btn secondary"
+                            style={{ padding: "6px 12px", fontSize: "12px" }}
+                            onClick={() => setPreviewLesson(isActive ? null : lesson)}
+                          >
+                            <PlayCircle size={14} style={{ color: "var(--primary)" }} />
+                            {isActive ? "Close" : "Preview"}
+                          </button>
+                        ) : (
+                          <PlayCircle size={18} style={{ color: "#cbd5e1" }} />
                         )}
                       </div>
                     </div>
-
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "var(--text-muted)", fontSize: "13px" }}>
-                      <PlayCircle size={18} style={{ color: "var(--primary)" }} />
-                    </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </div>
@@ -250,14 +317,14 @@ export default function CourseDetail() {
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "16px" }}>
               <h2 style={{ margin: 0, fontSize: "22px", fontWeight: "800" }}>
-                Student Reviews & Ratings
+                Student Reviews &amp; Ratings
               </h2>
               <span style={{ fontSize: "13px", color: "var(--text-muted)", fontWeight: "600" }}>
                 {course.reviews?.length || 0} Ratings
               </span>
             </div>
 
-            <div className="review-list">
+            <div className="review-list" style={{ display: "grid", gap: "16px" }}>
               {!course.reviews || course.reviews.length === 0 ? (
                 <div className="card" style={{ padding: "32px", textAlign: "center", color: "var(--text-muted)", borderStyle: "dashed" }}>
                   <MessageSquare size={32} style={{ margin: "0 auto 12px auto", color: "#cbd5e1" }} />
@@ -285,8 +352,8 @@ export default function CourseDetail() {
               )}
             </div>
 
-            {/* Write a Review Card */}
-            {user && (
+            {/* Write a Review Card — only show if enrolled */}
+            {user && isEnrolled && (
               <div className="card" style={{ marginTop: "32px", background: "var(--bg-surface)", border: "1px solid var(--border-color)" }}>
                 <h3 style={{ fontSize: "17px", fontWeight: "800", marginBottom: "4px" }}>Leave Your Review</h3>
                 <p style={{ fontSize: "13px", color: "var(--text-muted)", marginBottom: "20px" }}>
@@ -347,6 +414,14 @@ export default function CourseDetail() {
                 </form>
               </div>
             )}
+
+            {/* Prompt to enroll if logged in but not enrolled */}
+            {user && !isEnrolled && (
+              <div style={{ marginTop: "24px", padding: "16px", background: "var(--primary-light)", borderRadius: "var(--radius-md)", fontSize: "13.5px", color: "var(--primary-dark)" }}>
+                <GraduationCap size={16} style={{ display: "inline", marginRight: "6px", verticalAlign: "middle" }} />
+                Enroll in this course to leave a review and access all lessons.
+              </div>
+            )}
           </div>
         </div>
 
@@ -383,12 +458,16 @@ export default function CourseDetail() {
               )}
             </div>
 
-            {/* Notification messages */}
-            {message && <div className="success" style={{ marginBottom: "16px" }}>{message}</div>}
-            {error && <div className="error" style={{ marginBottom: "16px" }}>{error}</div>}
-
             {/* Action buttons */}
-            {user ? (
+            {isEnrolled ? (
+              <Link
+                to={`/my-courses?courseId=${id}`}
+                className="btn success btn-glow"
+                style={{ width: "100%", height: "48px", fontSize: "15px" }}
+              >
+                <PlayCircle size={18} /> Go to Classroom
+              </Link>
+            ) : user ? (
               <div style={{ display: "grid", gap: "10px" }}>
                 <button
                   className="btn btn-glow"
@@ -440,7 +519,7 @@ export default function CourseDetail() {
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                 <BookOpen size={18} style={{ color: "#06b6d4", flexShrink: 0 }} />
-                <span>Access on Mobile, Tablet & Desktop</span>
+                <span>Access on Mobile, Tablet &amp; Desktop</span>
               </div>
             </div>
           </div>
