@@ -1,6 +1,8 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { api } from "../api/client.js";
+import { useAuth } from "../context/AuthContext.jsx";
 import CourseCard from "../components/CourseCard.jsx";
+import SkeletonCard from "../components/SkeletonCard.jsx";
 import {
   Search,
   Sparkles,
@@ -9,23 +11,45 @@ import {
   Zap,
   Star,
   BookOpen,
-  Filter,
   Layers,
   Flame,
   CheckCircle2,
-  Code2,
   ShieldCheck,
-  RotateCcw
+  RotateCcw,
+  SlidersHorizontal,
+  Code2
 } from "lucide-react";
 
+const CATEGORY_ICONS = {
+  All: <Flame size={14} />,
+  "Web Development": <Code2 size={14} />,
+  "Backend": <Layers size={14} />,
+  "Database": <BookOpen size={14} />,
+};
+
 export default function Home() {
+  const { user } = useAuth();
   const [courses, setCourses] = useState([]);
+  const [enrolledIds, setEnrolledIds] = useState([]);
   const [q, setQ] = useState("");
+  const [debouncedQ, setDebouncedQ] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [sortBy, setSortBy] = useState("newest");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const debounceTimer = useRef(null);
 
-  async function loadCourses(search = "") {
+  // Debounced search — fire API after 400ms of no typing
+  useEffect(() => {
+    clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(() => {
+      setDebouncedQ(q);
+    }, 400);
+    return () => clearTimeout(debounceTimer.current);
+  }, [q]);
+
+  // Load courses when debounced query changes
+  const loadCourses = useCallback(async (search = "") => {
     try {
       setLoading(true);
       setError("");
@@ -36,17 +60,22 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
-  }
-
-  useEffect(() => {
-    loadCourses();
   }, []);
 
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      loadCourses(q);
+  useEffect(() => {
+    loadCourses(debouncedQ);
+  }, [debouncedQ, loadCourses]);
+
+  // Load enrolled course IDs for the logged-in user
+  useEffect(() => {
+    if (!user) {
+      setEnrolledIds([]);
+      return;
     }
-  };
+    api("/courses/mine")
+      .then((data) => setEnrolledIds(data.map((item) => item.course?.id).filter(Boolean)))
+      .catch(() => setEnrolledIds([]));
+  }, [user]);
 
   // Derive unique categories dynamically from loaded courses
   const categories = useMemo(() => {
@@ -60,11 +89,40 @@ export default function Home() {
     return list;
   }, [courses]);
 
-  // Filter courses by category selection
+  // Filter and sort courses
   const filteredCourses = useMemo(() => {
-    if (selectedCategory === "All") return courses;
-    return courses.filter((c) => c.category?.name === selectedCategory);
-  }, [courses, selectedCategory]);
+    let result = selectedCategory === "All"
+      ? courses
+      : courses.filter((c) => c.category?.name === selectedCategory);
+
+    switch (sortBy) {
+      case "price-asc":
+        result = [...result].sort((a, b) => Number(a.price) - Number(b.price));
+        break;
+      case "price-desc":
+        result = [...result].sort((a, b) => Number(b.price) - Number(a.price));
+        break;
+      case "rating":
+        result = [...result].sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0));
+        break;
+      case "newest":
+      default:
+        result = [...result].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        break;
+    }
+    return result;
+  }, [courses, selectedCategory, sortBy]);
+
+  // Real stats from loaded data
+  const totalEnrollments = courses.reduce((sum, c) => sum + (c.enrollmentCount || 0), 0);
+  const totalReviews = courses.reduce((sum, c) => sum + (c.reviewCount || 0), 0);
+
+  const handleReset = () => {
+    setQ("");
+    setSelectedCategory("All");
+    setSortBy("newest");
+    loadCourses("");
+  };
 
   return (
     <>
@@ -99,11 +157,11 @@ export default function Home() {
               }}
             />
             <input
+              id="home-search"
               type="text"
               placeholder="Search courses, skills, or topics..."
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              onKeyDown={handleKeyDown}
               aria-label="Search courses"
             />
           </div>
@@ -117,17 +175,23 @@ export default function Home() {
           <div className="hero-stat-card">
             <div className="hero-stat-number">
               <Users size={20} style={{ color: "#38bdf8" }} />
-              <span>15,000+</span>
+              <span>{courses.length > 0 && totalEnrollments > 0 ? `${totalEnrollments.toLocaleString()}+` : `${courses.length}+`}</span>
             </div>
-            <div className="hero-stat-label">Active Learners</div>
+            <div className="hero-stat-label">
+              {totalEnrollments > 0 ? "Total Enrollments" : "Available Courses"}
+            </div>
           </div>
 
           <div className="hero-stat-card">
             <div className="hero-stat-number">
               <Star size={20} style={{ color: "#fbbf24" }} />
-              <span>4.9 / 5.0</span>
+              <span>
+                {totalReviews > 0
+                  ? (courses.reduce((sum, c) => sum + (c.averageRating || 0), 0) / courses.filter(c => c.averageRating > 0).length || 0).toFixed(1)
+                  : "5.0"}
+              </span>
             </div>
-            <div className="hero-stat-label">Student Rating</div>
+            <div className="hero-stat-label">Average Rating</div>
           </div>
 
           <div className="hero-stat-card">
@@ -188,29 +252,45 @@ export default function Home() {
         </div>
       )}
 
-      {/* Catalog Header & Category Filter Chips */}
+      {/* Catalog Header, Sort & Category Filter */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px", marginBottom: "16px" }}>
         <div>
           <h2 style={{ margin: "0 0 4px 0", fontSize: "24px", fontWeight: "800", letterSpacing: "-0.5px" }}>
             Explore Featured Courses
           </h2>
           <p style={{ margin: 0, fontSize: "14px", color: "var(--text-muted)" }}>
-            Showing {filteredCourses.length} {filteredCourses.length === 1 ? "course" : "courses"} available for enrollment
+            {loading ? "Loading..." : `Showing ${filteredCourses.length} ${filteredCourses.length === 1 ? "course" : "courses"} available for enrollment`}
           </p>
         </div>
 
-        {q && (
-          <button
-            className="btn secondary"
-            style={{ fontSize: "13px", padding: "6px 14px" }}
-            onClick={() => {
-              setQ("");
-              loadCourses("");
-            }}
-          >
-            <RotateCcw size={13} /> Reset Search
-          </button>
-        )}
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+          {/* Sort Dropdown */}
+          <div className="sort-select-wrapper">
+            <SlidersHorizontal size={15} style={{ color: "var(--text-muted)" }} />
+            <select
+              id="sort-courses"
+              className="sort-select"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              aria-label="Sort courses"
+            >
+              <option value="newest">Newest First</option>
+              <option value="rating">Highest Rated</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+            </select>
+          </div>
+
+          {(q || selectedCategory !== "All") && (
+            <button
+              className="btn secondary"
+              style={{ fontSize: "13px", padding: "6px 14px" }}
+              onClick={handleReset}
+            >
+              <RotateCcw size={13} /> Reset
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Category Pills Filter Bar */}
@@ -218,32 +298,22 @@ export default function Home() {
         {categories.map((cat) => (
           <button
             key={cat}
+            id={`cat-${cat.replace(/\s+/g, "-").toLowerCase()}`}
             className={`chip-btn ${selectedCategory === cat ? "active" : ""}`}
             onClick={() => setSelectedCategory(cat)}
           >
-            {cat === "All" && <Flame size={14} />}
+            {CATEGORY_ICONS[cat] ?? <Layers size={14} />}
             {cat}
           </button>
         ))}
       </div>
 
-      {/* Loading Skeleton / State */}
+      {/* Loading Skeleton Grid */}
       {loading ? (
-        <div style={{ textAlign: "center", padding: "80px 24px", color: "var(--text-muted)" }}>
-          <div
-            style={{
-              display: "inline-block",
-              width: "44px",
-              height: "44px",
-              border: "4px solid var(--border-color)",
-              borderTopColor: "var(--primary)",
-              borderRadius: "50%",
-              animation: "spin 1s linear infinite",
-              marginBottom: "16px"
-            }}
-          ></div>
-          <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
-          <p style={{ fontWeight: "600" }}>Loading courses from database...</p>
+        <div className="grid">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
         </div>
       ) : filteredCourses.length === 0 ? (
         /* Empty Search Results Card */
@@ -269,14 +339,7 @@ export default function Home() {
           <p style={{ color: "var(--text-muted)", fontSize: "14px", marginBottom: "24px", lineHeight: "1.6" }}>
             We couldn't find any courses matching your criteria. Try adjusting your search query or selecting a different category.
           </p>
-          <button
-            className="btn"
-            onClick={() => {
-              setQ("");
-              setSelectedCategory("All");
-              loadCourses("");
-            }}
-          >
+          <button className="btn" onClick={handleReset}>
             View All Courses
           </button>
         </div>
@@ -284,7 +347,7 @@ export default function Home() {
         /* Course Grid */
         <div className="grid">
           {filteredCourses.map((course) => (
-            <CourseCard key={course.id} course={course} />
+            <CourseCard key={course.id} course={course} enrolledIds={enrolledIds} />
           ))}
         </div>
       )}
