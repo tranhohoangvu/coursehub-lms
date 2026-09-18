@@ -178,6 +178,52 @@ export async function createLesson(req, res) {
   res.status(201).json(lessonFromRow(result.rows[0]));
 }
 
+export async function updateLesson(req, res) {
+  const data = lessonSchema.partial().parse(req.body);
+
+  const lessonResult = await query(
+    `SELECT l.*, c.instructor_id FROM lessons l
+     JOIN courses c ON c.id = l.course_id
+     WHERE l.id = $1`,
+    [req.params.lessonId]
+  );
+  const lesson = lessonResult.rows[0];
+  if (!lesson) return res.status(404).json({ message: "Lesson not found" });
+  if (req.user.role !== "ADMIN" && lesson.instructor_id !== req.user.id)
+    return res.status(403).json({ message: "Forbidden" });
+
+  const updated = await query(
+    `UPDATE lessons SET
+       title         = COALESCE($1, title),
+       content       = COALESCE($2, content),
+       lesson_order  = COALESCE($3, lesson_order),
+       is_preview    = COALESCE($4, is_preview),
+       video_url     = COALESCE($5, video_url),
+       resource_url  = COALESCE($6, resource_url),
+       updated_at    = now()
+     WHERE id = $7 RETURNING *`,
+    [
+      data.title,
+      data.content,
+      data.order,
+      data.isPreview,
+      data.videoUrl,
+      data.resourceUrl,
+      req.params.lessonId,
+    ]
+  );
+  res.json(lessonFromRow(updated.rows[0]));
+}
+
+export async function checkEnrollment(req, res) {
+  if (!req.user) return res.json({ enrolled: false });
+  const result = await query(
+    "SELECT id FROM enrollments WHERE user_id = $1 AND course_id = $2",
+    [req.user.id, req.params.id]
+  );
+  res.json({ enrolled: result.rowCount > 0 });
+}
+
 export async function markLessonCompleted(req, res) {
   const lessonResult = await query("SELECT * FROM lessons WHERE id = $1", [req.params.lessonId]);
   const lesson = lessonResult.rows[0];

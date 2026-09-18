@@ -72,3 +72,11 @@ export async function removeFromCart(req, res) {
   await query("DELETE FROM cart_items WHERE cart_id = $1 AND course_id = $2", [cart.id, req.params.courseId]);
   res.json({ message: "Removed from cart" });
 }
+
+export async function getCartCount(req, res) {
+  const cart = await getOrCreateCart(req.user.id);
+  const result = await query("SELECT COUNT(*)::int as count FROM cart_items WHERE cart_id = $1", [cart.id]);
+  res.json({ count: result.rows[0]?.count || 0 });
+}
+
+

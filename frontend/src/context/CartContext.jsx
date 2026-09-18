@@ -14,8 +14,8 @@ export function CartProvider({ children }) {
       return;
     }
     try {
-      const data = await api("/cart");
-      setCartCount(data?.items?.length ?? 0);
+      const data = await api("/cart/count");
+      setCartCount(data?.count ?? 0);
     } catch {
       setCartCount(0);
     }

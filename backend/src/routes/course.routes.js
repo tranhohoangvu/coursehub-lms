@@ -9,6 +9,8 @@ import {
   markLessonIncomplete,
   reviewCourse,
   updateCourse,
+  updateLesson,
+  checkEnrollment,
 } from "../controllers/course.controller.js";
 import { allowRoles, authRequired } from "../middlewares/auth.js";
 
@@ -23,5 +25,7 @@ router.post("/:id/lessons", authRequired, allowRoles("INSTRUCTOR", "ADMIN"), cre
 router.post("/:id/reviews", authRequired, reviewCourse);
 router.post("/lessons/:lessonId/complete", authRequired, markLessonCompleted);
 router.post("/lessons/:lessonId/incomplete", authRequired, markLessonIncomplete);
+router.patch("/lessons/:lessonId", authRequired, allowRoles("INSTRUCTOR", "ADMIN"), updateLesson);
+router.get("/:id/enrollment", authRequired, checkEnrollment);
 
 export default router;

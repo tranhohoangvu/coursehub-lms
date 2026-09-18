@@ -47,11 +47,13 @@ export default function CourseDetail() {
   }
 
   async function checkEnrollment() {
-    if (!user) return;
+    if (!user) {
+      setIsEnrolled(false);
+      return;
+    }
     try {
-      const mine = await api("/courses/mine");
-      const found = mine.some((item) => item.course?.id === id || item.course?.id === String(id));
-      setIsEnrolled(found);
+      const res = await api(`/courses/${id}/enrollment`);
+      setIsEnrolled(!!res.enrolled);
     } catch {
       setIsEnrolled(false);
     }
