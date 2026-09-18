@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "./context/AuthContext.jsx";
+import { useCart } from "./context/CartContext.jsx";
 import {
   Menu,
   X,
@@ -13,15 +14,23 @@ import {
   LogIn,
   UserPlus,
   Compass,
-  Code,
-  Database,
-  Server,
-  Heart
+  Heart,
+  Code2,
+  Globe
 } from "lucide-react";
 
 export default function App() {
   const { user, logout } = useAuth();
+  const { cartCount } = useCart();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  // Scroll-aware nav shadow
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Determine user role badge style
   const getRoleBadgeClass = (role) => {
@@ -36,7 +45,7 @@ export default function App() {
       <div style={{ height: "3px", background: "linear-gradient(90deg, #4f46e5 0%, #8b5cf6 50%, #06b6d4 100%)" }}></div>
 
       {/* Sticky Glassmorphic Navbar */}
-      <nav className="nav">
+      <nav className={`nav${isScrolled ? " scrolled" : ""}`}>
         <div className="nav-inner">
           <Link to="/" className="logo" onClick={() => setIsSidebarOpen(false)}>
             <div className="logo-sparkle">
@@ -66,6 +75,9 @@ export default function App() {
                 <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                   <ShoppingCart size={16} /> Cart
                 </span>
+                {cartCount > 0 && (
+                  <span className="cart-count-badge">{cartCount}</span>
+                )}
               </NavLink>
             )}
 
@@ -134,7 +146,7 @@ export default function App() {
           <div className="mobile-sidebar" onClick={(e) => e.stopPropagation()}>
             <div className="sidebar-header">
               <Link to="/" className="logo" onClick={() => setIsSidebarOpen(false)}>
-                <div className="logo-sparkle">
+                <div className="logo-sparkle" style={{ width: "28px", height: "28px" }}>
                   <Sparkles size={16} />
                 </div>
                 <span>CourseHub</span>
@@ -162,7 +174,7 @@ export default function App() {
               {user && (
                 <NavLink to="/cart" onClick={() => setIsSidebarOpen(false)}>
                   <ShoppingCart size={18} style={{ display: "inline", verticalAlign: "middle", marginRight: "8px" }} />
-                  Shopping Cart
+                  Shopping Cart {cartCount > 0 && <span className="cart-count-badge" style={{ marginLeft: "4px" }}>{cartCount}</span>}
                 </NavLink>
               )}
               {user?.role === "INSTRUCTOR" && (
@@ -242,12 +254,33 @@ export default function App() {
                 <span style={{ color: "#ffffff", WebkitTextFillColor: "#ffffff" }}>CourseHub</span>
               </div>
               <p style={{ maxWidth: "340px", fontSize: "14px", lineHeight: "1.6", color: "#94a3b8" }}>
-                Next-generation Learning Management System built for developers and digital creators. Powered by PostgreSQL & native SQL performance.
+                Next-generation Learning Management System built for developers and digital creators. Powered by PostgreSQL &amp; native SQL performance.
               </p>
               <div style={{ display: "flex", gap: "8px", marginTop: "16px", flexWrap: "wrap" }}>
                 <span className="badge cyan" style={{ fontSize: "11px" }}>PostgreSQL</span>
                 <span className="badge" style={{ fontSize: "11px" }}>React 19</span>
                 <span className="badge success" style={{ fontSize: "11px" }}>Express Native</span>
+              </div>
+              {/* Social links */}
+              <div className="footer-social">
+                <a
+                  href="https://github.com/tranhohoangvu/coursehub-lms"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="footer-social-link"
+                  title="GitHub Repository"
+                >
+                  <Code2 size={16} />
+                </a>
+                <a
+                  href="https://coursehub-lms-eight.vercel.app"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="footer-social-link"
+                  title="Live Demo"
+                >
+                  <Globe size={16} />
+                </a>
               </div>
             </div>
 
@@ -256,7 +289,7 @@ export default function App() {
               <ul className="footer-links">
                 <li><Link to="/">Browse Catalog</Link></li>
                 <li><Link to="/my-courses">My Learning</Link></li>
-                <li><Link to="/cart">Cart & Checkout</Link></li>
+                <li><Link to="/cart">Cart &amp; Checkout</Link></li>
               </ul>
             </div>
 
@@ -280,8 +313,11 @@ export default function App() {
           </div>
 
           <div className="footer-bottom">
-            <div>
-              © {new Date().getFullYear()} <strong>CourseHub</strong>. Engineered with passion for modern engineering standards.
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <span className="footer-status-dot" />
+              <span>All systems operational</span>
+              <span style={{ color: "#475569", margin: "0 8px" }}>·</span>
+              © {new Date().getFullYear()} <strong style={{ color: "#ffffff", marginLeft: "4px" }}>CourseHub</strong>. All rights reserved.
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "#94a3b8" }}>
               Crafted with <Heart size={14} style={{ color: "#f43f5e" }} /> by Hoang Vu
