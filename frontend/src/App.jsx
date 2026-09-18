@@ -41,15 +41,12 @@ export default function App() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      {/* Top Accent Gradient Bar */}
-      <div style={{ height: "3px", background: "linear-gradient(90deg, #4f46e5 0%, #8b5cf6 50%, #06b6d4 100%)" }}></div>
-
-      {/* Sticky Glassmorphic Navbar */}
+      {/* Sticky Clean Navbar */}
       <nav className={`nav${isScrolled ? " scrolled" : ""}`}>
         <div className="nav-inner">
           <Link to="/" className="logo" onClick={() => setIsSidebarOpen(false)}>
-            <div className="logo-sparkle">
-              <Sparkles size={18} />
+            <div className="logo-icon">
+              <BookOpen size={18} />
             </div>
             <span>CourseHub</span>
           </Link>
@@ -146,8 +143,8 @@ export default function App() {
           <div className="mobile-sidebar" onClick={(e) => e.stopPropagation()}>
             <div className="sidebar-header">
               <Link to="/" className="logo" onClick={() => setIsSidebarOpen(false)}>
-                <div className="logo-sparkle" style={{ width: "28px", height: "28px" }}>
-                  <Sparkles size={16} />
+                <div className="logo-icon" style={{ width: "28px", height: "28px" }}>
+                  <BookOpen size={16} />
                 </div>
                 <span>CourseHub</span>
               </Link>
@@ -248,18 +245,18 @@ export default function App() {
           <div className="footer-inner">
             <div className="footer-brand">
               <div className="logo" style={{ marginBottom: "14px" }}>
-                <div className="logo-sparkle" style={{ width: "28px", height: "28px" }}>
-                  <Sparkles size={15} />
+                <div className="logo-icon" style={{ width: "28px", height: "28px" }}>
+                  <BookOpen size={16} />
                 </div>
-                <span style={{ color: "#ffffff", WebkitTextFillColor: "#ffffff" }}>CourseHub</span>
+                <span>CourseHub</span>
               </div>
-              <p style={{ maxWidth: "340px", fontSize: "14px", lineHeight: "1.6", color: "#94a3b8" }}>
-                Next-generation Learning Management System built for developers and digital creators. Powered by PostgreSQL &amp; native SQL performance.
+              <p style={{ maxWidth: "340px", fontSize: "14px", lineHeight: "1.6", color: "var(--text-muted)" }}>
+                Curated learning platform designed for modern engineers and creators. Hands-on projects with verified certifications.
               </p>
               <div style={{ display: "flex", gap: "8px", marginTop: "16px", flexWrap: "wrap" }}>
-                <span className="badge cyan" style={{ fontSize: "11px" }}>PostgreSQL</span>
+                <span className="badge" style={{ fontSize: "11px" }}>PostgreSQL</span>
                 <span className="badge" style={{ fontSize: "11px" }}>React 19</span>
-                <span className="badge success" style={{ fontSize: "11px" }}>Express Native</span>
+                <span className="badge" style={{ fontSize: "11px" }}>Node.js</span>
               </div>
               {/* Social links */}
               <div className="footer-social">

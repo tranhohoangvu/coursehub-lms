@@ -204,7 +204,7 @@ export default function CourseDetail() {
       {/* Split Grid Content Layout */}
       <div className="detail-grid">
         {/* Left Column: Syllabus & Reviews */}
-        <div>
+        <div className="detail-main-col">
           {/* What You'll Learn Checklist Card */}
           <div className="what-you-learn-box">
             <h3 style={{ fontSize: "18px", fontWeight: "800", color: "var(--text-main)", marginBottom: "4px" }}>
@@ -216,19 +216,19 @@ export default function CourseDetail() {
 
             <div className="learn-checklist-grid">
               <div className="learn-item">
-                <CheckCircle2 size={18} style={{ color: "#10b981", flexShrink: 0, marginTop: "2px" }} />
+                <CheckCircle2 size={18} style={{ color: "var(--primary)", flexShrink: 0, marginTop: "2px" }} />
                 <span>Deep dive into architectural patterns and raw database queries.</span>
               </div>
               <div className="learn-item">
-                <CheckCircle2 size={18} style={{ color: "#10b981", flexShrink: 0, marginTop: "2px" }} />
+                <CheckCircle2 size={18} style={{ color: "var(--primary)", flexShrink: 0, marginTop: "2px" }} />
                 <span>Master authentication, authorization, and secure JWT token flows.</span>
               </div>
               <div className="learn-item">
-                <CheckCircle2 size={18} style={{ color: "#10b981", flexShrink: 0, marginTop: "2px" }} />
+                <CheckCircle2 size={18} style={{ color: "var(--primary)", flexShrink: 0, marginTop: "2px" }} />
                 <span>Hands-on practice with step-by-step coding lessons.</span>
               </div>
               <div className="learn-item">
-                <CheckCircle2 size={18} style={{ color: "#10b981", flexShrink: 0, marginTop: "2px" }} />
+                <CheckCircle2 size={18} style={{ color: "var(--primary)", flexShrink: 0, marginTop: "2px" }} />
                 <span>Full industry-level certificate of completion upon graduation.</span>
               </div>
             </div>
@@ -275,7 +275,7 @@ export default function CourseDetail() {
                             )}
                           </div>
                           {lesson.content && (
-                            <p style={{ margin: 0, fontSize: "13px", color: "var(--text-muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            <p style={{ margin: 0, fontSize: "13px", color: "var(--text-muted)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", lineHeight: 1.5 }}>
                               {lesson.content}
                             </p>
                           )}
@@ -428,9 +428,9 @@ export default function CourseDetail() {
         </div>
 
         {/* Right Column: Sticky Purchase Widget */}
-        <div>
+        <div className="detail-side-col">
           <div className="purchase-card-sticky">
-            <div style={{ borderRadius: "var(--radius-md)", overflow: "hidden", marginBottom: "20px", height: "180px", background: "#0f172a" }}>
+            <div style={{ borderRadius: "var(--radius-md)", overflow: "hidden", marginBottom: "20px", height: "180px", background: "var(--bg-subtle)" }}>
               <img
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
                 src={course.thumbnailUrl || "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&auto=format&fit=crop&q=80"}
@@ -452,7 +452,7 @@ export default function CourseDetail() {
                 </span>
               ) : (
                 <div style={{ display: "flex", alignItems: "baseline", gap: "8px", marginTop: "4px" }}>
-                  <span className="price" style={{ fontSize: "28px", fontWeight: "800", color: "var(--text-main)" }}>
+                  <span className="price" style={{ fontSize: "28px", fontWeight: "800", color: "var(--primary)" }}>
                     {Number(course.price).toLocaleString("vi-VN")}
                   </span>
                   <span style={{ fontSize: "14px", fontWeight: "700", color: "var(--text-muted)" }}>VND</span>
@@ -495,6 +495,7 @@ export default function CourseDetail() {
                 </p>
                 <Link
                   to="/login"
+                  state={{ from: `/courses/${id}` }}
                   className="btn"
                   style={{ width: "100%", height: "44px", fontSize: "14px", justifyContent: "center" }}
                 >
@@ -508,7 +509,7 @@ export default function CourseDetail() {
             {/* Value guarantee bullet points */}
             <div style={{ display: "grid", gap: "14px", fontSize: "13.5px", color: "var(--text-muted)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <ShieldCheck size={18} style={{ color: "#10b981", flexShrink: 0 }} />
+                <ShieldCheck size={18} style={{ color: "var(--primary)", flexShrink: 0 }} />
                 <span>30-Day Money-Back Guarantee</span>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -516,11 +517,11 @@ export default function CourseDetail() {
                 <span>Full Lifetime Access</span>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <Award size={18} style={{ color: "#f59e0b", flexShrink: 0 }} />
+                <Award size={18} style={{ color: "var(--accent-gold)", flexShrink: 0 }} />
                 <span>Certificate of Completion</span>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <BookOpen size={18} style={{ color: "#06b6d4", flexShrink: 0 }} />
+                <BookOpen size={18} style={{ color: "var(--primary)", flexShrink: 0 }} />
                 <span>Access on Mobile, Tablet &amp; Desktop</span>
               </div>
             </div>

@@ -116,6 +116,261 @@ function MyCoursesSkeleton() {
   );
 }
 
+// --- Classroom Workspace Component (Legal Top-Level Hooks) ---
+function ClassroomWorkspace({
+  activeCourseItem,
+  activeCourseId,
+  activeLessonId,
+  setSearchParams,
+  toggleLessonCompletion,
+  saveResumeLesson
+}) {
+  const course = activeCourseItem.course;
+  const lessons = course.lessons || [];
+  const completedLessons = lessons.filter((l) => l.completed).length;
+  const totalLessons = lessons.length;
+  const progressPercent = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
+  const isGraduated = progressPercent === 100 && totalLessons > 0;
+
+  const currentLessonIndex = lessons.findIndex((l) => l.id === activeLessonId);
+  const currentLesson = currentLessonIndex >= 0 ? lessons[currentLessonIndex] : lessons[0] || null;
+  const youtubeId = currentLesson ? getYouTubeId(currentLesson.videoUrl) : null;
+  const prevLesson = currentLessonIndex > 0 ? lessons[currentLessonIndex - 1] : null;
+  const nextLesson = currentLessonIndex >= 0 && currentLessonIndex < lessons.length - 1 ? lessons[currentLessonIndex + 1] : null;
+
+  // Save last lesson when it changes
+  useEffect(() => {
+    if (currentLesson) saveResumeLesson(activeCourseId, currentLesson.id);
+  }, [currentLesson?.id, activeCourseId, saveResumeLesson]);
+
+  // Keyboard navigation: ArrowLeft/Right to move between lessons
+  useEffect(() => {
+    function handleKey(e) {
+      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+      if (e.key === "ArrowRight" && nextLesson)
+        setSearchParams({ courseId: activeCourseId, lessonId: nextLesson.id });
+      if (e.key === "ArrowLeft" && prevLesson)
+        setSearchParams({ courseId: activeCourseId, lessonId: prevLesson.id });
+    }
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [nextLesson, prevLesson, activeCourseId, setSearchParams]);
+
+  // Get the userName for certificate (from localStorage token)
+  const userName = (() => {
+    try { return JSON.parse(atob(localStorage.getItem("token")?.split(".")[1] || ""))?.name || "Student"; } catch { return "Student"; }
+  })();
+
+  return (
+    <div>
+      {/* Workspace Top Bar */}
+      <div className="classroom-header">
+        <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+          <button className="btn secondary" style={{ alignSelf: "flex-start", padding: "6px 14px", fontSize: "13px" }} onClick={() => setSearchParams({})}>
+            <ArrowLeft size={14} /> Back to My Courses
+          </button>
+          <h1 style={{ margin: 0, fontSize: "22px", fontWeight: "800", letterSpacing: "-0.5px" }}>{course.title}</h1>
+        </div>
+
+        <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
+          {/* Keyboard hint */}
+          <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "var(--text-muted)", background: "var(--bg-subtle)", padding: "6px 12px", borderRadius: "var(--radius-full)", border: "1px solid var(--border-color)" }}>
+            <Keyboard size={13} /> ← → to navigate lessons
+          </div>
+
+          {/* Progress widget */}
+          <div style={{ minWidth: "240px", background: "var(--bg-surface)", padding: "12px 18px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)", boxShadow: "var(--shadow-xs)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", fontWeight: "700", marginBottom: "6px" }}>
+              <span>Progress</span>
+              <span style={{ color: isGraduated ? "var(--success)" : "var(--primary)" }}>{progressPercent}%</span>
+            </div>
+            <div className="progress-track">
+              <div className="progress-fill" style={{ width: `${progressPercent}%`, background: "var(--primary)" }} />
+            </div>
+            <div style={{ fontSize: "11.5px", color: "var(--text-muted)", marginTop: "4px", textAlign: "right" }}>
+              {completedLessons}/{totalLessons} lessons
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 100% Graduation Banner with Certificate Button */}
+      {isGraduated && (
+        <div style={{ background: "linear-gradient(135deg, #065f46 0%, #047857 100%)", color: "#ffffff", padding: "20px 24px", borderRadius: "var(--radius-lg)", marginBottom: "24px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px", boxShadow: "0 10px 25px rgba(6, 95, 70, 0.3)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+            <div style={{ width: "42px", height: "42px", borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Award size={24} />
+            </div>
+            <div>
+              <strong style={{ fontSize: "16px", display: "block" }}>🎉 Congratulations on Graduating!</strong>
+              <span style={{ fontSize: "13.5px", opacity: 0.9 }}>You have successfully completed all lessons in this curriculum.</span>
+            </div>
+          </div>
+          <button
+            className="btn"
+            style={{ background: "rgba(255,255,255,0.95)", color: "#065f46", fontWeight: "800" }}
+            onClick={() => printCertificate(course.title, userName)}
+          >
+            <Printer size={16} /> Download Certificate
+          </button>
+        </div>
+      )}
+
+      {lessons.length === 0 ? (
+        <div className="card" style={{ textAlign: "center", padding: "48px 24px", color: "var(--text-muted)" }}>
+          <p>No lessons published yet for this course.</p>
+        </div>
+      ) : (
+        <div className="detail-grid">
+          {/* Left: Video & Lesson Content */}
+          <div className="detail-main-col">
+            {currentLesson ? (
+              <div className="card" style={{ padding: "28px" }}>
+                {/* Video Player */}
+                {youtubeId ? (
+                  <div className="video-theatre">
+                    <iframe
+                      src={`https://www.youtube.com/embed/${youtubeId}?autoplay=0&rel=0`}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      title={currentLesson.title}
+                    />
+                  </div>
+                ) : currentLesson.videoUrl ? (
+                  <div style={{ background: "var(--text-main)", color: "#fff", padding: "32px 24px", borderRadius: "var(--radius-md)", marginBottom: "24px", textAlign: "center" }}>
+                    <Video size={36} style={{ color: "var(--primary)", margin: "0 auto 12px auto" }} />
+                    <h4 style={{ marginBottom: "8px" }}>Watch Video on YouTube</h4>
+                    <a href={currentLesson.videoUrl} target="_blank" rel="noopener noreferrer" className="btn btn-glow" style={{ display: "inline-flex", marginTop: "8px" }}>
+                      Open Video Player
+                    </a>
+                  </div>
+                ) : null}
+
+                {/* Lesson Title & Completion */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "16px", flexWrap: "wrap", marginBottom: "20px" }}>
+                  <div>
+                    <span style={{ fontSize: "12px", color: "var(--primary)", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                      Lesson {currentLesson.order} of {totalLessons}
+                    </span>
+                    <h2 style={{ margin: "2px 0 0 0", fontSize: "22px", fontWeight: "800" }}>{currentLesson.title}</h2>
+                  </div>
+                  <div>
+                    {currentLesson.completed ? (
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        <span className="badge success" style={{ padding: "8px 14px", fontSize: "13px" }}>
+                          <CheckCircle2 size={16} /> Completed
+                        </span>
+                        <button className="btn secondary" style={{ padding: "8px 14px", fontSize: "13px", color: "var(--danger)", borderColor: "var(--danger-light)" }}
+                          onClick={() => toggleLessonCompletion(course.id, currentLesson.id, true)}>
+                          Reset
+                        </button>
+                      </div>
+                    ) : (
+                      <button className="btn success" style={{ padding: "8px 18px", fontSize: "14px" }}
+                        onClick={() => toggleLessonCompletion(course.id, currentLesson.id, false)}>
+                        <Check size={16} /> Mark as Complete
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="divider" style={{ margin: "20px 0" }} />
+
+                <h3 style={{ fontSize: "16px", fontWeight: "700", marginBottom: "10px" }}>Lesson Notes &amp; Explanation</h3>
+                <p style={{ whiteSpace: "pre-wrap", color: "var(--text-muted)", fontSize: "14.5px", lineHeight: "1.75", marginBottom: "24px" }}>
+                  {currentLesson.content || "Follow along with the instructions and video above."}
+                </p>
+
+                {currentLesson.resourceUrl && (
+                  <div style={{ background: "var(--bg-base)", border: "1px solid var(--border-color)", borderRadius: "var(--radius-md)", padding: "16px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                      <FileText size={24} style={{ color: "var(--primary)" }} />
+                      <div>
+                        <strong style={{ display: "block", fontSize: "14px" }}>Downloadable Lesson Assets</strong>
+                        <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>Source code, lecture notes, or cheat-sheets</span>
+                      </div>
+                    </div>
+                    <a href={currentLesson.resourceUrl} target="_blank" rel="noopener noreferrer" className="btn secondary" style={{ fontSize: "12.5px", padding: "8px 14px" }}>
+                      <Download size={14} /> Download
+                    </a>
+                  </div>
+                )}
+
+                {/* Lesson Navigation Prev / Next */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "32px", paddingTop: "20px", borderTop: "1px solid var(--border-color)" }}>
+                  {prevLesson ? (
+                    <button className="btn secondary" style={{ fontSize: "13.5px" }}
+                      onClick={() => setSearchParams({ courseId: activeCourseId, lessonId: prevLesson.id })}>
+                      <ArrowLeft size={15} /> Previous: Lesson {prevLesson.order}
+                    </button>
+                  ) : <div />}
+
+                  {nextLesson ? (
+                    <button className="btn" style={{ fontSize: "13.5px" }}
+                      onClick={() => setSearchParams({ courseId: activeCourseId, lessonId: nextLesson.id })}>
+                      Next: Lesson {nextLesson.order} <ArrowRight size={15} />
+                    </button>
+                  ) : (
+                    <span style={{ fontSize: "13px", color: "var(--text-muted)", fontWeight: "600" }}>
+                      🎉 Final Lesson Reached
+                    </span>
+                  )}
+                </div>
+              </div>
+            ) : null}
+          </div>
+
+          {/* Right: Lesson Playlist Sidebar */}
+          <div className="detail-side-col">
+            <div className="card" style={{ padding: "20px", position: "sticky", top: "96px" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid var(--border-color)" }}>
+                <span style={{ fontSize: "14px", fontWeight: "700", display: "flex", alignItems: "center", gap: "6px" }}>
+                  <Layers size={16} /> Course Syllabus
+                </span>
+                <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>{totalLessons} lessons</span>
+              </div>
+
+              <div style={{ display: "grid", gap: "6px", maxHeight: "60vh", overflowY: "auto", paddingRight: "4px" }}>
+                {lessons.map((lesson) => {
+                  const isActive = currentLesson?.id === lesson.id;
+                  return (
+                    <div
+                      key={lesson.id}
+                      className="workspace-lesson-row"
+                      onClick={() => setSearchParams({ courseId: activeCourseId, lessonId: lesson.id })}
+                      style={{
+                        display: "flex", alignItems: "center", justifyContent: "space-between",
+                        padding: "12px 14px", borderRadius: "var(--radius-md)",
+                        border: `1px solid ${isActive ? "var(--primary)" : "var(--border-color)"}`,
+                        background: isActive ? "var(--primary-light)" : lesson.completed ? "var(--bg-subtle)" : "var(--bg-surface)",
+                        cursor: "pointer", transition: "var(--transition-fast)"
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1, minWidth: 0 }}>
+                        {lesson.completed ? (
+                          <CheckCircle2 size={18} style={{ color: "var(--success)", flexShrink: 0 }} />
+                        ) : (
+                          <div style={{ width: "18px", height: "18px", borderRadius: "50%", border: "2px solid #cbd5e1", flexShrink: 0 }} />
+                        )}
+                        <span style={{ fontSize: "13px", fontWeight: isActive ? "700" : "500", color: isActive ? "var(--primary-dark)" : lesson.completed ? "var(--text-muted)" : "var(--text-main)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {lesson.order}. {lesson.title}
+                        </span>
+                      </div>
+                      {lesson.isPreview && (
+                        <span className="badge success" style={{ fontSize: "9px", padding: "2px 6px", marginLeft: "6px", flexShrink: 0 }}>Preview</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function MyCourses() {
   const { showToast } = useToast();
   const [items, setItems] = useState([]);
@@ -184,252 +439,57 @@ export default function MyCourses() {
   // CLASSROOM WORKSPACE VIEW
   // =========================================================================
   if (activeCourseId) {
-    const activeCourseItem = items.find((item) => item.course.id === activeCourseId);
-    if (!activeCourseItem) {
-      if (loading) return <div style={{ textAlign: "center", padding: "80px" }}><div style={{ width: "40px", height: "40px", border: "4px solid #e2e8f0", borderTopColor: "#4f46e5", borderRadius: "50%", animation: "spin 1s linear infinite", margin: "0 auto 16px" }} /></div>;
-      return null;
+    if (loading) {
+      return (
+        <div style={{ textAlign: "center", padding: "100px 24px" }}>
+          <div
+            style={{
+              width: "42px",
+              height: "42px",
+              border: "4px solid var(--border-color)",
+              borderTopColor: "var(--primary)",
+              borderRadius: "50%",
+              animation: "spin 1s linear infinite",
+              margin: "0 auto 16px"
+            }}
+          />
+          <p style={{ color: "var(--text-muted)", fontSize: "14px", fontWeight: "600" }}>
+            Loading classroom...
+          </p>
+        </div>
+      );
     }
 
-    const course = activeCourseItem.course;
-    const lessons = course.lessons || [];
-    const completedLessons = lessons.filter((l) => l.completed).length;
-    const totalLessons = lessons.length;
-    const progressPercent = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
-    const isGraduated = progressPercent === 100 && totalLessons > 0;
-
-    const currentLessonIndex = lessons.findIndex((l) => l.id === activeLessonId);
-    const currentLesson = currentLessonIndex >= 0 ? lessons[currentLessonIndex] : lessons[0] || null;
-    const youtubeId = currentLesson ? getYouTubeId(currentLesson.videoUrl) : null;
-    const prevLesson = currentLessonIndex > 0 ? lessons[currentLessonIndex - 1] : null;
-    const nextLesson = currentLessonIndex >= 0 && currentLessonIndex < lessons.length - 1 ? lessons[currentLessonIndex + 1] : null;
-
-    // Save last lesson when it changes
-    useEffect(() => {
-      if (currentLesson) saveResumeLesson(activeCourseId, currentLesson.id);
-    }, [currentLesson?.id]);
-
-    // Keyboard navigation: ArrowLeft/Right to move between lessons
-    useEffect(() => {
-      function handleKey(e) {
-        if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
-        if (e.key === "ArrowRight" && nextLesson)
-          setSearchParams({ courseId: activeCourseId, lessonId: nextLesson.id });
-        if (e.key === "ArrowLeft" && prevLesson)
-          setSearchParams({ courseId: activeCourseId, lessonId: prevLesson.id });
-      }
-      window.addEventListener("keydown", handleKey);
-      return () => window.removeEventListener("keydown", handleKey);
-    }, [nextLesson?.id, prevLesson?.id]);
-
-    // Get the userName for certificate (from localStorage token)
-    const userName = (() => {
-      try { return JSON.parse(atob(localStorage.getItem("token")?.split(".")[1] || ""))?.name || "Student"; } catch { return "Student"; }
-    })();
-
-    return (
-      <div>
-        {/* Workspace Top Bar */}
-        <div className="classroom-header">
-          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            <button className="btn secondary" style={{ alignSelf: "flex-start", padding: "6px 14px", fontSize: "13px" }} onClick={() => setSearchParams({})}>
-              <ArrowLeft size={14} /> Back to My Courses
+    const activeCourseItem = items.find((item) => item.course?.id === activeCourseId);
+    if (!activeCourseItem) {
+      return (
+        <div className="card" style={{ textAlign: "center", padding: "64px 24px", maxWidth: "600px", margin: "40px auto" }}>
+          <BookOpen size={48} style={{ color: "var(--text-muted)", margin: "0 auto 16px" }} />
+          <h2 style={{ fontSize: "20px", fontWeight: "800", marginBottom: "8px" }}>Course not found in your learning list</h2>
+          <p style={{ color: "var(--text-muted)", fontSize: "14px", marginBottom: "24px" }}>
+            You might not be enrolled in this course yet, or it has been removed.
+          </p>
+          <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
+            <button className="btn secondary" onClick={() => setSearchParams({})}>
+              Back to My Courses
             </button>
-            <h1 style={{ margin: 0, fontSize: "22px", fontWeight: "800", letterSpacing: "-0.5px" }}>{course.title}</h1>
-          </div>
-
-          <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
-            {/* Keyboard hint */}
-            <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "var(--text-muted)", background: "#f8fafc", padding: "6px 12px", borderRadius: "var(--radius-full)", border: "1px solid var(--border-color)" }}>
-              <Keyboard size={13} /> ← → to navigate lessons
-            </div>
-
-            {/* Progress widget */}
-            <div style={{ minWidth: "240px", background: "var(--bg-surface)", padding: "12px 18px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)", boxShadow: "var(--shadow-xs)" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", fontWeight: "700", marginBottom: "6px" }}>
-                <span>Progress</span>
-                <span style={{ color: isGraduated ? "#10b981" : "var(--primary)" }}>{progressPercent}%</span>
-              </div>
-              <div className="progress-track">
-                <div className="progress-fill" style={{ width: `${progressPercent}%` }} />
-              </div>
-              <div style={{ fontSize: "11.5px", color: "var(--text-muted)", marginTop: "4px", textAlign: "right" }}>
-                {completedLessons}/{totalLessons} lessons
-              </div>
-            </div>
+            <Link to="/" className="btn">
+              Explore Courses
+            </Link>
           </div>
         </div>
+      );
+    }
 
-        {/* 100% Graduation Banner with Certificate Button */}
-        {isGraduated && (
-          <div style={{ background: "linear-gradient(135deg, #065f46 0%, #047857 100%)", color: "#ffffff", padding: "20px 24px", borderRadius: "var(--radius-lg)", marginBottom: "24px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px", boxShadow: "0 10px 25px rgba(6, 95, 70, 0.3)" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-              <div style={{ width: "42px", height: "42px", borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <Award size={24} />
-              </div>
-              <div>
-                <strong style={{ fontSize: "16px", display: "block" }}>🎉 Congratulations on Graduating!</strong>
-                <span style={{ fontSize: "13.5px", opacity: 0.9 }}>You have successfully completed all lessons in this curriculum.</span>
-              </div>
-            </div>
-            <button
-              className="btn"
-              style={{ background: "rgba(255,255,255,0.95)", color: "#065f46", fontWeight: "800" }}
-              onClick={() => printCertificate(course.title, userName)}
-            >
-              <Printer size={16} /> Download Certificate
-            </button>
-          </div>
-        )}
-
-        {lessons.length === 0 ? (
-          <div className="card" style={{ textAlign: "center", padding: "48px 24px", color: "var(--text-muted)" }}>
-            <p>No lessons published yet for this course.</p>
-          </div>
-        ) : (
-          <div className="detail-grid">
-            {/* Left: Video & Lesson Content */}
-            <div>
-              {currentLesson ? (
-                <div className="card" style={{ padding: "28px" }}>
-                  {/* Video Player */}
-                  {youtubeId ? (
-                    <div className="video-theatre">
-                      <iframe
-                        src={`https://www.youtube.com/embed/${youtubeId}?autoplay=0&rel=0`}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                        title={currentLesson.title}
-                      />
-                    </div>
-                  ) : currentLesson.videoUrl ? (
-                    <div style={{ background: "#0f172a", color: "#fff", padding: "32px 24px", borderRadius: "var(--radius-md)", marginBottom: "24px", textAlign: "center" }}>
-                      <Video size={36} style={{ color: "var(--primary)", margin: "0 auto 12px auto" }} />
-                      <h4 style={{ marginBottom: "8px" }}>Watch Video on YouTube</h4>
-                      <a href={currentLesson.videoUrl} target="_blank" rel="noopener noreferrer" className="btn btn-glow" style={{ display: "inline-flex", marginTop: "8px" }}>
-                        Open Video Player
-                      </a>
-                    </div>
-                  ) : null}
-
-                  {/* Lesson Title & Completion */}
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "16px", flexWrap: "wrap", marginBottom: "20px" }}>
-                    <div>
-                      <span style={{ fontSize: "12px", color: "var(--primary)", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                        Lesson {currentLesson.order} of {totalLessons}
-                      </span>
-                      <h2 style={{ margin: "2px 0 0 0", fontSize: "22px", fontWeight: "800" }}>{currentLesson.title}</h2>
-                    </div>
-                    <div>
-                      {currentLesson.completed ? (
-                        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                          <span className="badge success" style={{ padding: "8px 14px", fontSize: "13px" }}>
-                            <CheckCircle2 size={16} /> Completed
-                          </span>
-                          <button className="btn secondary" style={{ padding: "8px 14px", fontSize: "13px", color: "var(--danger)", borderColor: "var(--danger-light)" }}
-                            onClick={() => toggleLessonCompletion(course.id, currentLesson.id, true)}>
-                            Reset
-                          </button>
-                        </div>
-                      ) : (
-                        <button className="btn success" style={{ padding: "8px 18px", fontSize: "14px" }}
-                          onClick={() => toggleLessonCompletion(course.id, currentLesson.id, false)}>
-                          <Check size={16} /> Mark as Complete
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="divider" style={{ margin: "20px 0" }} />
-
-                  <h3 style={{ fontSize: "16px", fontWeight: "700", marginBottom: "10px" }}>Lesson Notes &amp; Explanation</h3>
-                  <p style={{ whiteSpace: "pre-wrap", color: "var(--text-muted)", fontSize: "14.5px", lineHeight: "1.75", marginBottom: "24px" }}>
-                    {currentLesson.content || "Follow along with the instructions and video above."}
-                  </p>
-
-                  {currentLesson.resourceUrl && (
-                    <div style={{ background: "var(--bg-base)", border: "1px solid var(--border-color)", borderRadius: "var(--radius-md)", padding: "16px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                        <FileText size={24} style={{ color: "var(--primary)" }} />
-                        <div>
-                          <strong style={{ display: "block", fontSize: "14px" }}>Downloadable Lesson Assets</strong>
-                          <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>Source code, lecture notes, or cheat-sheets</span>
-                        </div>
-                      </div>
-                      <a href={currentLesson.resourceUrl} target="_blank" rel="noopener noreferrer" className="btn secondary" style={{ fontSize: "12.5px", padding: "8px 14px" }}>
-                        <Download size={14} /> Download
-                      </a>
-                    </div>
-                  )}
-
-                  {/* Prev / Next nav */}
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "32px", paddingTop: "20px", borderTop: "1px solid var(--border-color)" }}>
-                    {prevLesson ? (
-                      <button className="btn secondary" style={{ fontSize: "13px", padding: "8px 16px" }}
-                        onClick={() => setSearchParams({ courseId: activeCourseId, lessonId: prevLesson.id })}>
-                        <ArrowLeft size={14} /> Prev
-                      </button>
-                    ) : <div />}
-                    {nextLesson && (
-                      <button className="btn" style={{ fontSize: "13px", padding: "8px 16px" }}
-                        onClick={() => setSearchParams({ courseId: activeCourseId, lessonId: nextLesson.id })}>
-                        Next <ArrowRight size={14} />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <div className="card" style={{ padding: "48px", textAlign: "center", color: "var(--text-muted)" }}>
-                  <p>Select a lesson from the syllabus to start studying.</p>
-                </div>
-              )}
-            </div>
-
-            {/* Right: Syllabus Sidebar */}
-            <div>
-              <div className="card" style={{ position: "sticky", top: "100px", padding: "24px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid var(--border-color)" }}>
-                  <h3 style={{ margin: 0, fontSize: "16px", fontWeight: "800" }}>Course Syllabus</h3>
-                  <span className="badge" style={{ fontSize: "11px" }}>{lessons.length} Modules</span>
-                </div>
-
-                <div style={{ maxHeight: "60vh", overflowY: "auto", display: "grid", gap: "8px", paddingRight: "4px" }}>
-                  {lessons.map((lesson) => {
-                    const isActive = lesson.id === (currentLesson?.id || "");
-                    return (
-                      <div
-                        key={lesson.id}
-                        className="workspace-lesson-row"
-                        onClick={() => setSearchParams({ courseId: activeCourseId, lessonId: lesson.id })}
-                        style={{
-                          display: "flex", alignItems: "center", justifyContent: "space-between",
-                          padding: "12px 14px", borderRadius: "var(--radius-md)",
-                          border: `1px solid ${isActive ? "var(--primary)" : "var(--border-color)"}`,
-                          background: isActive ? "var(--primary-light)" : lesson.completed ? "#f8fafc" : "var(--bg-surface)",
-                          cursor: "pointer", transition: "var(--transition-fast)"
-                        }}
-                      >
-                        <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1, minWidth: 0 }}>
-                          {lesson.completed ? (
-                            <CheckCircle2 size={18} style={{ color: "#10b981", flexShrink: 0 }} />
-                          ) : (
-                            <div style={{ width: "18px", height: "18px", borderRadius: "50%", border: "2px solid #cbd5e1", flexShrink: 0 }} />
-                          )}
-                          <span style={{ fontSize: "13px", fontWeight: isActive ? "700" : "500", color: isActive ? "var(--primary-dark)" : lesson.completed ? "var(--text-muted)" : "var(--text-main)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                            {lesson.order}. {lesson.title}
-                          </span>
-                        </div>
-                        {lesson.isPreview && (
-                          <span className="badge success" style={{ fontSize: "9px", padding: "2px 6px", marginLeft: "6px", flexShrink: 0 }}>Preview</span>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+    return (
+      <ClassroomWorkspace
+        activeCourseItem={activeCourseItem}
+        activeCourseId={activeCourseId}
+        activeLessonId={activeLessonId}
+        setSearchParams={setSearchParams}
+        toggleLessonCompletion={toggleLessonCompletion}
+        saveResumeLesson={saveResumeLesson}
+      />
     );
   }
 
