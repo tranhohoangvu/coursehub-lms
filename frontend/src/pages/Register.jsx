@@ -1,26 +1,42 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
+import { useToast } from "../context/ToastContext.jsx";
 import {
   UserPlus,
   User,
   Mail,
   Lock,
-  Sparkles,
-  ArrowRight,
-  ShieldCheck,
   CheckCircle2,
   Eye,
-  EyeOff
+  EyeOff,
+  Loader2
 } from "lucide-react";
+
+function getPasswordStrength(password) {
+  if (!password) return { level: 0, label: "", cls: "" };
+  let score = 0;
+  if (password.length >= 6) score++;
+  if (password.length >= 10) score++;
+  if (/[A-Z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
+  if (/[^A-Za-z0-9]/.test(password)) score++;
+
+  if (score <= 1) return { level: 1, label: "Weak", cls: "weak" };
+  if (score === 2) return { level: 2, label: "Fair", cls: "fair" };
+  if (score === 3) return { level: 3, label: "Good", cls: "good" };
+  return { level: 4, label: "Strong", cls: "strong" };
+}
 
 export default function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const strength = getPasswordStrength(form.password);
 
   function setField(name, value) {
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -30,11 +46,11 @@ export default function Register() {
     e.preventDefault();
     try {
       setLoading(true);
-      setError("");
       await register(form.name, form.email, form.password);
+      showToast("Account created! Welcome to CourseHub 🎉", "success");
       navigate("/");
     } catch (err) {
-      setError(err.message);
+      showToast(err.message, "error");
     } finally {
       setLoading(false);
     }
@@ -68,29 +84,30 @@ export default function Register() {
           Join thousands of engineers learning high-demand tech skills
         </p>
 
-        {error && <div className="error" style={{ marginBottom: "20px" }}>{error}</div>}
-
-        <form className="form" onSubmit={handleSubmit}>
+        <form className="form" id="register-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label">Full Name</label>
+            <label className="form-label" htmlFor="register-name">Full Name</label>
             <div style={{ position: "relative" }}>
               <User size={16} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
               <input
+                id="register-name"
                 className="input"
                 required
                 style={{ paddingLeft: "42px" }}
                 value={form.name}
                 onChange={(e) => setField("name", e.target.value)}
                 placeholder="e.g. Alex Morgan"
+                disabled={loading}
               />
             </div>
           </div>
 
           <div className="form-group">
-            <label className="form-label">Email Address</label>
+            <label className="form-label" htmlFor="register-email">Email Address</label>
             <div style={{ position: "relative" }}>
               <Mail size={16} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
               <input
+                id="register-email"
                 className="input"
                 type="email"
                 required
@@ -98,15 +115,17 @@ export default function Register() {
                 value={form.email}
                 onChange={(e) => setField("email", e.target.value)}
                 placeholder="name@example.com"
+                disabled={loading}
               />
             </div>
           </div>
 
           <div className="form-group">
-            <label className="form-label">Password</label>
+            <label className="form-label" htmlFor="register-password">Password</label>
             <div style={{ position: "relative" }}>
               <Lock size={16} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
               <input
+                id="register-password"
                 className="input"
                 type={showPassword ? "text" : "password"}
                 required
@@ -114,9 +133,11 @@ export default function Register() {
                 value={form.password}
                 onChange={(e) => setField("password", e.target.value)}
                 placeholder="At least 6 characters"
+                disabled={loading}
               />
               <button
                 type="button"
+                id="toggle-register-password"
                 onClick={() => setShowPassword(!showPassword)}
                 style={{
                   position: "absolute",
@@ -135,14 +156,37 @@ export default function Register() {
                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
+
+            {/* Password Strength Indicator */}
+            {form.password && (
+              <>
+                <div className="password-strength" role="progressbar" aria-label={`Password strength: ${strength.label}`}>
+                  {[1, 2, 3, 4].map((bar) => (
+                    <div
+                      key={bar}
+                      className={`strength-bar ${bar <= strength.level ? strength.cls : ""}`}
+                    />
+                  ))}
+                </div>
+                <span className={`strength-label ${strength.cls}`}>{strength.label} password</span>
+              </>
+            )}
           </div>
 
           <button
+            id="register-submit"
             className="btn success btn-glow"
             style={{ width: "100%", height: "46px", marginTop: "8px", fontSize: "15px" }}
             disabled={loading}
           >
-            {loading ? "Creating Account..." : "Create Free Account"}
+            {loading ? (
+              <>
+                <Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} />
+                Creating Account...
+              </>
+            ) : (
+              "Create Free Account"
+            )}
           </button>
         </form>
 
@@ -157,11 +201,15 @@ export default function Register() {
         <div style={{ marginTop: "28px", paddingTop: "20px", borderTop: "1px solid var(--border-color)", display: "grid", gap: "8px", fontSize: "12.5px", color: "var(--text-muted)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <CheckCircle2 size={14} style={{ color: "#10b981" }} />
-            <span>Instant access to free course previews & tutorials</span>
+            <span>Instant access to free course previews &amp; tutorials</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <CheckCircle2 size={14} style={{ color: "#10b981" }} />
             <span>Track progress with interactive syllabus checklist</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <CheckCircle2 size={14} style={{ color: "#10b981" }} />
+            <span>Earn certificates upon course completion</span>
           </div>
         </div>
       </div>

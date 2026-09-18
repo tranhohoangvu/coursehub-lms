@@ -1,47 +1,62 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
+import { useToast } from "../context/ToastContext.jsx";
 import {
   LogIn,
   Mail,
   Lock,
   Sparkles,
-  ArrowRight,
   ShieldCheck,
   GraduationCap,
   User,
   Eye,
-  EyeOff
+  EyeOff,
+  Loader2
 } from "lucide-react";
 
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { showToast } = useToast();
+
+  // Redirect to where user came from, or home
+  const from = location.state?.from || "/";
+
   const [email, setEmail] = useState("student@example.com");
   const [password, setPassword] = useState("123456");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e) {
     if (e) e.preventDefault();
     try {
       setLoading(true);
-      setError("");
       await login(email, password);
-      navigate("/");
+      navigate(from, { replace: true });
     } catch (err) {
-      setError(err.message);
+      showToast(err.message, "error");
     } finally {
       setLoading(false);
     }
   }
 
-  // Quick 1-click test accounts
-  const setDemoCredentials = (demoEmail, demoRole) => {
+  // Quick 1-click test accounts — auto-submit immediately
+  async function setDemoCredentials(demoEmail) {
     setEmail(demoEmail);
     setPassword("123456");
-  };
+    // Auto-login with the demo credentials directly
+    try {
+      setLoading(true);
+      await login(demoEmail, "123456");
+      navigate(from, { replace: true });
+    } catch (err) {
+      showToast(err.message, "error");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="auth-wrapper">
@@ -71,14 +86,13 @@ export default function Login() {
           Log in to your CourseHub account to continue learning
         </p>
 
-        {error && <div className="error" style={{ marginBottom: "20px" }}>{error}</div>}
-
-        <form className="form" onSubmit={handleSubmit}>
+        <form className="form" id="login-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label">Email Address</label>
+            <label className="form-label" htmlFor="login-email">Email Address</label>
             <div style={{ position: "relative" }}>
               <Mail size={16} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
               <input
+                id="login-email"
                 className="input"
                 type="email"
                 required
@@ -86,15 +100,17 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@example.com"
+                disabled={loading}
               />
             </div>
           </div>
 
           <div className="form-group">
-            <label className="form-label">Password</label>
+            <label className="form-label" htmlFor="login-password">Password</label>
             <div style={{ position: "relative" }}>
               <Lock size={16} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
               <input
+                id="login-password"
                 className="input"
                 type={showPassword ? "text" : "password"}
                 required
@@ -102,9 +118,11 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
+                disabled={loading}
               />
               <button
                 type="button"
+                id="toggle-password-visibility"
                 onClick={() => setShowPassword(!showPassword)}
                 style={{
                   position: "absolute",
@@ -126,11 +144,19 @@ export default function Login() {
           </div>
 
           <button
+            id="login-submit"
             className="btn btn-glow"
             style={{ width: "100%", height: "46px", marginTop: "8px", fontSize: "15px" }}
             disabled={loading}
           >
-            {loading ? "Authenticating..." : "Sign In to Account"}
+            {loading ? (
+              <>
+                <Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} />
+                Authenticating...
+              </>
+            ) : (
+              "Sign In to Account"
+            )}
           </button>
         </form>
 
@@ -141,17 +167,19 @@ export default function Login() {
           </Link>
         </div>
 
-        {/* 1-Click Quick Demo Accounts Selection */}
+        {/* 1-Click Quick Demo Accounts — auto-login on click */}
         <div style={{ marginTop: "28px", paddingTop: "20px", borderTop: "1px solid var(--border-color)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "10px", fontSize: "12.5px", fontWeight: "700", color: "var(--text-main)" }}>
             <Sparkles size={14} style={{ color: "var(--primary)" }} />
-            <span>One-Click Demo Accounts:</span>
+            <span>One-Click Demo Accounts (auto-login):</span>
           </div>
 
           <div style={{ display: "grid", gap: "8px" }}>
             <div
+              id="demo-student"
               className="demo-account-chip"
-              onClick={() => setDemoCredentials("student@example.com", "STUDENT")}
+              onClick={() => !loading && setDemoCredentials("student@example.com")}
+              style={{ opacity: loading ? 0.6 : 1, cursor: loading ? "not-allowed" : "pointer" }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                 <User size={14} style={{ color: "#0284c7" }} />
@@ -161,8 +189,10 @@ export default function Login() {
             </div>
 
             <div
+              id="demo-instructor"
               className="demo-account-chip"
-              onClick={() => setDemoCredentials("teacher@example.com", "INSTRUCTOR")}
+              onClick={() => !loading && setDemoCredentials("teacher@example.com")}
+              style={{ opacity: loading ? 0.6 : 1, cursor: loading ? "not-allowed" : "pointer" }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                 <GraduationCap size={14} style={{ color: "#86198f" }} />
@@ -172,8 +202,10 @@ export default function Login() {
             </div>
 
             <div
+              id="demo-admin"
               className="demo-account-chip"
-              onClick={() => setDemoCredentials("admin@example.com", "ADMIN")}
+              onClick={() => !loading && setDemoCredentials("admin@example.com")}
+              style={{ opacity: loading ? 0.6 : 1, cursor: loading ? "not-allowed" : "pointer" }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                 <ShieldCheck size={14} style={{ color: "#b45309" }} />
