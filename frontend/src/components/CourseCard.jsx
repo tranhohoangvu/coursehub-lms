@@ -1,12 +1,20 @@
 import { Link } from "react-router-dom";
-import { Star, ArrowRight, BookOpen, Clock, CheckCircle2 } from "lucide-react";
+import { Star, ArrowRight, BookOpen, Clock, CheckCircle2, PlayCircle } from "lucide-react";
 
-export default function CourseCard({ course }) {
+export default function CourseCard({ course, enrolledIds = [] }) {
   const isFree = Number(course.price) === 0;
+  const isEnrolled = enrolledIds.includes(course.id);
 
   // Derive initial for instructor avatar
   const instructorName = course.instructor?.name || "Instructor";
   const instructorInitial = instructorName.charAt(0).toUpperCase();
+
+  // Real rating from backend average_rating field
+  const avgRating = course.averageRating > 0
+    ? course.averageRating.toFixed(1)
+    : null;
+
+  const reviewCount = course.reviewCount ?? 0;
 
   return (
     <div className="course-card">
@@ -25,6 +33,11 @@ export default function CourseCard({ course }) {
             {course.category?.name || "Development"}
           </span>
         </div>
+        {isEnrolled && (
+          <div className="course-enrolled-badge">
+            <CheckCircle2 size={11} /> Enrolled
+          </div>
+        )}
       </div>
 
       {/* Course Body */}
@@ -33,8 +46,16 @@ export default function CourseCard({ course }) {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "12.5px", fontWeight: "700", color: "#f59e0b" }}>
             <Star size={14} fill="#f59e0b" />
-            <span>4.9</span>
-            <span style={{ color: "var(--text-light)", fontWeight: "500" }}>(120+ reviews)</span>
+            {avgRating ? (
+              <>
+                <span>{avgRating}</span>
+                <span style={{ color: "var(--text-light)", fontWeight: "500" }}>
+                  ({reviewCount > 0 ? `${reviewCount} review${reviewCount !== 1 ? "s" : ""}` : "No reviews"})
+                </span>
+              </>
+            ) : (
+              <span style={{ color: "var(--text-light)", fontWeight: "500", fontSize: "12px" }}>New Course</span>
+            )}
           </div>
 
           <span style={{ fontSize: "12px", color: "var(--text-light)", display: "flex", alignItems: "center", gap: "4px" }}>
@@ -80,13 +101,23 @@ export default function CourseCard({ course }) {
             )}
           </div>
 
-          <Link
-            className="btn"
-            to={`/courses/${course.id}`}
-            style={{ padding: "8px 14px", fontSize: "13px" }}
-          >
-            Explore <ArrowRight size={14} />
-          </Link>
+          {isEnrolled ? (
+            <Link
+              className="btn success"
+              to={`/my-courses?courseId=${course.id}`}
+              style={{ padding: "8px 14px", fontSize: "13px" }}
+            >
+              <PlayCircle size={14} /> Resume
+            </Link>
+          ) : (
+            <Link
+              className="btn"
+              to={`/courses/${course.id}`}
+              style={{ padding: "8px 14px", fontSize: "13px" }}
+            >
+              Explore <ArrowRight size={14} />
+            </Link>
+          )}
         </div>
       </div>
     </div>
