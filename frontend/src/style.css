@@ -59,6 +59,7 @@
   --shadow-lg: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
   --shadow-xl: 0 25px 50px -12px rgba(15, 23, 42, 0.15);
   --shadow-glow: 0 0 25px var(--primary-glow);
+  --nav-scrolled-shadow: 0 8px 32px rgba(15, 23, 42, 0.1);
 
   --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -123,7 +124,13 @@ button, input, textarea, select {
   -webkit-backdrop-filter: blur(18px);
   border-bottom: 1px solid rgba(226, 232, 240, 0.8);
   box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
-  transition: var(--transition-smooth);
+  transition: box-shadow 0.3s ease, background 0.3s ease;
+}
+
+.nav.scrolled {
+  box-shadow: var(--nav-scrolled-shadow);
+  background: rgba(255, 255, 255, 0.96);
+  border-bottom-color: rgba(226, 232, 240, 1);
 }
 
 .nav-inner {
@@ -489,6 +496,34 @@ button, input, textarea, select {
   border-radius: var(--radius-md);
 }
 
+/* Sort Dropdown */
+.sort-select-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sort-select {
+  height: 40px;
+  padding: 0 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  box-shadow: var(--shadow-xs);
+  width: auto;
+}
+
+.sort-select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
 /* Hero Live Stats Bar */
 .hero-stats {
   display: grid;
@@ -572,6 +607,116 @@ button, input, textarea, select {
 }
 
 /* ==========================================================================
+   Skeleton Loading System
+   ========================================================================== */
+@keyframes shimmer {
+  0% { background-position: -700px 0; }
+  100% { background-position: 700px 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #f0f4f8 25%, #e8edf3 50%, #f0f4f8 75%);
+  background-size: 700px 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+  border-radius: var(--radius-sm);
+}
+
+.skeleton-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.skeleton-thumb {
+  width: 100%;
+  height: 190px;
+}
+
+.skeleton-body {
+  padding: 22px;
+  display: grid;
+  gap: 12px;
+}
+
+.skeleton-line {
+  height: 14px;
+  border-radius: var(--radius-xs);
+}
+
+.skeleton-line.short  { width: 40%; }
+.skeleton-line.medium { width: 70%; }
+.skeleton-line.full   { width: 100%; }
+.skeleton-line.tall   { height: 20px; }
+.skeleton-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+/* ==========================================================================
+   Toast Notification System
+   ========================================================================== */
+.toast-container {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  max-width: 380px;
+  box-shadow: var(--shadow-lg);
+  pointer-events: all;
+  animation: toastSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(12px);
+}
+
+.toast.exiting {
+  animation: toastSlideOut 0.25s ease-in forwards;
+}
+
+.toast.success {
+  background: rgba(236, 253, 245, 0.97);
+  color: var(--success-dark);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.toast.error {
+  background: rgba(254, 242, 242, 0.97);
+  color: var(--danger-dark);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.toast.info {
+  background: rgba(238, 242, 255, 0.97);
+  color: var(--primary-dark);
+  border: 1px solid rgba(79, 70, 229, 0.25);
+}
+
+@keyframes toastSlideIn {
+  from { opacity: 0; transform: translateX(40px) scale(0.95); }
+  to   { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes toastSlideOut {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(40px); }
+}
+
+/* ==========================================================================
    Course Cards & Grid System
    ========================================================================== */
 .grid {
@@ -639,6 +784,24 @@ button, input, textarea, select {
   top: 14px;
   left: 14px;
   z-index: 2;
+}
+
+.course-enrolled-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
+  background: rgba(16, 185, 129, 0.9);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .course-content-body {
@@ -776,6 +939,160 @@ button, input, textarea, select {
 }
 
 /* ==========================================================================
+   Tab Bar (Admin & multi-section pages)
+   ========================================================================== */
+.tab-bar {
+  display: flex;
+  gap: 4px;
+  background: #f1f5f9;
+  padding: 6px;
+  border-radius: var(--radius-lg);
+  margin-bottom: 28px;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+}
+
+.tab-bar::-webkit-scrollbar { display: none; }
+
+.tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: var(--radius-md);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: var(--transition-fast);
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  background: rgba(255,255,255,0.7);
+  color: var(--text-main);
+}
+
+.tab-btn.active {
+  background: #ffffff;
+  color: var(--primary);
+  box-shadow: var(--shadow-sm);
+  font-weight: 700;
+}
+
+.tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  background: var(--primary-light);
+  color: var(--primary);
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.tab-btn.active .tab-count {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* ==========================================================================
+   CSS Bar Chart (Admin Dashboard)
+   ========================================================================== */
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  height: 120px;
+  padding: 0 4px;
+}
+
+.bar-chart-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.bar-chart-bar {
+  width: 100%;
+  background: linear-gradient(180deg, #6366f1 0%, #4f46e5 100%);
+  border-radius: 6px 6px 0 0;
+  transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 4px;
+  cursor: pointer;
+  position: relative;
+}
+
+.bar-chart-bar:hover {
+  background: linear-gradient(180deg, #818cf8 0%, #6366f1 100%);
+}
+
+.bar-chart-bar::after {
+  content: attr(data-value);
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--primary);
+  opacity: 0;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+
+.bar-chart-bar:hover::after {
+  opacity: 1;
+}
+
+.bar-chart-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-align: center;
+}
+
+/* ==========================================================================
+   Password Strength Indicator
+   ========================================================================== */
+.password-strength {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.strength-bar {
+  flex: 1;
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: #e2e8f0;
+  transition: background 0.3s ease;
+}
+
+.strength-bar.weak   { background: #ef4444; }
+.strength-bar.fair   { background: #f59e0b; }
+.strength-bar.good   { background: #3b82f6; }
+.strength-bar.strong { background: #10b981; }
+
+.strength-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.strength-label.weak   { color: #ef4444; }
+.strength-label.fair   { color: #f59e0b; }
+.strength-label.good   { color: #3b82f6; }
+.strength-label.strong { color: #10b981; }
+
+/* ==========================================================================
    Course Detail Page & Sticky Purchase Card
    ========================================================================== */
 .detail-grid {
@@ -827,6 +1144,11 @@ button, input, textarea, select {
 }
 
 /* Lesson Accordion Item */
+.lesson-list {
+  display: grid;
+  gap: 0;
+}
+
 .lesson-item-card {
   display: flex;
   align-items: center;
@@ -834,9 +1156,22 @@ button, input, textarea, select {
   padding: 16px 20px;
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  margin-bottom: 12px;
+  border-bottom: none;
   transition: var(--transition-fast);
+}
+
+.lesson-item-card:first-child {
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.lesson-item-card:last-child {
+  border-bottom: 1px solid var(--border-color);
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+}
+
+.lesson-item-card:only-child {
+  border-radius: var(--radius-md);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .lesson-item-card:hover {
@@ -855,6 +1190,7 @@ button, input, textarea, select {
   border-radius: 50%;
   font-weight: 700;
   font-size: 13px;
+  flex-shrink: 0;
 }
 
 /* Sticky Purchase Widget */
@@ -866,6 +1202,12 @@ button, input, textarea, select {
   border-radius: var(--radius-lg);
   padding: 28px;
   box-shadow: var(--shadow-xl);
+  animation: slideUpCard 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUpCard {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ==========================================================================
@@ -916,6 +1258,28 @@ button, input, textarea, select {
   width: 100%;
   height: 100%;
   border: 0;
+}
+
+/* Lesson sidebar row */
+.workspace-lesson-row {
+  transition: var(--transition-fast);
+}
+
+.workspace-lesson-row:hover {
+  border-color: var(--primary) !important;
+  background: var(--primary-light) !important;
+}
+
+/* ==========================================================================
+   Cart item fade-out animation
+   ========================================================================== */
+.cart-item-removing {
+  animation: fadeOutLeft 0.3s ease-out forwards;
+}
+
+@keyframes fadeOutLeft {
+  from { opacity: 1; transform: translateX(0); max-height: 200px; }
+  to   { opacity: 0; transform: translateX(-20px); max-height: 0; padding: 0; margin: 0; overflow: hidden; }
 }
 
 /* ==========================================================================
@@ -986,6 +1350,11 @@ textarea {
   border: 1px solid rgba(16, 185, 129, 0.25);
 }
 
+.divider {
+  border: none;
+  border-top: 1px solid var(--border-color);
+}
+
 /* Modal Windows */
 .modal-overlay {
   position: fixed;
@@ -1023,7 +1392,7 @@ textarea {
 
 @keyframes modalScaleUp {
   from { opacity: 0; transform: scale(0.95) translateY(10px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 /* ==========================================================================
@@ -1053,6 +1422,22 @@ textarea {
   letter-spacing: 0.6px;
   padding: 16px 20px;
   border-bottom: 1px solid var(--border-color);
+  user-select: none;
+}
+
+.table th.sortable {
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.table th.sortable:hover {
+  background: #eef2ff;
+  color: var(--primary);
+}
+
+.table th.sorted {
+  color: var(--primary);
+  background: var(--primary-light);
 }
 
 .table td {
@@ -1149,6 +1534,47 @@ textarea {
   color: #ffffff;
 }
 
+.footer-social {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.footer-social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #94a3b8;
+  transition: var(--transition-fast);
+}
+
+.footer-social-link:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.footer-status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(16,185,129,0.3);
+  animation: statusPulse 2s ease-in-out infinite;
+}
+
+@keyframes statusPulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(16,185,129,0.3); }
+  50%       { box-shadow: 0 0 0 6px rgba(16,185,129,0.1); }
+}
+
 .footer-bottom {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   padding-top: 24px;
@@ -1236,6 +1662,11 @@ textarea {
   color: var(--primary);
 }
 
+.sidebar-divider {
+  border-top: 1px solid var(--border-color);
+  margin: 4px 0;
+}
+
 @keyframes slideLeft {
   from { transform: translateX(100%); }
   to { transform: translateX(0); }
@@ -1246,6 +1677,42 @@ textarea {
   to { opacity: 1; }
 }
 
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ==========================================================================
+   Accessibility: Reduced Motion
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .skeleton {
+    animation: none;
+    background: #f0f4f8;
+  }
+
+  .hero::before {
+    animation: none;
+  }
+
+  .cart-count-badge {
+    animation: none;
+  }
+
+  .footer-status-dot {
+    animation: none;
+  }
+}
+
+/* ==========================================================================
+   Responsive Breakpoints
+   ========================================================================== */
 @media (max-width: 900px) {
   .hero h1 { font-size: 34px; }
   .hero-stats { grid-template-columns: repeat(2, 1fr); }
@@ -1261,4 +1728,8 @@ textarea {
   .search-container { flex-direction: column; }
   .search-container .btn { width: 100%; }
   .footer-inner { grid-template-columns: 1fr; }
+  .tab-bar { padding: 4px; }
+  .tab-btn { padding: 8px 12px; font-size: 12.5px; }
+  .toast-container { left: 16px; right: 16px; bottom: 16px; }
+  .toast { max-width: 100%; }
 }
