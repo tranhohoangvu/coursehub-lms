@@ -19,7 +19,7 @@ function StepIndicator({ current, steps }) {
             <div style={{
               display: "flex", alignItems: "center", gap: "10px",
               padding: "10px 16px", borderRadius: "var(--radius-md)",
-              background: isActive ? "var(--primary)" : isDone ? "var(--success-light)" : "#f1f5f9",
+              background: isActive ? "var(--primary)" : isDone ? "var(--success-light)" : "var(--bg-subtle)",
               color: isActive ? "#fff" : isDone ? "var(--success-dark)" : "var(--text-muted)",
               fontWeight: "700", fontSize: "13px", whiteSpace: "nowrap",
               boxShadow: isActive ? "0 4px 12px var(--primary-glow)" : "none",
@@ -27,7 +27,7 @@ function StepIndicator({ current, steps }) {
             }}>
               <div style={{
                 width: "24px", height: "24px", borderRadius: "50%", flexShrink: 0,
-                background: isActive ? "rgba(255,255,255,0.25)" : isDone ? "#10b981" : "#cbd5e1",
+                background: isActive ? "rgba(255,255,255,0.25)" : isDone ? "#10b981" : "var(--border-color)",
                 color: isDone ? "#fff" : "inherit",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: "12px", fontWeight: "800"
@@ -37,7 +37,7 @@ function StepIndicator({ current, steps }) {
               {step}
             </div>
             {idx < steps.length - 1 && (
-              <div style={{ flex: 1, height: "2px", background: isDone ? "#10b981" : "#e2e8f0", margin: "0 8px" }} />
+              <div style={{ flex: 1, height: "2px", background: isDone ? "#10b981" : "var(--border-color)", margin: "0 8px" }} />
             )}
           </div>
         );
@@ -242,12 +242,12 @@ export default function Instructor() {
             </div>
 
             {createdCourse ? (
-              <div style={{ background: "var(--primary-light)", color: "var(--primary-dark)", padding: "12px 16px", borderRadius: "var(--radius-md)", fontSize: "13.5px", marginBottom: "20px", fontWeight: "600", display: "flex", alignItems: "center", gap: "8px" }}>
+              <div style={{ background: "var(--primary-light)", color: "var(--text-main)", border: "1px solid var(--border-color)", padding: "12px 16px", borderRadius: "var(--radius-md)", fontSize: "13.5px", marginBottom: "20px", fontWeight: "600", display: "flex", alignItems: "center", gap: "8px" }}>
                 <CheckCircle2 size={16} style={{ color: "var(--primary)" }} />
                 Target: <strong>{createdCourse.title}</strong>
               </div>
             ) : (
-              <div style={{ background: "#f8fafc", border: "1px dashed var(--border-color)", color: "var(--text-muted)", padding: "16px", borderRadius: "var(--radius-md)", fontSize: "13px", marginBottom: "20px", textAlign: "center" }}>
+              <div style={{ background: "var(--bg-subtle)", border: "1px dashed var(--border-color)", color: "var(--text-muted)", padding: "16px", borderRadius: "var(--radius-md)", fontSize: "13px", marginBottom: "20px", textAlign: "center" }}>
                 Go to Step 1 to create a course first.
               </div>
             )}

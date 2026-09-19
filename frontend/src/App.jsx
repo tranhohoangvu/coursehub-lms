@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "./context/AuthContext.jsx";
 import { useCart } from "./context/CartContext.jsx";
+import ThemeToggle from "./components/ThemeToggle.jsx";
 import {
   Menu,
   X,
@@ -30,6 +31,33 @@ export default function App() {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Global keyboard shortcut: press "/" anywhere to focus search
+  useEffect(() => {
+    const handleGlobalSlash = (e) => {
+      const tag = e.target.tagName?.toLowerCase();
+      if (
+        tag === "input" ||
+        tag === "textarea" ||
+        e.target.isContentEditable ||
+        e.metaKey ||
+        e.ctrlKey ||
+        e.altKey
+      ) {
+        return;
+      }
+      if (e.key === "/") {
+        e.preventDefault();
+        const searchInput = document.getElementById("catalog-search");
+        if (searchInput) {
+          searchInput.focus();
+          searchInput.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }
+    };
+    window.addEventListener("keydown", handleGlobalSlash);
+    return () => window.removeEventListener("keydown", handleGlobalSlash);
   }, []);
 
   // Determine user role badge style
@@ -124,16 +152,22 @@ export default function App() {
                 </button>
               </div>
             )}
+
+            {/* Theme Toggle Button (Light/Dark mode) */}
+            <ThemeToggle />
           </div>
 
-          {/* Toggle Burger Menu on Mobile */}
-          <button
-            className="mobile-menu-toggle"
-            onClick={() => setIsSidebarOpen(true)}
-            aria-label="Open navigation menu"
-          >
-            <Menu size={24} />
-          </button>
+          {/* Mobile Right Controls: Theme Toggle & Burger Menu */}
+          <div className="mobile-only" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <ThemeToggle />
+            <button
+              className="mobile-menu-toggle"
+              onClick={() => setIsSidebarOpen(true)}
+              aria-label="Open navigation menu"
+            >
+              <Menu size={24} />
+            </button>
+          </div>
         </div>
       </nav>
 

@@ -439,7 +439,7 @@ export default function Admin() {
       case "INSTRUCTOR":
         return <span className="badge instructor">Instructor</span>;
       default:
-        return <span className="badge" style={{ background: "#e2e8f0", color: "#334155" }}>Student</span>;
+        return <span className="badge student">Student</span>;
     }
   };
 
@@ -449,9 +449,9 @@ export default function Admin() {
       case "PUBLISHED":
         return <span className="badge success">Published</span>;
       case "DRAFT":
-        return <span className="badge" style={{ background: "#cbd5e1", color: "#1e293b" }}>Draft</span>;
+        return <span className="badge" style={{ background: "var(--bg-subtle)", color: "var(--text-muted)", border: "1px solid var(--border-color)" }}>Draft</span>;
       case "BLOCKED":
-        return <span className="badge" style={{ background: "#fecaca", color: "#991b1b" }}>Blocked</span>;
+        return <span className="badge danger">Blocked</span>;
       default:
         return <span className="badge">{status}</span>;
     }
@@ -905,7 +905,7 @@ export default function Admin() {
                       </td>
                       <td style={{ color: "var(--text-muted)" }}>{c.instructorName || "Unknown"}</td>
                       <td>
-                        <span className="badge" style={{ background: "#e0e7ff", color: "#312e81" }}>
+                        <span className="badge">
                           {c.categoryName || "General"}
                         </span>
                       </td>

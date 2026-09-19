@@ -196,7 +196,7 @@ function ClassroomWorkspace({
 
       {/* 100% Graduation Banner with Certificate Button */}
       {isGraduated && (
-        <div style={{ background: "linear-gradient(135deg, #065f46 0%, #047857 100%)", color: "#ffffff", padding: "20px 24px", borderRadius: "var(--radius-lg)", marginBottom: "24px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px", boxShadow: "0 10px 25px rgba(6, 95, 70, 0.3)" }}>
+        <div style={{ background: "linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)", color: "#ffffff", padding: "20px 24px", borderRadius: "var(--radius-lg)", marginBottom: "24px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px", boxShadow: "0 10px 25px rgba(37, 99, 235, 0.3)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
             <div style={{ width: "42px", height: "42px", borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <Award size={24} />
@@ -207,8 +207,7 @@ function ClassroomWorkspace({
             </div>
           </div>
           <button
-            className="btn"
-            style={{ background: "rgba(255,255,255,0.95)", color: "#065f46", fontWeight: "800" }}
+            className="btn-download-cert"
             onClick={() => printCertificate(course.title, userName)}
           >
             <Printer size={16} /> Download Certificate
@@ -237,7 +236,7 @@ function ClassroomWorkspace({
                     />
                   </div>
                 ) : currentLesson.videoUrl ? (
-                  <div style={{ background: "var(--text-main)", color: "#fff", padding: "32px 24px", borderRadius: "var(--radius-md)", marginBottom: "24px", textAlign: "center" }}>
+                  <div style={{ background: "var(--bg-subtle)", color: "var(--text-main)", padding: "32px 24px", borderRadius: "var(--radius-md)", marginBottom: "24px", textAlign: "center", border: "1px solid var(--border-color)" }}>
                     <Video size={36} style={{ color: "var(--primary)", margin: "0 auto 12px auto" }} />
                     <h4 style={{ marginBottom: "8px" }}>Watch Video on YouTube</h4>
                     <a href={currentLesson.videoUrl} target="_blank" rel="noopener noreferrer" className="btn btn-glow" style={{ display: "inline-flex", marginTop: "8px" }}>
@@ -533,7 +532,7 @@ export default function MyCourses() {
           {/* Search bar */}
           <div className="search-container" style={{ marginBottom: "32px", maxWidth: "540px" }}>
             <div className="search-input-wrapper">
-              <Search size={18} style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", color: "#64748b" }} />
+              <Search size={18} style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", color: "var(--text-light)" }} />
               <input type="text" placeholder="Search enrolled courses..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
             </div>
             {searchQuery && (
@@ -584,7 +583,7 @@ export default function MyCourses() {
                             {isFinished && (
                               <button
                                 className="btn secondary"
-                                style={{ padding: "8px 14px", fontSize: "12.5px", color: "#047857", borderColor: "#6ee7b7" }}
+                                style={{ padding: "8px 14px", fontSize: "12.5px", color: "var(--primary)", borderColor: "var(--border-color)" }}
                                 onClick={() => printCertificate(item.course.title, "Student")}
                               >
                                 <Printer size={13} /> Certificate
@@ -604,7 +603,7 @@ export default function MyCourses() {
                           {item.course.description}
                         </p>
 
-                        <div style={{ background: "#f8fafc", padding: "12px 16px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)" }}>
+                        <div style={{ background: "var(--bg-subtle)", padding: "12px 16px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)" }}>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px", fontSize: "12.5px" }}>
                             <span style={{ fontWeight: "700", color: isFinished ? "#10b981" : "var(--text-main)" }}>
                               {isFinished ? "🏆 Completed!" : savedLesson ? `📍 Last: Lesson ${savedLesson.order}` : "In Progress"}

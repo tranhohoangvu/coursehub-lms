@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Star, ArrowRight, BookOpen, Clock, CheckCircle2, PlayCircle } from "lucide-react";
+import { Star, ArrowRight, BookOpen, Clock, CheckCircle2, PlayCircle, Bookmark, Eye } from "lucide-react";
 
 export default function CourseCard({ course, enrolledIds = [] }) {
   const isFree = Number(course.price) === 0;
   const isEnrolled = enrolledIds.includes(course.id);
+  const [isBookmarked, setIsBookmarked] = useState(false);
 
   // Derive initial for instructor avatar
   const instructorName = course.instructor?.name || "Instructor";
@@ -15,6 +17,12 @@ export default function CourseCard({ course, enrolledIds = [] }) {
     : null;
 
   const reviewCount = course.reviewCount ?? 0;
+
+  const toggleBookmark = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsBookmarked(!isBookmarked);
+  };
 
   return (
     <div className="course-card">
@@ -33,6 +41,28 @@ export default function CourseCard({ course, enrolledIds = [] }) {
             {course.category?.name || "Development"}
           </span>
         </div>
+
+        {/* Quick Action Floating Pills on Hover */}
+        <div className="course-quick-actions">
+          <Link
+            to={`/courses/${course.id}`}
+            className="quick-action-pill"
+            title="Xem trước thông tin khóa học"
+          >
+            <Eye size={13} />
+            <span>Xem nhanh</span>
+          </Link>
+          <button
+            type="button"
+            className={`quick-action-pill bookmark-btn ${isBookmarked ? "active" : ""}`}
+            onClick={toggleBookmark}
+            title={isBookmarked ? "Bỏ lưu khóa học" : "Lưu khóa học"}
+            aria-label={isBookmarked ? "Bỏ lưu khóa học" : "Lưu khóa học"}
+          >
+            <Bookmark size={13} fill={isBookmarked ? "currentColor" : "none"} />
+          </button>
+        </div>
+
         {isEnrolled && (
           <div className="course-enrolled-badge">
             <CheckCircle2 size={11} /> Enrolled
@@ -48,8 +78,8 @@ export default function CourseCard({ course, enrolledIds = [] }) {
             <Star size={14} fill="#f59e0b" />
             {avgRating ? (
               <>
-                <span>{avgRating}</span>
-                <span style={{ color: "var(--text-light)", fontWeight: "500" }}>
+                <span className="tnum">{avgRating}</span>
+                <span className="tnum" style={{ color: "var(--text-light)", fontWeight: "500" }}>
                   ({reviewCount > 0 ? `${reviewCount} review${reviewCount !== 1 ? "s" : ""}` : "No reviews"})
                 </span>
               </>
@@ -95,7 +125,7 @@ export default function CourseCard({ course, enrolledIds = [] }) {
             {isFree ? (
               <span className="price-tag free">FREE</span>
             ) : (
-              <span className="price-tag">
+              <span className="price-tag tnum">
                 {Number(course.price).toLocaleString("vi-VN")} <span style={{ fontSize: "13px", fontWeight: "600", color: "var(--text-muted)" }}>VND</span>
               </span>
             )}

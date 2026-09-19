@@ -138,29 +138,15 @@ export default function Cart() {
 
 
       {message && (
-        <div
-          style={{
-            background: "linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)",
-            border: "1px solid #10b981",
-            color: "#065f46",
-            padding: "20px 24px",
-            borderRadius: "var(--radius-lg)",
-            marginBottom: "28px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: "16px"
-          }}
-        >
+        <div className="cart-checkout-success-banner">
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <CheckCircle2 size={24} style={{ color: "#10b981" }} />
+            <CheckCircle2 size={24} style={{ color: "#10b981", flexShrink: 0 }} />
             <div>
-              <strong style={{ display: "block", fontSize: "15px" }}>{message}</strong>
-              <span style={{ fontSize: "13px" }}>You now have lifetime access to your newly enrolled courses.</span>
+              <strong style={{ display: "block", fontSize: "15px", marginBottom: "2px" }}>{message}</strong>
+              <span style={{ fontSize: "13px", opacity: 0.9 }}>You now have lifetime access to your newly enrolled courses.</span>
             </div>
           </div>
-          <Link to="/my-courses" className="btn success" style={{ padding: "8px 18px", fontSize: "13.5px" }}>
+          <Link to="/my-courses" className="btn-start-learning">
             Start Learning Now <ArrowRight size={15} />
           </Link>
         </div>

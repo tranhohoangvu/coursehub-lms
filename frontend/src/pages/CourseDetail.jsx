@@ -489,8 +489,8 @@ export default function CourseDetail() {
                 </Link>
               </div>
             ) : (
-              <div style={{ background: "var(--primary-light)", padding: "16px", borderRadius: "var(--radius-md)", textAlign: "center" }}>
-                <p style={{ fontSize: "13.5px", color: "var(--primary-dark)", margin: "0 0 12px 0", fontWeight: "600" }}>
+              <div style={{ background: "var(--primary-light)", border: "1px solid var(--border-color)", padding: "16px", borderRadius: "var(--radius-md)", textAlign: "center" }}>
+                <p style={{ fontSize: "13.5px", color: "var(--text-main)", margin: "0 0 12px 0", fontWeight: "600" }}>
                   Sign in or create an account to enroll in this course.
                 </p>
                 <Link

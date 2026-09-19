@@ -69,6 +69,46 @@
   --font-mono: 'JetBrains Mono', monospace;
 }
 
+/* ==========================================================================
+   Dark Theme Tokens (Inspired by toggles.dev & usehallmark.com Midnight)
+   ========================================================================== */
+[data-theme="dark"] {
+  --bg-base: #0B0F19;
+  --bg-surface: #111827;
+  --bg-surface-glass: rgba(17, 24, 39, 0.88);
+  --bg-subtle: #1E293B;
+  --bg-hover: #334155;
+
+  --text-main: #F8FAFC;
+  --text-muted: #94A3B8;
+  --text-light: #64748B;
+  --text-inverse: #0F172A;
+
+  --primary: #38BDF8;
+  --primary-hover: #0EA5E9;
+  --primary-light: rgba(56, 189, 248, 0.14);
+  --primary-dark: #0284C7;
+
+  --accent-ink: #F8FAFC;
+  --accent-ink-hover: #E2E8F0;
+
+  --border-color: #1E293B;
+  --border-subtle: #172033;
+  --border-focus: #38BDF8;
+
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.5), 0 1px 2px -1px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 14px -2px rgba(0, 0, 0, 0.6), 0 2px 6px -2px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 28px -6px rgba(0, 0, 0, 0.7), 0 4px 10px -2px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 20px 38px -8px rgba(0, 0, 0, 0.8);
+  --nav-scrolled-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
 /* Global Reset */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -125,7 +165,7 @@ button, input, textarea, select {
 
 .nav.scrolled {
   box-shadow: var(--nav-scrolled-shadow);
-  background: rgba(255, 255, 255, 0.98);
+  background: var(--bg-surface-glass);
 }
 
 .nav-inner {
@@ -200,14 +240,22 @@ button, input, textarea, select {
 }
 
 .cart-count-badge {
-  background: var(--text-main);
+  background: var(--primary);
   color: #ffffff;
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 800;
-  padding: 2px 6px;
+  padding: 2px 7px;
   border-radius: var(--radius-full);
   min-width: 18px;
   text-align: center;
+  line-height: 1.2;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+}
+
+[data-theme="dark"] .cart-count-badge {
+  background: #38BDF8;
+  color: #0B0F19;
+  box-shadow: 0 2px 8px rgba(56, 189, 248, 0.35);
 }
 
 /* User Profile Badge in Nav */
@@ -227,13 +275,18 @@ button, input, textarea, select {
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background: var(--text-main);
-  color: #fff;
+  background: var(--primary);
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 800;
+}
+
+[data-theme="dark"] .user-avatar-initial {
+  background: #38BDF8;
+  color: #0B0F19;
 }
 
 /* ==========================================================================
@@ -270,7 +323,7 @@ button, input, textarea, select {
 }
 
 .btn.secondary {
-  background: #ffffff;
+  background: var(--bg-surface);
   color: var(--text-main) !important;
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-xs);
@@ -278,7 +331,7 @@ button, input, textarea, select {
 
 .btn.secondary:hover {
   background: var(--bg-subtle);
-  border-color: #cbd5e1;
+  border-color: var(--primary);
   color: var(--primary) !important;
   transform: translateY(-2px);
   box-shadow: var(--shadow-sm);
@@ -335,7 +388,7 @@ button, input, textarea, select {
 }
 
 .nav-btn-login, .nav-btn-logout {
-  background: #ffffff !important;
+  background: var(--bg-surface) !important;
   color: var(--text-main) !important;
   border: 1px solid var(--border-color) !important;
   border-radius: var(--radius-full) !important;
@@ -345,7 +398,8 @@ button, input, textarea, select {
 
 .nav-btn-login:hover, .nav-btn-logout:hover {
   background: var(--bg-subtle) !important;
-  border-color: #cbd5e1 !important;
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
 }
 
 /* ==========================================================================
@@ -449,7 +503,7 @@ button, input, textarea, select {
 }
 
 .hero-secondary-pill {
-  background: #FFFFFF !important;
+  background: var(--bg-surface) !important;
   border: 1px solid var(--border-color) !important;
   color: var(--text-main) !important;
   border-radius: var(--radius-full) !important;
@@ -464,7 +518,7 @@ button, input, textarea, select {
 
 .hero-secondary-pill:hover {
   background: var(--bg-subtle) !important;
-  border-color: #CBD5E1 !important;
+  border-color: var(--primary) !important;
   transform: translateY(-2px);
   box-shadow: var(--shadow-sm) !important;
 }
@@ -556,9 +610,7 @@ button, input, textarea, select {
 .editorial-stats-strip {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  border-top: 1px solid var(--border-color);
-  border-bottom: 1px solid var(--border-color);
-  background: #FFFFFF;
+  background: var(--bg-surface);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-color);
   padding: 28px 0;
@@ -622,7 +674,7 @@ button, input, textarea, select {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #FFFFFF;
+  background: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   padding: 0 12px;
@@ -664,6 +716,25 @@ button, input, textarea, select {
   color: var(--text-main);
 }
 
+/* Catalog Search Shortcut Hint */
+.catalog-search-shortcut {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  pointer-events: none;
+}
+
 /* ==========================================================================
    Asymmetric Bento Showcase Grid (Taste-Skill Anti-Slop: Eliminates 3 Equal Cards)
    ========================================================================== */
@@ -682,7 +753,7 @@ button, input, textarea, select {
 }
 
 .bento-card {
-  background: #FFFFFF;
+  background: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-xl);
   padding: 32px;
@@ -693,7 +764,7 @@ button, input, textarea, select {
 .bento-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
-  border-color: #CBD5E1;
+  border-color: var(--primary);
 }
 
 /* Left Hero Feature Card */
@@ -744,6 +815,7 @@ button, input, textarea, select {
 .bento-code-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 6px;
   padding-bottom: 12px;
   border-bottom: 1px solid #1E293B;
@@ -756,17 +828,75 @@ button, input, textarea, select {
   margin-left: 8px;
 }
 
+/* Interactive SQL Run Button */
+.bento-run-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(37, 99, 235, 0.18);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #38BDF8;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 4px 11px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bento-run-btn:hover:not(:disabled) {
+  background: rgba(37, 99, 235, 0.35);
+  border-color: #38BDF8;
+  color: #FFFFFF;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(56, 189, 248, 0.3);
+}
+
+.bento-run-btn:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.bento-run-btn.running {
+  opacity: 0.8;
+  cursor: wait;
+  border-color: #F59E0B;
+  color: #F59E0B;
+  background: rgba(245, 158, 11, 0.18);
+}
+
+.code-executing {
+  animation: code-pulse 0.4s ease infinite alternate;
+}
+
+@keyframes code-pulse {
+  from { opacity: 0.75; }
+  to { opacity: 1; }
+}
+
+.pulsing-amber {
+  background: #F59E0B !important;
+  box-shadow: 0 0 8px #F59E0B !important;
+  animation: dot-pulse 0.6s infinite alternate;
+}
+
+@keyframes dot-pulse {
+  from { transform: scale(0.85); opacity: 0.6; }
+  to { transform: scale(1.25); opacity: 1; }
+}
+
 .bento-code-snippet pre {
   margin: 0;
   font-size: 12px;
   line-height: 1.55;
   color: #E2E8F0;
   overflow-x: auto;
+  transition: opacity 0.2s ease;
 }
 
 .bento-code-status {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 7px;
   font-size: 11.5px;
   color: #10B981;
@@ -868,7 +998,7 @@ button, input, textarea, select {
   gap: 6px;
   padding: 8px 16px;
   border-radius: var(--radius-full);
-  background: #FFFFFF;
+  background: var(--bg-surface);
   border: 1px solid var(--border-color);
   color: var(--text-muted);
   font-size: 13px;
@@ -882,7 +1012,7 @@ button, input, textarea, select {
 .chip-btn:hover {
   background: var(--bg-subtle);
   color: var(--text-main);
-  border-color: #D5CEBF;
+  border-color: var(--primary);
 }
 
 .chip-btn.active {
@@ -1031,18 +1161,19 @@ button, input, textarea, select {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #FFFFFF;
+  background: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: 0 2px 6px rgba(20, 28, 26, 0.03);
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  position: relative;
 }
 
 .course-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 16px 32px -8px rgba(20, 28, 26, 0.08);
-  border-color: #D5CEBF;
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
 }
 
 .course-thumbnail-box {
@@ -1076,7 +1207,7 @@ button, input, textarea, select {
   top: 12px;
   right: 12px;
   z-index: 2;
-  background: rgba(19, 78, 74, 0.92);
+  background: rgba(37, 99, 235, 0.92);
   color: #FFFFFF;
   font-size: 10.5px;
   font-weight: 700;
@@ -1087,6 +1218,62 @@ button, input, textarea, select {
   display: flex;
   align-items: center;
   gap: 4px;
+}
+
+/* Quick Action Floating Pills on Hover (Variant.com & SceneAI inspired) */
+.course-quick-actions {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 5;
+}
+
+.course-card:hover .course-quick-actions {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.quick-action-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(15, 23, 42, 0.78);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #FFFFFF !important;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 5px 11px;
+  border-radius: var(--radius-full);
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.quick-action-pill:hover {
+  background: var(--primary);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #FFFFFF !important;
+  transform: translateY(-1px);
+}
+
+.quick-action-pill.bookmark-btn {
+  padding: 6px;
+  border-radius: 50%;
+}
+
+.quick-action-pill.bookmark-btn.active {
+  background: #F59E0B;
+  border-color: #F59E0B;
+  color: #FFFFFF !important;
 }
 
 .course-content-body {
@@ -1409,13 +1596,19 @@ button, input, textarea, select {
 }
 
 .detail-header-card {
-  background: linear-gradient(145deg, #0C211D 0%, #153E37 100%);
+  background: linear-gradient(145deg, #0F172A 0%, #1E3A8A 100%);
   color: #FAF8F5;
   padding: 38px 40px;
   border-radius: var(--radius-xl);
   margin-bottom: 32px;
-  box-shadow: 0 16px 36px -12px rgba(12, 33, 29, 0.18);
+  box-shadow: 0 16px 36px -12px rgba(15, 23, 42, 0.25);
   border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+[data-theme="dark"] .detail-header-card {
+  background: linear-gradient(145deg, #0B132B 0%, #172554 100%);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.6);
 }
 
 .detail-header-card h1 {
@@ -1429,7 +1622,7 @@ button, input, textarea, select {
 }
 
 .what-you-learn-box {
-  background: #FFFFFF;
+  background: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-xl);
   padding: 30px;
@@ -1483,7 +1676,7 @@ button, input, textarea, select {
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  background: #FFFFFF;
+  background: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-bottom: none;
   transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
@@ -1507,8 +1700,8 @@ button, input, textarea, select {
 }
 
 .lesson-item-card:hover {
-  background: #FAF8F5;
-  border-color: #D5CEBF;
+  background: var(--bg-subtle);
+  border-color: var(--primary);
   transform: translateX(4px);
 }
 
@@ -1530,11 +1723,11 @@ button, input, textarea, select {
 .purchase-card-sticky {
   position: sticky;
   top: 96px;
-  background: #FFFFFF;
+  background: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-xl);
   padding: 24px;
-  box-shadow: 0 16px 36px -8px rgba(20, 28, 26, 0.08);
+  box-shadow: var(--shadow-lg);
   box-sizing: border-box;
   width: 100%;
   max-width: 100%;
@@ -1686,6 +1879,82 @@ textarea {
   border: 1px solid rgba(16, 185, 129, 0.25);
 }
 
+/* Checkout Success Alert Banner */
+.cart-checkout-success-banner {
+  background: var(--success-light);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: var(--success-dark);
+  padding: 20px 24px;
+  border-radius: var(--radius-lg);
+  margin-bottom: 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+[data-theme="dark"] .cart-checkout-success-banner {
+  background: rgba(16, 185, 129, 0.14);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #34D399;
+}
+
+.cart-checkout-success-banner .btn-start-learning {
+  background: #10B981 !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  padding: 10px 20px !important;
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  border-radius: var(--radius-full) !important;
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  text-decoration: none !important;
+  transition: all 0.2s ease !important;
+}
+
+.cart-checkout-success-banner .btn-start-learning:hover {
+  background: #059669 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.45) !important;
+}
+
+/* Download Certificate Pill Button */
+.btn-download-cert {
+  background: #FFFFFF !important;
+  color: #1E3A8A !important;
+  font-weight: 800 !important;
+  font-size: 13.5px !important;
+  padding: 10px 20px !important;
+  border-radius: var(--radius-full) !important;
+  border: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.btn-download-cert:hover {
+  background: #F8FAFC !important;
+  color: #2563EB !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35) !important;
+}
+
+.btn-download-cert svg {
+  color: #1E3A8A !important;
+  transition: color 0.2s ease;
+}
+
+.btn-download-cert:hover svg {
+  color: #2563EB !important;
+}
+
 .divider {
   border: none;
   border-top: 1px solid var(--border-color);
@@ -1750,7 +2019,7 @@ textarea {
 }
 
 .table th {
-  background: #f8fafc;
+  background: var(--bg-subtle);
   color: var(--text-muted);
   font-size: 12px;
   font-weight: 700;
@@ -1767,7 +2036,7 @@ textarea {
 }
 
 .table th.sortable:hover {
-  background: #eef2ff;
+  background: var(--bg-hover);
   color: var(--primary);
 }
 
@@ -1789,7 +2058,7 @@ textarea {
 }
 
 .table tr:hover td {
-  background: #f8fafc;
+  background: var(--bg-hover);
 }
 
 /* ==========================================================================
@@ -1802,7 +2071,7 @@ textarea {
 
 .auth-card {
   background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-xl);
   padding: 38px 32px;
   box-shadow: var(--shadow-xl);
@@ -1814,16 +2083,17 @@ textarea {
   align-items: center;
   justify-content: space-between;
   padding: 10px 14px;
-  background: #f8fafc;
+  background: var(--bg-subtle);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: var(--transition-fast);
   margin-top: 8px;
+  color: var(--text-main);
 }
 
 .demo-account-chip:hover {
-  background: var(--primary-light);
+  background: var(--bg-hover);
   border-color: var(--primary);
 }
 
@@ -1832,7 +2102,7 @@ textarea {
    ========================================================================== */
 .footer {
   margin-top: auto;
-  background: #ffffff;
+  background: var(--bg-surface);
   color: var(--text-muted);
   border-top: 1px solid var(--border-color);
   padding: 60px 0 30px 0;
@@ -2080,7 +2350,7 @@ textarea {
 .tab-bar {
   display: flex;
   gap: 8px;
-  background: #f1f5f9;
+  background: var(--bg-subtle);
   padding: 6px;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-color);
@@ -2104,14 +2374,15 @@ textarea {
 }
 
 .tab-btn:hover:not(.active) {
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--bg-hover);
   color: var(--text-main);
 }
 
 .tab-btn.active {
-  background: #ffffff;
+  background: var(--bg-surface);
   color: var(--primary);
   box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
 }
 
 .tab-count {
@@ -2124,8 +2395,8 @@ textarea {
   border-radius: var(--radius-full);
   font-size: 11px;
   font-weight: 800;
-  background: #e2e8f0;
-  color: #475569;
+  background: var(--bg-hover);
+  color: var(--text-muted);
 }
 
 .tab-btn.active .tab-count {
@@ -2182,15 +2453,15 @@ textarea {
   justify-content: space-between;
   gap: 14px;
   padding: 12px 16px;
-  background: #f8fafc;
+  background: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   transition: var(--transition-smooth);
 }
 
 .lesson-item-card:hover {
-  background: #ffffff;
-  border-color: #cbd5e1;
+  background: var(--bg-subtle);
+  border-color: var(--primary);
   box-shadow: var(--shadow-xs);
 }
 
@@ -2292,6 +2563,86 @@ textarea {
 
 
 /* ==========================================================================
+   Theme Toggle Button (Light & Dark SVG Morphing, toggles.dev style)
+   ========================================================================== */
+.theme-toggle-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 38px;
+  border-radius: var(--radius-full);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--shadow-xs);
+  flex-shrink: 0;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--bg-subtle);
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.theme-toggle-icon-wrap {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-icon {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+}
+
+.sun-icon {
+  transform: rotate(0deg) scale(1);
+  opacity: 1;
+}
+
+.moon-icon {
+  transform: rotate(90deg) scale(0);
+  opacity: 0;
+}
+
+.theme-toggle-icon-wrap.is-dark .sun-icon {
+  transform: rotate(-90deg) scale(0);
+  opacity: 0;
+}
+
+.theme-toggle-icon-wrap.is-dark .moon-icon {
+  transform: rotate(0deg) scale(1);
+  opacity: 1;
+}
+
+.theme-shortcut-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: 4px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  pointer-events: none;
+}
+
+/* ==========================================================================
    Accessibility: Reduced Motion
    ========================================================================== */
 @media (prefers-reduced-motion: reduce) {
@@ -2320,6 +2671,82 @@ textarea {
 }
 
 /* ==========================================================================
+   Search Container & Utility Styles
+   ========================================================================== */
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.search-input-wrapper {
+  position: relative;
+  flex: 1;
+}
+
+.search-input-wrapper input {
+  width: 100%;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 12px 16px 12px 44px;
+  background: var(--bg-surface);
+  font-size: 14px;
+  color: var(--text-main);
+  transition: var(--transition-fast);
+}
+
+.search-input-wrapper input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+/* Visibility Utilities */
+.mobile-only {
+  display: none !important;
+}
+
+/* ==========================================================================
+   Dark Theme Specific Overrides (Clean Contrast)
+   ========================================================================== */
+[data-theme="dark"] .badge.admin {
+  background: rgba(245, 158, 11, 0.18);
+  color: #FBBF24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+[data-theme="dark"] .badge.instructor {
+  background: rgba(168, 85, 247, 0.18);
+  color: #C084FC;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+[data-theme="dark"] .badge.student {
+  background: rgba(56, 189, 248, 0.18);
+  color: #38BDF8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+[data-theme="dark"] .badge.cyan {
+  background: rgba(6, 182, 212, 0.18);
+  color: #22D3EE;
+  border: 1px solid rgba(6, 182, 212, 0.3);
+}
+
+[data-theme="dark"] .error {
+  background: rgba(239, 68, 68, 0.15);
+  color: #F87171;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+[data-theme="dark"] .success {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34D399;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+/* ==========================================================================
    Responsive Breakpoints
    ========================================================================== */
 @media (max-width: 900px) {
@@ -2332,6 +2759,7 @@ textarea {
 
 @media (max-width: 768px) {
   .desktop-only { display: none !important; }
+  .mobile-only { display: flex !important; }
   .mobile-menu-toggle { display: flex !important; }
   .hero { padding: 40px 24px; }
   .search-container { flex-direction: column; }

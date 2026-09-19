@@ -4,6 +4,7 @@ import { api } from "../api/client.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import CourseCard from "../components/CourseCard.jsx";
 import SkeletonCard from "../components/SkeletonCard.jsx";
+import NumberTicker from "../components/NumberTicker.jsx";
 import {
   Search,
   Sparkles,
@@ -19,7 +20,8 @@ import {
   RotateCcw,
   SlidersHorizontal,
   Code2,
-  ArrowRight
+  ArrowRight,
+  Play
 } from "lucide-react";
 
 const CATEGORY_ICONS = {
@@ -41,6 +43,29 @@ export default function Home() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const debounceTimer = useRef(null);
+
+  // Interactive SQL Sandbox State
+  const [isQueryRunning, setIsQueryRunning] = useState(false);
+  const [queryMetrics, setQueryMetrics] = useState({
+    time: "4.2",
+    pool: "8/20",
+    hit: "99.8%"
+  });
+
+  const handleRunQuery = () => {
+    if (isQueryRunning) return;
+    setIsQueryRunning(true);
+    setTimeout(() => {
+      const randomizedTime = (3.2 + Math.random() * 1.5).toFixed(1);
+      const randomizedPool = `${Math.floor(6 + Math.random() * 6)}/20`;
+      setQueryMetrics({
+        time: randomizedTime,
+        pool: randomizedPool,
+        hit: "99.9%"
+      });
+      setIsQueryRunning(false);
+    }, 420);
+  };
 
   // Debounced search — fire API after 400ms of no typing
   useEffect(() => {
@@ -127,8 +152,6 @@ export default function Home() {
     loadCourses("");
   };
 
-  const [activeHeroTab, setActiveHeroTab] = useState("preview");
-
   return (
     <>
       {/* Taste-Skill High-Craft Minimalist Hero Section */}
@@ -192,35 +215,45 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Clean 4-Column Statistics Strip */}
+      {/* Clean 4-Column Statistics Strip with NumberTicker */}
       <div className="editorial-stats-strip">
         <div className="stat-strip-col">
-          <div className="stat-strip-num">{courses.length > 0 ? courses.length : "8+"}</div>
+          <div className="stat-strip-num">
+            <NumberTicker value={courses.length > 0 ? courses.length : 8} suffix="+" />
+          </div>
           <div className="stat-strip-label">Khóa học chuyên sâu</div>
           <div className="stat-strip-sub">Tuyển chọn từ bài toán thực tế</div>
         </div>
         <div className="stat-strip-col">
           <div className="stat-strip-num">
-            {totalReviews > 0
-              ? `${(courses.reduce((sum, c) => sum + (c.averageRating || 0), 0) / (courses.filter(c => c.averageRating > 0).length || 1)).toFixed(1)}★`
-              : "5.0★"}
+            <NumberTicker
+              value={totalReviews > 0
+                ? (courses.reduce((sum, c) => sum + (c.averageRating || 0), 0) / (courses.filter(c => c.averageRating > 0).length || 1)).toFixed(1)
+                : 5.0}
+              decimals={1}
+              suffix="★"
+            />
           </div>
           <div className="stat-strip-label">Đánh giá học viên</div>
           <div className="stat-strip-sub">Chất lượng giảng dạy uy tín</div>
         </div>
         <div className="stat-strip-col">
-          <div className="stat-strip-num">100%</div>
+          <div className="stat-strip-num">
+            <NumberTicker value={100} suffix="%" />
+          </div>
           <div className="stat-strip-label">Thực hành dự án</div>
           <div className="stat-strip-sub">Không bài tập lý thuyết suông</div>
         </div>
         <div className="stat-strip-col">
-          <div className="stat-strip-num">0 ms</div>
+          <div className="stat-strip-num">
+            <NumberTicker value={0} suffix=" ms" />
+          </div>
           <div className="stat-strip-label">Độ trễ ORM rườm rà</div>
           <div className="stat-strip-sub">Tối ưu truy vấn native SQL</div>
         </div>
       </div>
 
-      {/* Asymmetric Bento Showcase (Anti-Slop: Eliminates 3-Column Equal Cards) */}
+      {/* Asymmetric Bento Showcase with Interactive SQL Sandbox */}
       <div className="bento-showcase-grid">
         {/* Large Feature Card (Span 2) */}
         <div className="bento-card bento-hero-card">
@@ -232,12 +265,25 @@ export default function Home() {
 
           <div className="bento-code-snippet">
             <div className="bento-code-header">
-              <span className="dot red" />
-              <span className="dot yellow" />
-              <span className="dot green" />
-              <span className="bento-code-filename">pool-query-optimizer.sql</span>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <span className="dot red" />
+                <span className="dot yellow" />
+                <span className="dot green" />
+                <span className="bento-code-filename">pool-query-optimizer.sql</span>
+              </div>
+
+              <button
+                type="button"
+                className={`bento-run-btn ${isQueryRunning ? "running" : ""}`}
+                onClick={handleRunQuery}
+                disabled={isQueryRunning}
+                title="Chạy mô phỏng truy vấn tối ưu"
+              >
+                <Play size={12} fill="currentColor" />
+                <span>{isQueryRunning ? "Đang chạy..." : "Chạy truy vấn"}</span>
+              </button>
             </div>
-            <pre>
+            <pre className={isQueryRunning ? "code-executing" : ""}>
               <code>{`-- Native PostgreSQL Query (Zero ORM Latency)
 SELECT c.id, c.title, c.price,
        ROUND(AVG(r.rating), 1) AS rating,
@@ -250,8 +296,18 @@ GROUP BY c.id
 ORDER BY rating DESC;`}</code>
             </pre>
             <div className="bento-code-status">
-              <span className="status-dot green" />
-              <span>Executed in <strong>4.2ms</strong> · Memory footprint: 14KB</span>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                <span className={`status-dot ${isQueryRunning ? "pulsing-amber" : "green"}`} />
+                <span>
+                  {isQueryRunning ? (
+                    "Đang thực thi truy vấn qua Connection Pool..."
+                  ) : (
+                    <>
+                      Executed in <strong className="tnum">{queryMetrics.time}ms</strong> · Connection Pool: <span className="tnum">{queryMetrics.pool}</span> · Buffer Hit: <span className="tnum">{queryMetrics.hit}</span>
+                    </>
+                  )}
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -310,7 +366,7 @@ ORDER BY rating DESC;`}</code>
               onChange={(e) => setQ(e.target.value)}
               aria-label="Search courses"
             />
-            {q && (
+            {q ? (
               <button
                 className="catalog-search-clear"
                 onClick={() => setQ("")}
@@ -318,6 +374,10 @@ ORDER BY rating DESC;`}</code>
               >
                 <RotateCcw size={12} />
               </button>
+            ) : (
+              <kbd className="catalog-search-shortcut" title="Nhấn / để tìm kiếm nhanh">
+                /
+              </kbd>
             )}
           </div>
 
