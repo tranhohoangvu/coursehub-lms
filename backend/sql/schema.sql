@@ -111,3 +111,20 @@ CREATE TABLE IF NOT EXISTS reviews (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   UNIQUE(user_id, course_id)
 );
+
+-- ============================================================================
+-- PERFORMANCE INDEXES (High-Perf SQL Optimization)
+-- ============================================================================
+CREATE INDEX IF NOT EXISTS idx_courses_status ON courses(status);
+CREATE INDEX IF NOT EXISTS idx_courses_instructor_id ON courses(instructor_id);
+CREATE INDEX IF NOT EXISTS idx_courses_category_id ON courses(category_id);
+CREATE INDEX IF NOT EXISTS idx_courses_created_at ON courses(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_lessons_course_order ON lessons(course_id, lesson_order ASC);
+CREATE INDEX IF NOT EXISTS idx_cart_items_cart_id ON cart_items(cart_id);
+CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders(user_id);
+CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id);
+CREATE INDEX IF NOT EXISTS idx_enrollments_user_id ON enrollments(user_id);
+CREATE INDEX IF NOT EXISTS idx_enrollments_course_id ON enrollments(course_id);
+CREATE INDEX IF NOT EXISTS idx_lesson_progress_user_id ON lesson_progress(user_id);
+CREATE INDEX IF NOT EXISTS idx_reviews_course_id ON reviews(course_id);
+

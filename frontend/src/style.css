@@ -3454,6 +3454,89 @@ textarea {
 }
 
 /* ==========================================================================
+   Pagination Component
+   ========================================================================== */
+.pagination-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 16px 4px 8px 4px;
+  margin-top: 16px;
+}
+
+.pagination-info {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.pagination-info .font-semibold {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.pagination-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pagination-pages {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pagination-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 10px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--bg-card-hover, rgba(37, 99, 235, 0.05));
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination-btn.nav-btn {
+  gap: 4px;
+  padding: 0 12px;
+}
+
+.pagination-btn.page-num-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+.pagination-ellipsis {
+  padding: 0 6px;
+  color: var(--text-muted);
+  font-size: 14px;
+  user-select: none;
+}
+
+/* ==========================================================================
    Responsive Breakpoints
    ========================================================================== */
 @media (max-width: 900px) {
@@ -3477,4 +3560,9 @@ textarea {
   .toast-container { left: 16px; right: 16px; bottom: 16px; }
   .toast { max-width: 100%; }
   .back-to-top-btn { bottom: 20px; right: 20px; width: 42px; height: 42px; }
+  .pagination-container {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
 }

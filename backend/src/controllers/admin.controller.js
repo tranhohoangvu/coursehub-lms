@@ -26,7 +26,17 @@ export async function dashboard(req, res) {
 }
 
 export async function listUsers(req, res) {
-  const users = await query("SELECT id, name, email, role, created_at FROM users ORDER BY created_at DESC");
+  const { page, limit } = req.query;
+  let paginationSql = "";
+  const params = [];
+  if (page && limit) {
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.max(1, parseInt(limit, 10) || 10);
+    const offset = (pageNum - 1) * limitNum;
+    params.push(limitNum, offset);
+    paginationSql = " LIMIT $1 OFFSET $2";
+  }
+  const users = await query(`SELECT id, name, email, role, created_at FROM users ORDER BY created_at DESC${paginationSql}`, params);
   res.json(users.rows.map((u) => ({ id: u.id, name: u.name, email: u.email, role: u.role, createdAt: u.created_at })));
 }
 
@@ -80,6 +90,17 @@ export async function deleteUser(req, res) {
 }
 
 export async function listAllCourses(req, res) {
+  const { page, limit } = req.query;
+  let paginationSql = "";
+  const params = [];
+  if (page && limit) {
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.max(1, parseInt(limit, 10) || 10);
+    const offset = (pageNum - 1) * limitNum;
+    params.push(limitNum, offset);
+    paginationSql = " LIMIT $1 OFFSET $2";
+  }
+
   const result = await query(
     `SELECT c.*, u.name AS instructor_name, cat.name AS category_name,
             COALESCE(AVG(r.rating), 0) AS average_rating
@@ -88,7 +109,8 @@ export async function listAllCourses(req, res) {
      LEFT JOIN categories cat ON cat.id = c.category_id
      LEFT JOIN reviews r ON r.course_id = c.id
      GROUP BY c.id, u.name, cat.name
-     ORDER BY c.created_at DESC`
+     ORDER BY c.created_at DESC${paginationSql}`,
+    params
   );
 
   res.json(
@@ -127,6 +149,17 @@ export async function deleteCourse(req, res) {
 }
 
 export async function listEnrollments(req, res) {
+  const { page, limit } = req.query;
+  let paginationSql = "";
+  const params = [];
+  if (page && limit) {
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.max(1, parseInt(limit, 10) || 10);
+    const offset = (pageNum - 1) * limitNum;
+    params.push(limitNum, offset);
+    paginationSql = " LIMIT $1 OFFSET $2";
+  }
+
   const result = await query(
     `SELECT e.id, e.user_id, e.course_id, e.created_at,
             u.name AS user_name, u.email AS user_email,
@@ -134,7 +167,8 @@ export async function listEnrollments(req, res) {
      FROM enrollments e
      JOIN users u ON u.id = e.user_id
      JOIN courses c ON c.id = e.course_id
-     ORDER BY e.created_at DESC`
+     ORDER BY e.created_at DESC${paginationSql}`,
+    params
   );
 
   res.json(

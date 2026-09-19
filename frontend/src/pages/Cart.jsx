@@ -61,7 +61,10 @@ export default function Cart() {
     try {
       setIsCheckingOut(true);
       setMessage("");
-      const order = await api("/orders/checkout", { method: "POST" });
+      const order = await api("/orders/checkout", {
+        method: "POST",
+        body: JSON.stringify({ couponCode: discountPercent > 0 ? couponCode : undefined }),
+      });
       setMessage(`Payment and enrollment successful! Order Reference #${order.id}`);
       await refreshCartCount();
       loadCart();

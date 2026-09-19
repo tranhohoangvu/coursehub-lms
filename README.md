@@ -7,81 +7,116 @@
 [![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB)](https://react.dev/)
 [![Express](https://img.shields.io/badge/Express.js-000000?style=flat&logo=express&logoColor=white)](https://expressjs.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Security: Helmet](https://img.shields.io/badge/Security-Helmet%20%2B%20Rate%20Limit-blue.svg)](https://helmetjs.github.io/)
+[![Tests](https://img.shields.io/badge/Tests-Node%20Native%20Runner-success.svg)](https://nodejs.org/api/test.html)
 
-**CourseHub** is a clean, lightweight, and high-performance Full-Stack Learning Management System (LMS) designed as a portfolio showcase for a **Backend Developer** role. 
+**CourseHub** is a production-ready, lightweight, and high-performance Full-Stack Learning Management System (LMS) designed to demonstrate enterprise-grade engineering principles.
 
-This project demonstrates core backend engineering principles, including database schema design, JWT-based Role-Based Access Control (RBAC), raw SQL query optimization using the native `pg` driver (no ORM like Prisma/Sequelize), and modular MVC architecture.
+This project showcases low-level database optimization, Zero-ORM native SQL architectures using `pg`, JWT Role-Based Access Control (RBAC), multi-tier API security, automated integration testing, and a modular React frontend.
 
 🌐 **Live Demo Links:**
 *   **Frontend (Vercel):** [https://coursehub-lms-eight.vercel.app](https://coursehub-lms-eight.vercel.app)
 *   **Backend API (Render):** [https://coursehub-lms.onrender.com](https://coursehub-lms.onrender.com)
 
 > [!NOTE]
-> **Lightweight & High-Performance Design:** This codebase intentionally avoids Docker and heavy ORMs (like Prisma) to ensure rapid cold-start times, eliminate engine-download bottlenecks in network-restricted environments, and demonstrate low-level database mastery.
+> **Zero-ORM & High-Performance Design:** This codebase intentionally uses the native PostgreSQL client (`pg`) instead of heavy ORMs (like Prisma or Sequelize). This eliminates ORM translation overhead, prevents runtime cold-start penalties, gives granular control over execution plans (`EXPLAIN ANALYZE`), and provides sub-5ms query performance.
 
 ---
 
 ## 🚀 Key Features
 
-### 👤 Authentication & Authorization (RBAC)
-*   Secure authentication using **JSON Web Tokens (JWT)**.
-*   **Role-Based Access Control** with three distinct roles:
-    *   `ADMIN`: Access to dashboard, system analytics, and user/course overview.
-    *   `INSTRUCTOR`: Create and manage course content, lessons, and curriculums.
-    *   `STUDENT`: Browse catalog, enroll in courses, track learning progress, and write reviews.
+### 👤 Authentication, Authorization & Security (RBAC)
+*   **Stateless JWT Authentication:** Secure session management with role-based route guards.
+*   **Role-Based Access Control (RBAC):**
+    *   `ADMIN`: Complete platform governance, system metrics, user/course management, and manual student enrollment/disenrollment.
+    *   `INSTRUCTOR`: Full course authoring studio, curriculum management, and editing/deleting courses and lessons.
+    *   `STUDENT`: Browse catalog, enroll in courses, track lesson progress, write reviews, and redeem coupons.
+*   **Security Hardening:**
+    *   HTTP security headers powered by `helmet({ crossOriginResourcePolicy: false })`.
+    *   Rate limiting on authentication routes (`/api/auth`) via `express-rate-limit` to thwart brute-force attempts.
+    *   Password hashing with `bcryptjs`.
+    *   Zero auth-flicker on hydration with `isInitializing` state guards.
 
-### 📚 Course & Learning Management
-*   **Udemy-style Classroom Workspace:** A premium split-screen layout showcasing the interactive syllabus navigation sidebar on the right, and the active study workspace on the left.
-*   **Embedded Video Player & Resources:** Stream YouTube video lessons directly inside the workspace and access attached learning resources (documentation, PDF slides, etc.).
-*   **URL-Synchronized Navigation:** Map active courses and lessons to query params (`/my-courses?courseId=...&lessonId=...`), enabling standard browser Back/Forward navigation.
-*   **Interactive Syllabus & Progress Bars:** Real-time progress bars calculating and displaying course completion percentages as students check off lessons.
-*   **Course Reviews:** Interactive rating and comment system enabling students to leave course feedback.
+### ⚡ Database Performance & Query Optimization
+*   **12 B-Tree Indexes:** Covering all foreign keys (`user_id`, `course_id`, `instructor_id`, `category_id`) and high-frequency search/sorting columns (`status`, `created_at`, `price`).
+*   **N+1 Query Elimination:** Subquery aggregation using native PostgreSQL `json_agg` for complex relational queries (`getMyCourses`, `myOrders`), retrieving entire relational hierarchies in a single database round-trip.
+*   **Server & Client Pagination:** Backend endpoints (`/api/courses`, `/api/admin/*`) and frontend components support granular `page` and `limit` navigation.
 
-### 🛒 Cart & Mock Checkout
-*   Persistent shopping cart stored in database and synced across devices.
-*   Mock checkout process simulating order creation and automatic enrollment.
+### 📚 Interactive Learning Classroom
+*   **Split-Screen Study Workspace:** Clean curriculum navigation sidebar on the right with the active video player and notes workspace on the left.
+*   **Embedded Video Streaming:** Embedded YouTube player with lesson descriptions and attached resource links.
+*   **URL-Synchronized Navigation:** Seamless deep-linking (`/my-courses?courseId=...&lessonId=...`) enabling native browser Back/Forward navigation.
+*   **Real-time Progress Calculation:** Dynamic calculation of course completion percentage as lessons are completed.
+*   **Student Feedback System:** Verified course reviews and rating breakdown.
 
-### 📊 Admin Dashboard
-*   Aggregated reports on platform revenue, total enrollments, and top-selling courses.
-*   System audit tables and overview.
+### 🛠️ Instructor Studio
+*   **Course Authoring:** Dynamic category assignment, custom thumbnails, and tuition pricing.
+*   **Curriculum Builder:** Add, edit, reorder, and delete lesson modules.
+*   **Lifecycle Management:** Edit course metadata or delete courses and lessons with integrated safety confirmations.
+
+### 🛒 Cart & Synchronized Coupon System
+*   Database-persisted shopping cart synchronized across user sessions.
+*   Server-validated discount coupon engine (`COURSEHUB50` for 50% off, `WELCOME20` for 20% off) ensuring frontend and backend order total parity.
+*   Duplicate enrollment prevention filtering during checkout.
+
+### 📊 Modular Admin Dashboard
+*   **Decomposed Tab Architecture:** Split into focused modular components:
+    *   `AdminOverviewTab`: Key metric cards, revenue statistics, recent activity.
+    *   `AdminUsersTab`: Filterable, sortable, and paginated user directory with role modification.
+    *   `AdminCoursesTab`: Filterable, sortable, and paginated course management with status toggle.
+    *   `AdminEnrollmentsTab`: Real-time student enrollment audit table with disenrollment capabilities.
+    *   `AdminModals`: Add/edit user, course, and enrollment dialogs.
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Component | Technology | Description |
+| Layer | Technology | Key Highlights |
 | :--- | :--- | :--- |
-| **Backend** | Node.js, Express.js | Fast, minimalist web framework for building APIs. |
-| **Database** | PostgreSQL (Supabase / Cloud) | Robust relational database. |
-| **Driver** | `pg` (node-postgres) | Native PostgreSQL client for writing raw, optimized SQL queries. |
-| **Frontend** | React, Vite, CSS | Modern SPA with lightning-fast development server. |
-| **Auth** | JWT (jsonwebtoken) | Stateless session security with authorization middleware. |
+| **Backend API** | Node.js, Express.js 4 | Modular MVC structure, `asyncHandler` error encapsulation |
+| **Database** | PostgreSQL (Supabase / Cloud) | B-Tree indexed schemas, relational integrity, `json_agg` subqueries |
+| **Database Driver**| `pg` (node-postgres) | Native connection pool, raw SQL performance (Zero-ORM) |
+| **Validation** | Zod | Schema-based payload validation formatted to structured HTTP 400 errors |
+| **Security** | Helmet, express-rate-limit, Bcrypt | HTTP protection, brute-force mitigation, secure password hashing |
+| **Frontend** | React 19, Vite | Fast HMR, responsive dark/light mode, custom design system |
+| **Styling** | Vanilla CSS | Custom utility tokens, glassmorphism, responsive pagination controls |
+| **Testing** | Node.js Native Test Runner (`node:test`) | Fast, dependency-free automated integration test suite |
 
 ---
 
-## 🏗️ Deployment & Architecture Model
+## 🏗️ Architecture Model
 
 ```mermaid
-graph LR
-    U[User]
-
-    subgraph Client
-        FE[React App<br/>Vercel]
+graph TD
+    Client[React 19 SPA<br/>Vite / Vercel]
+    
+    subgraph Express Backend
+        Security[Helmet + Rate Limiter]
+        Router[Express Routes]
+        Async[AsyncHandler Wrapper]
+        Zod[Zod Validation Schema]
+        Controller[Controllers & Business Logic]
+        ErrorMid[Error Middleware / Zod Formatter]
     end
 
-    subgraph Server
-        BE[Node.js + Express API<br/>Render]
+    subgraph PostgreSQL Database
+        Pool[pg Connection Pool]
+        Indexes[12 B-Tree Indexes]
+        Tables[(Tables: users, courses, lessons, orders, enrollments)]
     end
 
-    subgraph Data Layer
-        DB[(PostgreSQL<br/>Supabase)]
-    end
-
-    U --> FE
-    FE -->|HTTPS / REST API| BE
-    BE -->|SQL Query| DB
-    DB -->|Result Set| BE
-    BE -->|JSON Response| FE
+    Client -->|HTTPS REST API| Security
+    Security --> Router
+    Router --> Async
+    Async --> Zod
+    Zod --> Controller
+    Controller --> ErrorMid
+    Controller -->|Native SQL Query / json_agg| Pool
+    Pool --> Indexes
+    Indexes --> Tables
+    Tables -->|Result Set| Pool
+    Pool -->|Data| Controller
+    Controller -->|JSON Response| Client
 ```
 
 ---
@@ -92,27 +127,38 @@ graph LR
 coursehub/
 ├── backend/
 │   ├── sql/
-│   │   └── schema.sql          # DB tables, keys, and relational constraints
+│   │   └── schema.sql              # Database schema with 12 B-Tree indexes
 │   ├── scripts/
-│   │   ├── init-db.js         # Database connection init script
-│   │   └── seed.js            # Seed script inserting mock data for roles
+│   │   ├── init-db.js             # DDL execution script
+│   │   └── seed.js                # Database seeding script (roles, courses, lessons)
 │   ├── src/
-│   │   ├── controllers/       # Controller logic processing requests
-│   │   ├── middlewares/       # JWT auth & error handling middlewares
-│   │   ├── routes/            # Express route declarations
-│   │   ├── utils/             # Helper functions (token helpers, etc.)
-│   │   ├── db.js              # pg pool database instance
-│   │   └── server.js          # Express entry point
+│   │   ├── controllers/           # Business logic (admin, auth, course, cart, order)
+│   │   ├── middlewares/           # JWT auth, Zod & PostgreSQL error handler
+│   │   ├── routes/                # Express routes (auth, course, cart, order, admin)
+│   │   ├── utils/                 # asyncHandler, token helpers
+│   │   ├── db.js                  # pg Connection pool
+│   │   └── server.js              # Express entrypoint with Helmet & Rate Limiter
+│   ├── tests/
+│   │   └── api.test.js            # Automated integration test suite
 │   ├── package.json
 │   └── .env.example
 ├── frontend/
 │   ├── src/
-│   │   ├── api/               # Axios client instance and API layers
-│   │   ├── components/        # Reusable UI parts (CourseCard, ProtectedRoute)
-│   │   ├── context/           # React context for Auth state management
-│   │   ├── pages/             # App pages (Home, Login, Admin, Instructor...)
-│   │   ├── App.jsx            # Routing and core layout
-│   │   └── style.css          # Customized vanilla CSS design system
+│   │   ├── api/                   # Fetch-based API client with auth interceptor
+│   │   ├── components/            # Reusable UI (Pagination, CourseCard, ProtectedRoute)
+│   │   ├── context/               # AuthContext with isInitializing state
+│   │   ├── pages/
+│   │   │   ├── admin/             # Modular admin tabs (Overview, Users, Courses, etc.)
+│   │   │   ├── Admin.jsx          # Admin container layout
+│   │   │   ├── Cart.jsx           # Shopping cart & coupon checkout
+│   │   │   ├── CourseDetail.jsx   # Course syllabus preview & review submission
+│   │   │   ├── Home.jsx           # Editorial hero, bento tracks, paginated catalog
+│   │   │   ├── Instructor.jsx     # Instructor studio (CRUD courses & lessons)
+│   │   │   ├── Login.jsx          # Login view
+│   │   │   ├── MyCourses.jsx      # Classroom video workspace
+│   │   │   └── Register.jsx       # Student registration view
+│   │   ├── App.jsx                # Router & theme management
+│   │   └── style.css              # Custom responsive vanilla CSS design system
 │   ├── package.json
 │   └── vite.config.js
 └── README.md
@@ -123,8 +169,8 @@ coursehub/
 ## ⚙️ Installation & Setup
 
 ### Prerequisites
-*   Node.js (v18.x or higher)
-*   A running PostgreSQL Database instance (e.g., Supabase, local Postgres, or Render)
+*   **Node.js** (v18.x or higher)
+*   **PostgreSQL** instance (Supabase, local Postgres, or Render)
 
 ---
 
@@ -138,23 +184,28 @@ coursehub/
    ```bash
    npm install
    ```
-3. Set up the environment variables:
-   *   Copy `.env.example` to `.env`:
-       ```bash
-       cp .env.example .env
-       ```
-   *   Open `.env` and fill in your connection string and token secret:
-       ```env
-       DATABASE_URL=postgresql://your_user:your_password@your_host:5432/your_db
-       JWT_SECRET=your_super_secure_jwt_secret_key
-       PORT=5000
-       ```
-4. Initialize the Database and Seed mock data:
+3. Set up environment variables:
+   * Copy `.env.example` to `.env`:
+     ```bash
+     cp .env.example .env
+     ```
+   * Configure your database credentials and secrets:
+     ```env
+     DATABASE_URL=postgresql://your_user:your_password@your_host:5432/your_db
+     JWT_SECRET=your_super_secure_jwt_secret_key
+     PORT=5000
+     CLIENT_URL=http://localhost:5173
+     ```
+4. Initialize the database schema and seed mock data:
    ```bash
    npm run db:init
    npm run seed
    ```
-5. Start the development server:
+5. Run the automated test suite:
+   ```bash
+   npm run test
+   ```
+6. Start the development server:
    ```bash
    npm run dev
    ```
@@ -173,43 +224,64 @@ coursehub/
    npm install
    ```
 3. Configure environment variable:
-   *   Copy `.env.example` to `.env`:
-       ```bash
-       cp .env.example .env
-       ```
-   *   Confirm the API base URL in `.env` matches your backend:
-       ```env
-       VITE_API_URL=http://localhost:5000/api
-       ```
+   * Copy `.env.example` to `.env`:
+     ```bash
+     cp .env.example .env
+     ```
+   * Ensure the API URL points to your backend:
+     ```env
+     VITE_API_URL=http://localhost:5000/api
+     ```
 4. Start the Vite development server:
    ```bash
    npm run dev
    ```
    *The frontend application will run on:* `http://localhost:5173`
 
+5. Verify production build:
+   ```bash
+   npm run build
+   ```
+
+---
+
+## 🧪 Automated Testing
+
+The backend includes a comprehensive test suite written with Node's native test runner (`node:test`):
+
+```bash
+cd backend
+npm run test
+```
+
+### Coverage Highlights:
+*   `GET /`: Health check verification
+*   `Security headers`: Verification of Helmet HTTP protection
+*   `GET /api/courses`: Active courses listing & pagination query handling
+*   `GET /api/courses/categories`: Public category track listing
+*   `POST /api/auth/register`: Structured Zod validation errors on invalid input (HTTP 400)
+*   `POST /api/auth/register` & `login`: Full account creation & JWT authentication flow
+*   `GET /api/courses/mine`: Protected endpoint authentication barrier (HTTP 401)
+
 ---
 
 ## 🔑 Demo Accounts
 
-Use these pre-seeded accounts to experience the role-based access control flows:
+Use these pre-seeded accounts to explore the role-based features:
 
 | Role | Email | Password | Permissions |
 | :--- | :--- | :--- | :--- |
-| **Admin** | `admin@example.com` | `123456` | Complete site control & statistics view. |
-| **Instructor** | `teacher@example.com` | `123456` | Course creation, management, & lessons addition. |
-| **Student** | `student@example.com` | `123456` | Course purchase, enrollment, learning lessons & reviews. |
+| **Admin** | `admin@example.com` | `123456` | Platform metrics, manage all users/courses/enrollments |
+| **Instructor** | `teacher@example.com` | `123456` | Instructor Studio: Create, edit, and delete courses & lessons |
+| **Student** | `student@example.com` | `123456` | Course enrollment, classroom video player, coupon checkout, reviews |
 
 ---
 
-## 🛠️ Troubleshooting (Windows)
+## 🎟️ Demo Promotional Coupons
 
-If you encounter issues where `node_modules` is locked on Windows during package updates, close your terminal/VS Code and run the following commands in an administrator PowerShell:
-
-```powershell
-taskkill /F /IM node.exe
-rmdir /s /q node_modules
-npm install
-```
+Test the checkout discount engine in the Cart using these codes:
+*   `COURSEHUB50`: **50% OFF** entire order
+*   `WELCOME20`: **20% OFF** entire order
 
 ---
 

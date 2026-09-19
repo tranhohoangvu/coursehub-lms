@@ -42,10 +42,10 @@ export default function CourseCard({ course, enrolledIds = [] }) {
           </span>
           <span className="badge cyan" style={{ fontSize: "10.5px", padding: "2px 8px" }}>
             {course.title?.toLowerCase().includes("advanced") || course.title?.toLowerCase().includes("architecture")
-              ? "Nâng Cao"
+              ? "Advanced"
               : course.title?.toLowerCase().includes("native")
-              ? "Thực Chiến"
-              : "Toàn Diện"}
+              ? "Hands-on"
+              : "Full-Stack"}
           </span>
         </div>
 
@@ -54,17 +54,17 @@ export default function CourseCard({ course, enrolledIds = [] }) {
           <Link
             to={`/courses/${course.id}`}
             className="quick-action-pill"
-            title="Xem trước thông tin khóa học"
+            title="Quick course overview"
           >
             <Eye size={13} />
-            <span>Xem nhanh</span>
+            <span>Preview</span>
           </Link>
           <button
             type="button"
             className={`quick-action-pill bookmark-btn ${isBookmarked ? "active" : ""}`}
             onClick={toggleBookmark}
-            title={isBookmarked ? "Bỏ lưu khóa học" : "Lưu khóa học"}
-            aria-label={isBookmarked ? "Bỏ lưu khóa học" : "Lưu khóa học"}
+            title={isBookmarked ? "Remove bookmark" : "Bookmark course"}
+            aria-label={isBookmarked ? "Remove bookmark" : "Bookmark course"}
           >
             <Bookmark size={13} fill={isBookmarked ? "currentColor" : "none"} />
           </button>

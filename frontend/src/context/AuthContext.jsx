@@ -8,6 +8,9 @@ export function AuthProvider({ children }) {
     const raw = localStorage.getItem("user");
     return raw ? JSON.parse(raw) : null;
   });
+  const [isInitializing, setIsInitializing] = useState(() => {
+    return !!localStorage.getItem("token");
+  });
 
   async function login(email, password) {
     const data = await api("/auth/login", {
@@ -36,11 +39,21 @@ export function AuthProvider({ children }) {
   }
 
   useEffect(() => {
-    if (!localStorage.getItem("token")) return;
-    api("/auth/me").then((data) => setUser(data.user)).catch(logout);
+    if (!localStorage.getItem("token")) {
+      setIsInitializing(false);
+      return;
+    }
+    api("/auth/me")
+      .then((data) => setUser(data.user))
+      .catch(logout)
+      .finally(() => setIsInitializing(false));
   }, []);
 
-  return <AuthContext.Provider value={{ user, login, register, logout }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, isInitializing, login, register, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {

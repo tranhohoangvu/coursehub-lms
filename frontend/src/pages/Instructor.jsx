@@ -72,16 +72,21 @@ export default function Instructor() {
   const [editingLesson, setEditingLesson] = useState(null);
   const [editLessonForm, setEditLessonForm] = useState({});
 
+  // Edit course modal
+  const [editingCourse, setEditingCourse] = useState(null);
+  const [editCourseForm, setEditCourseForm] = useState({});
+
+  const [categories, setCategories] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const STEPS = ["Course Info", "Build Lessons", "My Courses"];
 
-  // Load instructor's courses on mount and when step changes to 2
+  // Load categories and instructor's courses on mount
   async function loadMyCourses() {
     try {
       setLoadingCourses(true);
-      // Get all published + draft courses belonging to this instructor
-      const data = await api("/courses?all=true");
+      // Get all published + draft courses belonging specifically to this instructor
+      const data = await api("/courses/instructor/mine");
       setMyCourses(data);
     } catch (err) {
       showToast(err.message, "error");
@@ -92,7 +97,61 @@ export default function Instructor() {
 
   useEffect(() => {
     loadMyCourses();
+    api("/courses/categories").then(setCategories).catch(() => {});
   }, []);
+
+  function openEditCourse(c) {
+    setEditingCourse(c);
+    setEditCourseForm({
+      title: c.title,
+      description: c.description,
+      price: c.price,
+      status: c.status,
+      categoryId: c.categoryId || "",
+      thumbnailUrl: c.thumbnailUrl || "",
+    });
+  }
+
+  async function handleEditCourseSave(e) {
+    e.preventDefault();
+    try {
+      setIsSubmitting(true);
+      await api(`/courses/${editingCourse.id}`, {
+        method: "PATCH",
+        body: JSON.stringify(editCourseForm),
+      });
+      showToast("Course details updated successfully!", "success");
+      setEditingCourse(null);
+      loadMyCourses();
+    } catch (err) {
+      showToast(err.message, "error");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function handleDeleteLesson(lessonId, lessonTitle) {
+    if (!window.confirm(`Are you sure you want to delete lesson "${lessonTitle}"?`)) return;
+    try {
+      await api(`/courses/lessons/${lessonId}`, { method: "DELETE" });
+      showToast(`Lesson "${lessonTitle}" deleted.`, "success");
+      loadMyCourses();
+    } catch (err) {
+      showToast(err.message, "error");
+    }
+  }
+
+  async function handleDeleteCourse(courseId, courseTitle) {
+    if (!window.confirm(`Are you sure you want to delete course "${courseTitle}"? All associated lessons will be permanently deleted.`)) return;
+    try {
+      await api(`/courses/${courseId}`, { method: "DELETE" });
+      showToast(`Course "${courseTitle}" deleted.`, "success");
+      if (createdCourse?.id === courseId) setCreatedCourse(null);
+      loadMyCourses();
+    } catch (err) {
+      showToast(err.message, "error");
+    }
+  }
 
   async function handleCreateCourse(e) {
     e.preventDefault();
@@ -202,10 +261,19 @@ export default function Instructor() {
               <textarea id="course-desc" className="input" required placeholder="Describe what students will build and learn..." value={course.description} onChange={(e) => setCourse({ ...course, description: e.target.value })} />
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "16px" }}>
               <div className="form-group">
                 <label className="form-label" htmlFor="course-price">Tuition Price (VND)</label>
                 <input id="course-price" className="input" type="number" required min={0} placeholder="0 for Free" value={course.price} onChange={(e) => setCourse({ ...course, price: Number(e.target.value) })} />
+              </div>
+              <div className="form-group">
+                <label className="form-label" htmlFor="course-category">Category Track</label>
+                <select id="course-category" className="input" value={course.categoryId || ""} onChange={(e) => setCourse({ ...course, categoryId: e.target.value })}>
+                  <option value="">-- Select Category --</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
+                </select>
               </div>
               <div className="form-group">
                 <label className="form-label" htmlFor="course-status">Publishing Status</label>
@@ -398,13 +466,31 @@ export default function Instructor() {
                           <span>{Number(c.price).toLocaleString("vi-VN")} VND</span>
                         </div>
                       </div>
-                      <button
-                        className="btn secondary"
-                        style={{ fontSize: "12.5px", padding: "8px 14px" }}
-                        onClick={() => { setExpandedCourseId(isExpanded ? null : c.id); setCreatedCourse(c); }}
-                      >
-                        {isExpanded ? <><ChevronUp size={14} /> Collapse</> : <><Layers size={14} /> Manage Lessons</>}
-                      </button>
+                      <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                        <button
+                          className="btn secondary"
+                          style={{ fontSize: "12.5px", padding: "8px 12px" }}
+                          onClick={() => openEditCourse(c)}
+                          title="Edit Course Details"
+                        >
+                          <Pencil size={14} /> Edit Info
+                        </button>
+                        <button
+                          className="btn secondary"
+                          style={{ fontSize: "12.5px", padding: "8px 14px" }}
+                          onClick={() => { setExpandedCourseId(isExpanded ? null : c.id); setCreatedCourse(c); }}
+                        >
+                          {isExpanded ? <><ChevronUp size={14} /> Collapse</> : <><Layers size={14} /> Manage Lessons</>}
+                        </button>
+                        <button
+                          className="btn danger"
+                          style={{ fontSize: "12.5px", padding: "8px 12px" }}
+                          onClick={() => handleDeleteCourse(c.id, c.title)}
+                          title="Delete Course"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
                     </div>
 
                     {/* Expandable lesson list */}
@@ -430,9 +516,14 @@ export default function Instructor() {
                                     <p style={{ margin: "2px 0 0", fontSize: "12px", color: "var(--text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{l.content?.slice(0, 70)}{l.content?.length > 70 ? "..." : ""}</p>
                                   </div>
                                 </div>
-                                <button className="btn secondary" style={{ padding: "5px 10px", fontSize: "12px", flexShrink: 0 }} onClick={() => openEditLesson(l)}>
-                                  <Pencil size={12} /> Edit
-                                </button>
+                                <div style={{ display: "flex", gap: "6px" }}>
+                                  <button className="btn secondary" style={{ padding: "5px 10px", fontSize: "12px", flexShrink: 0 }} onClick={() => openEditLesson(l)}>
+                                    <Pencil size={12} /> Edit
+                                  </button>
+                                  <button className="btn danger" style={{ padding: "5px 10px", fontSize: "12px", flexShrink: 0 }} onClick={() => handleDeleteLesson(l.id, l.title)} title="Delete Lesson">
+                                    <Trash2 size={12} />
+                                  </button>
+                                </div>
                               </div>
                             ))}
                           </div>
@@ -488,6 +579,61 @@ export default function Instructor() {
                   {isSubmitting ? <><Loader2 size={15} style={{ animation: "spin 1s linear infinite" }} /> Saving...</> : "Save Changes"}
                 </button>
                 <button type="button" className="btn secondary" style={{ flex: 1 }} onClick={() => setEditingLesson(null)}>Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Course Modal */}
+      {editingCourse && (
+        <div className="modal-overlay" onClick={() => setEditingCourse(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "600px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+              <h2 style={{ margin: 0, fontSize: "20px", fontWeight: "800" }}>Edit Course Details</h2>
+              <button onClick={() => setEditingCourse(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", padding: "4px" }}>✕</button>
+            </div>
+
+            <form className="form" onSubmit={handleEditCourseSave}>
+              <div className="form-group">
+                <label className="form-label" htmlFor="edit-course-title">Course Title</label>
+                <input id="edit-course-title" className="input" required value={editCourseForm.title || ""} onChange={(e) => setEditCourseForm({ ...editCourseForm, title: e.target.value })} />
+              </div>
+              <div className="form-group">
+                <label className="form-label" htmlFor="edit-course-desc">Description</label>
+                <textarea id="edit-course-desc" className="input" required value={editCourseForm.description || ""} onChange={(e) => setEditCourseForm({ ...editCourseForm, description: e.target.value })} style={{ minHeight: "100px" }} />
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "14px" }}>
+                <div className="form-group">
+                  <label className="form-label" htmlFor="edit-course-price">Price (VND)</label>
+                  <input id="edit-course-price" className="input" type="number" min={0} required value={editCourseForm.price || 0} onChange={(e) => setEditCourseForm({ ...editCourseForm, price: Number(e.target.value) })} />
+                </div>
+                <div className="form-group">
+                  <label className="form-label" htmlFor="edit-course-category">Category Track</label>
+                  <select id="edit-course-category" className="input" value={editCourseForm.categoryId || ""} onChange={(e) => setEditCourseForm({ ...editCourseForm, categoryId: e.target.value })}>
+                    <option value="">-- Choose Category --</option>
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>{cat.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label className="form-label" htmlFor="edit-course-status">Status</label>
+                  <select id="edit-course-status" className="input" value={editCourseForm.status || "DRAFT"} onChange={(e) => setEditCourseForm({ ...editCourseForm, status: e.target.value })}>
+                    <option value="DRAFT">Draft Mode</option>
+                    <option value="PUBLISHED">Published Live</option>
+                  </select>
+                </div>
+              </div>
+              <div className="form-group">
+                <label className="form-label" htmlFor="edit-course-thumb">Thumbnail URL</label>
+                <input id="edit-course-thumb" className="input" value={editCourseForm.thumbnailUrl || ""} onChange={(e) => setEditCourseForm({ ...editCourseForm, thumbnailUrl: e.target.value })} />
+              </div>
+              <div style={{ display: "flex", gap: "10px", marginTop: "12px" }}>
+                <button id="edit-course-save" className="btn" style={{ flex: 1 }} disabled={isSubmitting}>
+                  {isSubmitting ? <><Loader2 size={15} style={{ animation: "spin 1s linear infinite" }} /> Saving...</> : "Save Changes"}
+                </button>
+                <button type="button" className="btn secondary" style={{ flex: 1 }} onClick={() => setEditingCourse(null)}>Cancel</button>
               </div>
             </form>
           </div>

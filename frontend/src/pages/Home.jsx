@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext.jsx";
 import CourseCard from "../components/CourseCard.jsx";
 import SkeletonCard from "../components/SkeletonCard.jsx";
 import NumberTicker from "../components/NumberTicker.jsx";
+import Pagination from "../components/Pagination.jsx";
 import {
   Search,
   Sparkles,
@@ -43,59 +44,59 @@ const CATEGORY_ICONS = {
 
 const DIAGNOSTIC_TRACKS = {
   beginner: {
-    tag: "Lộ Trình Nhập Môn",
-    title: "Kỹ Sư Nền Tảng (Core Foundation Track)",
-    desc: "Xây dựng tư duy thuật toán vững chắc, làm chủ JavaScript ES6+ và thiết kế cơ sở dữ liệu quan hệ trước khi bước vào dự án lớn.",
-    duration: "Khoảng 8 - 10 tuần (1.5h/ngày)",
+    tag: "Foundation",
+    title: "Core Engineering Foundation Track",
+    desc: "Build solid computational thinking, master modern JavaScript (ES6+), and design relational databases before tackling complex systems.",
+    duration: "8 - 10 Weeks (1.5h/day)",
     steps: [
-      "Tư duy cấu trúc dữ liệu & JavaScript Modern ES6+",
-      "Thiết kế cơ sở dữ liệu quan hệ PostgreSQL chuẩn 3NF",
-      "Xây dựng RESTful API đầu tay với Express & Node.js"
+      "Computational Thinking & Modern JavaScript (ES6+)",
+      "Relational PostgreSQL Schema Design (3NF)",
+      "Build Your First RESTful API with Node.js & Express"
     ],
     targetCategory: "Web Development",
-    advice: "Dành 80% thời gian gõ code thực tế, không học vẹt lý thuyết qua slide."
+    advice: "Spend 80% of your time writing actual code, not passively watching slides."
   },
   fullstack: {
-    tag: "Lộ Trình Thực Chiến",
-    title: "Kỹ Sư Full-Stack Production (Full-Stack Mastery)",
-    desc: "Xây dựng hoàn chỉnh nền tảng quy mô lớn (LMS/E-Commerce) từ giao diện React mượt mà đến backend PostgreSQL Native chịu tải cao.",
-    duration: "Khoảng 12 - 14 tuần (2h/ngày)",
+    tag: "Production Ready",
+    title: "Full-Stack Production Mastery",
+    desc: "Architect end-to-end applications (LMS/E-Commerce) with responsive React interfaces and high-performance native PostgreSQL backends.",
+    duration: "12 - 14 Weeks (2h/day)",
     steps: [
-      "Làm chủ React 19, Custom Hooks & Clean State Management",
-      "Bảo mật Auth đa tầng (JWT HttpOnly + Bcrypt Password Hash)",
-      "Tối ưu hóa PostgreSQL Native & Connection Pool",
-      "Đóng gói Docker Containers & Deploy Cloud Supabase/Render"
+      "Master React 19, Custom Hooks & Clean State Management",
+      "Multi-tier Auth Security (JWT HttpOnly + Bcrypt Password Hash)",
+      "Native PostgreSQL Optimization & Connection Pooling",
+      "Docker Containerization & Supabase/Render Cloud Deploy"
     ],
     targetCategory: "Web Development",
-    advice: "Tập trung hoàn thiện 1 đồ án lớn chuẩn doanh nghiệp thay vì làm nhiều bài tập nhỏ rời rạc."
+    advice: "Focus on mastering one production-ready project rather than dozens of trivial tutorials."
   },
   backend: {
-    tag: "Lộ Trình Chuyên Sâu",
-    title: "Kiến Trúc Backend & High-Perf SQL (Zero-ORM)",
-    desc: "Chuyên sâu vào tối ưu hóa truy vấn cơ sở dữ liệu quy mô lớn, đánh B-Tree index chính xác và kiểm soát Connection Pool an toàn.",
-    duration: "Khoảng 8 - 10 tuần (2h/ngày)",
+    tag: "High-Perf Systems",
+    title: "Backend Architecture & High-Perf SQL (Zero-ORM)",
+    desc: "Deep-dive into large-scale query optimization, precision B-Tree indexing, and resilient Connection Pool management.",
+    duration: "8 - 10 Weeks (2h/day)",
     steps: [
-      "Phân tích EXPLAIN ANALYZE & Tối ưu Execution Plan dưới 5ms",
-      "Cấu hình Connection Pool & Transaction Isolation Levels",
-      "Bảo vệ dữ liệu, chống SQL Injection & Rate Limiting",
-      "Triển khai Redis Cache & Chuẩn hóa Microservices Architecture"
+      "EXPLAIN ANALYZE & Sub-5ms Query Execution Plans",
+      "Connection Pooling & Transaction Isolation Levels",
+      "Data Protection, SQL Injection Defense & Rate Limiting",
+      "Redis Caching Strategy & Scalable Microservices Patterns"
     ],
     targetCategory: "Backend",
-    advice: "Luôn đo đạc độ trễ và số lượt quét đĩa trước và sau khi đánh index."
+    advice: "Always measure latency and buffer hit ratios before and after adding indexes."
   },
   career: {
-    tag: "Lộ Trình Tuyển Dụng",
-    title: "Portfolio Kỹ Sư & Luyện Phỏng Vấn (Career Ready)",
-    desc: "Chuẩn hóa mã nguồn theo Clean Architecture, chuẩn bị câu hỏi phỏng vấn kỹ thuật và nhận mã tra cứu chứng chỉ số hóa đính kèm CV.",
-    duration: "Khoảng 4 - 6 tuần (Tập trung cao)",
+    tag: "Career Ready",
+    title: "Portfolio Engineering & Technical Interviews",
+    desc: "Standardize codebases according to Clean Code & SOLID principles, prepare for technical system design interviews, and share verifiable certificates.",
+    duration: "4 - 6 Weeks (Intensive)",
     steps: [
-      "Refactor Codebase theo nguyên lý Clean Code & SOLID",
-      "Thiết lập CI/CD GitHub Actions kiểm thử tự động",
-      "Luyện 50 câu hỏi phỏng vấn System Design & Live Coding",
-      "Chứng chỉ hoàn thành có mã xác thực số hóa gửi nhà tuyển dụng"
+      "Refactor Codebases following Clean Architecture & SOLID",
+      "Automated Testing with GitHub Actions CI/CD",
+      "50+ System Design & Live Coding Interview Scenarios",
+      "Verifiable digital completion certificate for your resume"
     ],
     targetCategory: "All",
-    advice: "Nhà tuyển dụng đánh giá cao khả năng giải thích lý do lựa chọn giải pháp kiến trúc."
+    advice: "Hiring managers look for engineers who can clearly articulate architectural trade-offs."
   }
 };
 
@@ -241,10 +242,33 @@ export default function Home() {
   const totalEnrollments = courses.reduce((sum, c) => sum + (c.enrollmentCount || 0), 0);
   const totalReviews = courses.reduce((sum, c) => sum + (c.reviewCount || 0), 0);
 
+  // Pagination for Course Catalog
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 6;
+
+  // Reset page when category, search query or sorting changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, debouncedQ, sortBy]);
+
+  const paginatedCourses = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredCourses.slice(start, start + pageSize);
+  }, [filteredCourses, currentPage, pageSize]);
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    const catalogElem = document.getElementById("catalog");
+    if (catalogElem) {
+      catalogElem.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
   const handleReset = () => {
     setQ("");
     setSelectedCategory("All");
     setSortBy("newest");
+    setCurrentPage(1);
     loadCourses("");
   };
 
@@ -257,15 +281,15 @@ export default function Home() {
           <div className="hero-left-col">
             <div className="hero-pill-tag">
               <Sparkles size={13} className="hero-pill-star" />
-              <span>Nền tảng đào tạo kỹ thuật thực chiến chuẩn doanh nghiệp</span>
+              <span>Enterprise-Grade Engineering Learning Platform</span>
             </div>
 
             <h1 className="hero-editorial-title">
-              Học kỹ thuật lập trình thực chiến từ dự án thật.
+              Master Practical Software Engineering on Real-World Systems.
             </h1>
 
             <p className="hero-editorial-desc">
-              Chương trình đào tạo chuyên sâu về kiến trúc hệ thống thực tế, tối ưu hóa <strong>PostgreSQL Native</strong>, thiết kế full-stack hoàn chỉnh và sẵn sàng triển khai production.
+              Intensive engineering curriculum covering real-world architecture, <strong>PostgreSQL Native</strong> performance, modern full-stack design, and production readiness.
             </p>
 
             {/* Integrated Quick Search Bar directly in Hero */}
@@ -273,7 +297,7 @@ export default function Home() {
               <Search size={16} style={{ color: "var(--primary)", flexShrink: 0 }} />
               <input
                 type="text"
-                placeholder="Tìm nhanh khóa học, kỹ năng (React, PostgreSQL, Docker...)..."
+                placeholder="Search courses, skills (React, PostgreSQL, Docker, Node.js...)..."
                 value={q}
                 onChange={(e) => {
                   setQ(e.target.value);
@@ -288,12 +312,12 @@ export default function Home() {
                 <button
                   className="catalog-search-clear"
                   onClick={() => setQ("")}
-                  title="Xóa tìm kiếm"
+                  title="Clear search"
                 >
                   <RotateCcw size={12} />
                 </button>
               ) : (
-                <kbd className="catalog-search-shortcut" title="Nhấn / để tìm kiếm nhanh">
+                <kbd className="catalog-search-shortcut" title="Press / to search">
                   /
                 </kbd>
               )}
@@ -302,7 +326,7 @@ export default function Home() {
             {/* Dual CTA Buttons */}
             <div className="hero-cta-buttons">
               <a href="#catalog" className="btn hero-primary-pill">
-                <span>Khám phá khóa học</span>
+                <span>Explore Courses</span>
                 <ArrowRight size={15} />
               </a>
               <button
@@ -311,15 +335,15 @@ export default function Home() {
                 onClick={() => handleSelectSkillTrack("diagnostic")}
               >
                 <Compass size={14} style={{ color: "var(--primary)" }} />
-                <span>Khảo sát lộ trình miễn phí</span>
+                <span>Career Assessment Roadmap</span>
               </button>
             </div>
 
             {/* Micro Trust Row */}
             <div className="hero-trust-row">
-              <div className="trust-item"><CheckCircle2 size={15} className="trust-check" /> <span>100% Codebase dự án thật</span></div>
-              <div className="trust-item"><CheckCircle2 size={15} className="trust-check" /> <span>Kèm sát code review 1-1</span></div>
-              <div className="trust-item"><CheckCircle2 size={15} className="trust-check" /> <span>Chứng chỉ số hóa QR</span></div>
+              <div className="trust-item"><CheckCircle2 size={15} className="trust-check" /> <span>100% Real-World Codebases</span></div>
+              <div className="trust-item"><CheckCircle2 size={15} className="trust-check" /> <span>Rigorous Code Reviews</span></div>
+              <div className="trust-item"><CheckCircle2 size={15} className="trust-check" /> <span>Verifiable Digital Certificates</span></div>
             </div>
           </div>
 
@@ -343,9 +367,9 @@ export default function Home() {
       {/* Credibility Trust Bar */}
       <div className="credibility-strip">
         <div className="credibility-intro">
-          <span className="credibility-badge">Cam kết chuẩn kỹ sư</span>
+          <span className="credibility-badge">Engineering Excellence</span>
           <span className="credibility-title">
-            Chương trình đào tạo chuyên sâu chuẩn kiến trúc doanh nghiệp
+            Industry-standard curriculum engineered for enterprise scalability
           </span>
         </div>
         <div className="credibility-partners">
@@ -372,17 +396,17 @@ export default function Home() {
         </div>
       </div>
 
-      {/* 2. Top-Fold Skill Practice Bento Hub (Inspired by TID 6 Practice Tracks) */}
+      {/* 2. Top-Fold Skill Practice Bento Hub */}
       <section className="skill-hub-section">
         <div className="section-header-row">
           <div>
             <div className="section-tag-pill">
               <Compass size={13} />
-              <span>Chuyên Mục Rèn Luyện Thực Chiến</span>
+              <span>Skill Specializations &amp; Practice Tracks</span>
             </div>
-            <h2 className="section-heading-lg">Rèn Luyện Kỹ Năng — Chuẩn Kỹ Sư Công Nghệ</h2>
+            <h2 className="section-heading-lg">Hands-on Mastery — Enterprise Engineering Standards</h2>
             <p className="section-sub-text">
-              Giáo trình phân theo từng miền chuyên môn. Chọn chuyên mục để lọc nhanh các khóa học tương ứng bên dưới.
+              Curriculum organized by technical domain. Select a track to filter matching courses below.
             </p>
           </div>
           <button
@@ -392,7 +416,7 @@ export default function Home() {
             onClick={() => handleSelectSkillTrack("diagnostic")}
           >
             <Target size={14} style={{ color: "var(--primary)" }} />
-            <span>Khảo sát định hướng lộ trình</span>
+            <span>Roadmap Assessment</span>
           </button>
         </div>
 
@@ -412,10 +436,10 @@ export default function Home() {
             </div>
             <h3 className="skill-card-title">Frontend Engineering</h3>
             <p className="skill-card-desc">
-              Làm chủ React 19, TypeScript, Clean Component Architecture và kỹ thuật tối ưu hóa hiệu năng render 60fps mượt mà.
+              Master React 19, modern hooks, clean component architecture, and 60fps rendering optimizations.
             </p>
             <div className="skill-card-footer">
-              <span>Lọc khóa học Frontend</span>
+              <span>Filter Frontend Courses</span>
               <ArrowUpRight size={16} className="skill-card-arrow" />
             </div>
           </div>
@@ -435,10 +459,10 @@ export default function Home() {
             </div>
             <h3 className="skill-card-title">Backend &amp; Native SQL</h3>
             <p className="skill-card-desc">
-              Xây dựng RESTful API chuẩn mực, tối ưu hóa truy vấn PostgreSQL Native không qua ORM cồng kềnh, cấu hình Connection Pools.
+              Build resilient REST APIs, optimize native PostgreSQL queries without ORM translation overhead, and configure robust pools.
             </p>
             <div className="skill-card-footer">
-              <span>Lọc khóa học Backend</span>
+              <span>Filter Backend Courses</span>
               <ArrowUpRight size={16} className="skill-card-arrow" />
             </div>
           </div>
@@ -458,10 +482,10 @@ export default function Home() {
             </div>
             <h3 className="skill-card-title">Database Architecture</h3>
             <p className="skill-card-desc">
-              Thiết kế Schema chuẩn 3NF, phân tích EXPLAIN ANALYZE, đánh B-Tree Index và kiểm soát Transaction an toàn.
+              Design 3NF relational schemas, analyze EXPLAIN plans, implement B-Tree indexes, and manage ACID transactions.
             </p>
             <div className="skill-card-footer">
-              <span>Lọc khóa học Database</span>
+              <span>Filter Database Courses</span>
               <ArrowUpRight size={16} className="skill-card-arrow" />
             </div>
           </div>
@@ -481,10 +505,10 @@ export default function Home() {
             </div>
             <h3 className="skill-card-title">DevOps &amp; Cloud Deploy</h3>
             <p className="skill-card-desc">
-              Container hóa ứng dụng với Docker, thiết lập CI/CD tự động và triển khai trên Render &amp; Supabase Cloud bảo mật.
+              Containerize apps with Docker, configure automated CI/CD pipelines, and deploy securely on Cloud platforms.
             </p>
             <div className="skill-card-footer">
-              <span>Xem lộ trình DevOps</span>
+              <span>View DevOps Pathway</span>
               <ArrowUpRight size={16} className="skill-card-arrow" />
             </div>
           </div>
@@ -504,10 +528,10 @@ export default function Home() {
             </div>
             <h3 className="skill-card-title">Full-Stack Mastery</h3>
             <p className="skill-card-desc">
-              Xây dựng hoàn chỉnh nền tảng LMS và E-Commerce end-to-end với phân quyền Role-Based, giỏ hàng, thanh toán và chứng chỉ.
+              Ship end-to-end LMS and E-Commerce platforms with Role-Based Access Control, persistent carts, and mock checkout.
             </p>
             <div className="skill-card-footer">
-              <span>Xem tất cả khóa học</span>
+              <span>Explore All Courses</span>
               <ArrowUpRight size={16} className="skill-card-arrow" />
             </div>
           </div>
@@ -524,14 +548,14 @@ export default function Home() {
               <div className="skill-card-icon-box" style={{ background: "var(--primary)", color: "#ffffff" }}>
                 <Compass size={22} />
               </div>
-              <span className="skill-card-tag highlight">MIỄN PHÍ</span>
+              <span className="skill-card-tag highlight">FREE ASSESS</span>
             </div>
-            <h3 className="skill-card-title">Định Hướng Lộ Trình</h3>
+            <h3 className="skill-card-title">Skill Diagnostic</h3>
             <p className="skill-card-desc">
-              Khảo sát 30 giây để nhận bản đồ lộ trình học tập cá nhân hóa phù hợp với thời gian và mục tiêu nghề nghiệp của bạn.
+              Take a 30-second assessment to unlock a personalized engineering roadmap aligned with your immediate goals.
             </p>
             <div className="skill-card-footer" style={{ color: "#10B981" }}>
-              <span>Làm khảo sát ngay</span>
+              <span>Start Assessment</span>
               <ArrowUpRight size={16} className="skill-card-arrow" />
             </div>
           </div>
@@ -551,10 +575,10 @@ export default function Home() {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px", marginBottom: "16px" }}>
           <div>
             <h2 style={{ margin: "0 0 4px 0", fontSize: "24px", fontWeight: "800", letterSpacing: "-0.5px" }}>
-              Danh Sách Khóa Học Chuyên Sâu
+              Explore Specialized Curriculum
             </h2>
             <p style={{ margin: 0, fontSize: "14px", color: "var(--text-muted)" }}>
-              {loading ? "Đang tải dữ liệu..." : `Hiển thị ${filteredCourses.length} khóa học phù hợp`}
+              {loading ? "Loading curriculum catalog..." : `Showing ${filteredCourses.length} specialized courses`}
             </p>
           </div>
 
@@ -565,7 +589,7 @@ export default function Home() {
               <input
                 id="catalog-search"
                 type="text"
-                placeholder="Lọc theo tên khóa học..."
+                placeholder="Search by course title..."
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 aria-label="Search courses"
@@ -574,12 +598,12 @@ export default function Home() {
                 <button
                   className="catalog-search-clear"
                   onClick={() => setQ("")}
-                  title="Xóa tìm kiếm"
+                  title="Clear search"
                 >
                   <RotateCcw size={12} />
                 </button>
               ) : (
-                <kbd className="catalog-search-shortcut" title="Nhấn / để tìm kiếm nhanh">
+                <kbd className="catalog-search-shortcut" title="Press / to focus search">
                   /
                 </kbd>
               )}
@@ -595,10 +619,10 @@ export default function Home() {
                 onChange={(e) => setSortBy(e.target.value)}
                 aria-label="Sort courses"
               >
-                <option value="newest">Mới nhất</option>
-                <option value="rating">Đánh giá cao nhất</option>
-                <option value="price-asc">Giá: Thấp đến Cao</option>
-                <option value="price-desc">Giá: Cao đến Thấp</option>
+                <option value="newest">Newest Releases</option>
+                <option value="rating">Highest Rated</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
               </select>
             </div>
 
@@ -654,21 +678,30 @@ export default function Home() {
               <Search size={28} />
             </div>
             <h3 style={{ fontSize: "20px", fontWeight: "800", color: "var(--text-main)", marginBottom: "8px" }}>
-              Không tìm thấy khóa học phù hợp
+              No matching courses found
             </h3>
             <p style={{ color: "var(--text-muted)", fontSize: "14px", marginBottom: "24px", lineHeight: "1.6" }}>
-              Không có khóa học nào khớp với điều kiện tìm kiếm hiện tại. Bạn có thể chọn danh mục khác hoặc xóa bộ lọc.
+              No courses match your current search query or filter criteria. Try selecting another category or resetting filters.
             </p>
             <button className="btn" onClick={handleReset}>
-              Xem tất cả khóa học
+              View all courses
             </button>
           </div>
         ) : (
-          <div className="grid">
-            {filteredCourses.map((course) => (
-              <CourseCard key={course.id} course={course} enrolledIds={enrolledIds} />
-            ))}
-          </div>
+          <>
+            <div className="grid">
+              {paginatedCourses.map((course) => (
+                <CourseCard key={course.id} course={course} enrolledIds={enrolledIds} />
+              ))}
+            </div>
+
+            <Pagination
+              currentPage={currentPage}
+              totalItems={filteredCourses.length}
+              pageSize={pageSize}
+              onPageChange={handlePageChange}
+            />
+          </>
         )}
       </div>
 
@@ -679,13 +712,13 @@ export default function Home() {
           <div style={{ marginBottom: "16px" }}>
             <div className="section-tag-pill">
               <Layers size={13} />
-              <span>Lộ Trình Đào Tạo 4 Cấp Độ</span>
+              <span>4-Stage Engineering Curriculum</span>
             </div>
             <h3 style={{ fontSize: "22px", fontWeight: "800", color: "var(--text-main)", margin: "4px 0 6px 0" }}>
-              Hành Trình Kỹ Sư Toàn Diện
+              Comprehensive Developer Roadmap
             </h3>
             <p style={{ fontSize: "13.5px", color: "var(--text-muted)", margin: 0, lineHeight: "1.5" }}>
-              Từ người mới bắt đầu đến tự tin kiến trúc hệ thống và triển khai Cloud Production.
+              From foundational software concepts to resilient cloud architecture and production deployments.
             </p>
           </div>
 
@@ -693,56 +726,56 @@ export default function Home() {
             {/* Level 1 */}
             <div className="pathway-step-card-compact">
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
-                <span className="pathway-step-num">CẤP ĐỘ 1 · FOUNDATION</span>
-                <span style={{ fontSize: "11px", color: "var(--text-light)" }}><Clock size={11} /> 4-6 tuần</span>
+                <span className="pathway-step-num">LEVEL 1 · FOUNDATION</span>
+                <span style={{ fontSize: "11px", color: "var(--text-light)" }}><Clock size={11} /> 4-6 weeks</span>
               </div>
               <h4 style={{ fontSize: "15px", fontWeight: "700", margin: "0 0 6px 0", color: "var(--text-main)" }}>
-                Nền Tảng Kỹ Thuật &amp; JavaScript Modern
+                Core Engineering &amp; Modern JavaScript
               </h4>
               <p style={{ fontSize: "12.5px", color: "var(--text-muted)", margin: 0, lineHeight: "1.4" }}>
-                Tư duy thuật toán, JS ES6+, DOM API, HTML5/CSS3 Semantic và quy trình Git Flow nhóm.
+                Algorithm thinking, ES6+ patterns, DOM API, semantic HTML5/CSS3, and team Git workflows.
               </p>
             </div>
 
             {/* Level 2 */}
             <div className="pathway-step-card-compact">
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
-                <span className="pathway-step-num">CẤP ĐỘ 2 · DEVELOPMENT</span>
-                <span style={{ fontSize: "11px", color: "var(--text-light)" }}><Clock size={11} /> 6-8 tuần</span>
+                <span className="pathway-step-num">LEVEL 2 · DEVELOPMENT</span>
+                <span style={{ fontSize: "11px", color: "var(--text-light)" }}><Clock size={11} /> 6-8 weeks</span>
               </div>
               <h4 style={{ fontSize: "15px", fontWeight: "700", margin: "0 0 6px 0", color: "var(--text-main)" }}>
-                Ứng Dụng React 19 &amp; RESTful API Engine
+                React 19 Apps &amp; RESTful API Engine
               </h4>
               <p style={{ fontSize: "12.5px", color: "var(--text-muted)", margin: 0, lineHeight: "1.4" }}>
-                Xây dựng Single-Page App với React 19, backend Express/Node.js và cơ sở dữ liệu PostgreSQL.
+                Single-page apps with React 19, clean Node.js / Express backend services, and PostgreSQL schemas.
               </p>
             </div>
 
             {/* Level 3 */}
             <div className="pathway-step-card-compact">
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
-                <span className="pathway-step-num" style={{ color: "#38BDF8" }}>CẤP ĐỘ 3 · OPTIMIZATION</span>
-                <span style={{ fontSize: "11px", color: "var(--text-light)" }}><Clock size={11} /> 6-8 tuần</span>
+                <span className="pathway-step-num" style={{ color: "#38BDF8" }}>LEVEL 3 · OPTIMIZATION</span>
+                <span style={{ fontSize: "11px", color: "var(--text-light)" }}><Clock size={11} /> 6-8 weeks</span>
               </div>
               <h4 style={{ fontSize: "15px", fontWeight: "700", margin: "0 0 6px 0", color: "var(--text-main)" }}>
-                PostgreSQL Native &amp; Bảo Mật Đa Tầng
+                Native PostgreSQL &amp; Multi-Tier Security
               </h4>
               <p style={{ fontSize: "12.5px", color: "var(--text-muted)", margin: 0, lineHeight: "1.4" }}>
-                Tối ưu truy vấn Native dưới 5ms, phân tích EXPLAIN ANALYZE, Auth JWT HttpOnly và Bcrypt.
+                Sub-5ms native SQL queries, EXPLAIN ANALYZE execution plans, JWT stateless auth, and Bcrypt hashing.
               </p>
             </div>
 
             {/* Level 4 */}
             <div className="pathway-step-card-compact">
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
-                <span className="pathway-step-num" style={{ color: "#10B981" }}>CẤP ĐỘ 4 · ARCHITECTURE</span>
-                <span style={{ fontSize: "11px", color: "var(--text-light)" }}><Clock size={11} /> 4-6 tuần</span>
+                <span className="pathway-step-num" style={{ color: "#10B981" }}>LEVEL 4 · ARCHITECTURE</span>
+                <span style={{ fontSize: "11px", color: "var(--text-light)" }}><Clock size={11} /> 4-6 weeks</span>
               </div>
               <h4 style={{ fontSize: "15px", fontWeight: "700", margin: "0 0 6px 0", color: "var(--text-main)" }}>
                 Cloud Native, DevOps &amp; System Design
               </h4>
               <p style={{ fontSize: "12.5px", color: "var(--text-muted)", margin: 0, lineHeight: "1.4" }}>
-                Container hóa Docker, CI/CD tự động hóa, triển khai Cloud và hoàn thiện portfolio kỹ sư.
+                Docker containerization, automated CI/CD pipelines, cloud deployment, and portfolio showcase polish.
               </p>
             </div>
           </div>
@@ -752,10 +785,10 @@ export default function Home() {
         <div className="learning-lab-col">
           <div className="bento-card bento-hero-card" style={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
             <div>
-              <div className="bento-badge">KIẾN TRÚC PRODUCTION ENGINE</div>
-              <h3 className="bento-card-title">Phòng Thí Nghiệm SQL Native &amp; Zero-ORM</h3>
+              <div className="bento-badge">PRODUCTION ENGINE ARCHITECTURE</div>
+              <h3 className="bento-card-title">Interactive SQL Native &amp; Zero-ORM Lab</h3>
               <p className="bento-card-desc">
-                Trải nghiệm sự khác biệt về hiệu năng khi thực thi trực tiếp trên PostgreSQL Native so với ORM cồng kềnh.
+                Experience raw query speeds on native PostgreSQL without the overhead of heavy ORM translation layers.
               </p>
 
               <div className="bento-code-snippet">
@@ -772,10 +805,10 @@ export default function Home() {
                     className={`bento-run-btn ${isQueryRunning ? "running" : ""}`}
                     onClick={handleRunQuery}
                     disabled={isQueryRunning}
-                    title="Chạy mô phỏng truy vấn tối ưu"
+                    title="Simulate optimized native query execution"
                   >
                     <Play size={12} fill="currentColor" />
-                    <span>{isQueryRunning ? "Đang chạy..." : "Chạy truy vấn"}</span>
+                    <span>{isQueryRunning ? "Executing..." : "Run Query"}</span>
                   </button>
                 </div>
                 <pre className={isQueryRunning ? "code-executing" : ""}>
@@ -795,7 +828,7 @@ ORDER BY rating DESC;`}</code>
                     <span className={`status-dot ${isQueryRunning ? "pulsing-amber" : "green"}`} />
                     <span>
                       {isQueryRunning ? (
-                        "Đang thực thi truy vấn qua Connection Pool..."
+                        "Executing query via pg connection pool..."
                       ) : (
                         <>
                           Executed in <strong className="tnum">{queryMetrics.time}ms</strong> · Pool: <span className="tnum">{queryMetrics.pool}</span> · Hit: <span className="tnum">{queryMetrics.hit}</span>
@@ -809,7 +842,7 @@ ORDER BY rating DESC;`}</code>
 
             <div style={{ marginTop: "16px", display: "flex", gap: "12px", alignItems: "center" }}>
               <div style={{ flex: 1, background: "var(--bg-subtle)", padding: "12px 16px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)", fontSize: "12.5px" }}>
-                <span style={{ color: "#10B981", fontWeight: "700" }}>✓ Zero-ORM Overhead:</span> Tối ưu truy vấn trực tiếp giúp API phản hồi dưới 5ms, giảm 80% tải CPU trên server production.
+                <span style={{ color: "#10B981", fontWeight: "700" }}>✓ Zero-ORM Overhead:</span> Direct queries respond under 5ms, reducing CPU load by up to 80% on production workloads.
               </div>
             </div>
           </div>
@@ -823,17 +856,17 @@ ORDER BY rating DESC;`}</code>
           <div>
             <div className="section-tag-pill">
               <Sparkles size={13} />
-              <span>Định Hướng Lộ Trình Cá Nhân Hóa</span>
+              <span>Personalized Engineering Roadmap</span>
             </div>
             <h2 style={{ fontSize: "26px", fontWeight: "800", color: "var(--text-main)", margin: "0 0 8px 0" }}>
-              Nhận Bản Đồ Định Hướng Lộ Trình Học Tập
+              Discover Your Targeted Curriculum Path
             </h2>
             <p style={{ fontSize: "14px", color: "var(--text-muted)", lineHeight: "1.5", margin: "0 0 20px 0" }}>
-              Chọn mục tiêu hiện tại để nhận kế hoạch rèn luyện chuẩn kỹ sư từ đội ngũ giảng viên CourseHub.
+              Select your immediate technical goal to receive an art-directed study syllabus from CourseHub mentors.
             </p>
 
             {/* Question 1: Goal */}
-            <div className="diagnostic-question-title">Mục tiêu trọng tâm của bạn:</div>
+            <div className="diagnostic-question-title">Your Primary Engineering Objective:</div>
             <div className="diagnostic-chip-group">
               <button
                 type="button"
@@ -841,7 +874,7 @@ ORDER BY rating DESC;`}</code>
                 onClick={() => setDiagnosticGoal("beginner")}
               >
                 <Code2 size={14} />
-                Bắt đầu từ con số 0
+                Start from Foundation
               </button>
               <button
                 type="button"
@@ -849,7 +882,7 @@ ORDER BY rating DESC;`}</code>
                 onClick={() => setDiagnosticGoal("fullstack")}
               >
                 <Zap size={14} />
-                Lên Kỹ Sư Full-Stack Thực Chiến
+                Full-Stack Production Engineer
               </button>
               <button
                 type="button"
@@ -857,7 +890,7 @@ ORDER BY rating DESC;`}</code>
                 onClick={() => setDiagnosticGoal("backend")}
               >
                 <Server size={14} />
-                Tối ưu Backend &amp; High-Perf SQL
+                Backend &amp; High-Perf SQL
               </button>
               <button
                 type="button"
@@ -865,7 +898,7 @@ ORDER BY rating DESC;`}</code>
                 onClick={() => setDiagnosticGoal("career")}
               >
                 <Award size={14} />
-                Luyện Phỏng Vấn &amp; Portfolio
+                Interview &amp; Portfolio Ready
               </button>
             </div>
           </div>
@@ -874,7 +907,7 @@ ORDER BY rating DESC;`}</code>
           <div className="diagnostic-card-result">
             <div className="diagnostic-result-header">
               <span className="diagnostic-result-tag">
-                {DIAGNOSTIC_TRACKS[diagnosticGoal]?.tag || "Khuyến Nghị"}
+                {DIAGNOSTIC_TRACKS[diagnosticGoal]?.tag || "Recommended"}
               </span>
               <span style={{ fontSize: "12px", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "4px" }}>
                 <Clock size={12} /> {DIAGNOSTIC_TRACKS[diagnosticGoal]?.duration}
@@ -898,7 +931,7 @@ ORDER BY rating DESC;`}</code>
             </div>
 
             <div style={{ background: "var(--bg-subtle)", padding: "10px 14px", borderRadius: "var(--radius-md)", marginBottom: "16px", border: "1px dashed var(--border-color)", fontSize: "12.5px", color: "var(--text-main)" }}>
-              💡 <strong>Lời khuyên Mentor:</strong> {DIAGNOSTIC_TRACKS[diagnosticGoal]?.advice}
+              💡 <strong>Mentor Insight:</strong> {DIAGNOSTIC_TRACKS[diagnosticGoal]?.advice}
             </div>
 
             <button
@@ -906,7 +939,7 @@ ORDER BY rating DESC;`}</code>
               className="btn diagnostic-cta-btn"
               onClick={() => handleSelectSkillTrack(DIAGNOSTIC_TRACKS[diagnosticGoal]?.targetCategory || "All")}
             >
-              <span>Bắt đầu lộ trình này ngay</span>
+              <span>Start this Learning Track</span>
               <ArrowRight size={15} />
             </button>
           </div>
@@ -919,8 +952,8 @@ ORDER BY rating DESC;`}</code>
           <div className="stat-strip-num">
             <NumberTicker value={courses.length > 0 ? courses.length : 8} suffix="+" />
           </div>
-          <div className="stat-strip-label">Khóa học chuyên sâu</div>
-          <div className="stat-strip-sub">Tuyển chọn từ bài toán thực tế</div>
+          <div className="stat-strip-label">Specialized Courses</div>
+          <div className="stat-strip-sub">Curated from production systems</div>
         </div>
         <div className="stat-strip-col">
           <div className="stat-strip-num">
@@ -932,22 +965,22 @@ ORDER BY rating DESC;`}</code>
               suffix="★"
             />
           </div>
-          <div className="stat-strip-label">Đánh giá học viên</div>
-          <div className="stat-strip-sub">Chất lượng giảng dạy uy tín</div>
+          <div className="stat-strip-label">Student Satisfaction</div>
+          <div className="stat-strip-sub">High-rigor curriculum feedback</div>
         </div>
         <div className="stat-strip-col">
           <div className="stat-strip-num">
             <NumberTicker value={100} suffix="%" />
           </div>
-          <div className="stat-strip-label">Thực hành dự án</div>
-          <div className="stat-strip-sub">Không bài tập lý thuyết suông</div>
+          <div className="stat-strip-label">Project-Driven</div>
+          <div className="stat-strip-sub">Zero passive theory slides</div>
         </div>
         <div className="stat-strip-col">
           <div className="stat-strip-num">
             <NumberTicker value={0} suffix=" ms" />
           </div>
-          <div className="stat-strip-label">Độ trễ ORM rườm rà</div>
-          <div className="stat-strip-sub">Tối ưu truy vấn native SQL</div>
+          <div className="stat-strip-label">Zero-ORM Latency</div>
+          <div className="stat-strip-sub">Direct native SQL optimization</div>
         </div>
       </div>
     </>
