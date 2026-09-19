@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Star, ArrowRight, BookOpen, Clock, CheckCircle2, PlayCircle, Bookmark, Eye } from "lucide-react";
+import { useLanguage } from "../context/LanguageContext.jsx";
 
 export default function CourseCard({ course, enrolledIds = [] }) {
+  const { t } = useLanguage();
   const isFree = Number(course.price) === 0;
   const isEnrolled = enrolledIds.includes(course.id);
   const [isBookmarked, setIsBookmarked] = useState(false);
@@ -42,10 +44,10 @@ export default function CourseCard({ course, enrolledIds = [] }) {
           </span>
           <span className="badge cyan" style={{ fontSize: "10.5px", padding: "2px 8px" }}>
             {course.title?.toLowerCase().includes("advanced") || course.title?.toLowerCase().includes("architecture")
-              ? "Advanced"
+              ? t("courseCard.tagAdvanced")
               : course.title?.toLowerCase().includes("native")
-              ? "Hands-on"
-              : "Full-Stack"}
+              ? t("courseCard.tagPractical")
+              : t("courseCard.tagFullstack")}
           </span>
         </div>
 
@@ -54,17 +56,17 @@ export default function CourseCard({ course, enrolledIds = [] }) {
           <Link
             to={`/courses/${course.id}`}
             className="quick-action-pill"
-            title="Quick course overview"
+            title={t("courseCard.previewTooltip")}
           >
             <Eye size={13} />
-            <span>Preview</span>
+            <span>{t("courseCard.previewBtn")}</span>
           </Link>
           <button
             type="button"
             className={`quick-action-pill bookmark-btn ${isBookmarked ? "active" : ""}`}
             onClick={toggleBookmark}
-            title={isBookmarked ? "Remove bookmark" : "Bookmark course"}
-            aria-label={isBookmarked ? "Remove bookmark" : "Bookmark course"}
+            title={isBookmarked ? t("courseCard.bookmarkRemove") : t("courseCard.bookmarkAdd")}
+            aria-label={isBookmarked ? t("courseCard.bookmarkRemove") : t("courseCard.bookmarkAdd")}
           >
             <Bookmark size={13} fill={isBookmarked ? "currentColor" : "none"} />
           </button>
@@ -72,7 +74,7 @@ export default function CourseCard({ course, enrolledIds = [] }) {
 
         {isEnrolled && (
           <div className="course-enrolled-badge">
-            <CheckCircle2 size={11} /> Enrolled
+            <CheckCircle2 size={11} /> {t("courseCard.enrolledBadge")}
           </div>
         )}
       </div>
@@ -87,16 +89,16 @@ export default function CourseCard({ course, enrolledIds = [] }) {
               <>
                 <span className="tnum">{avgRating}</span>
                 <span className="tnum" style={{ color: "var(--text-light)", fontWeight: "500" }}>
-                  ({reviewCount > 0 ? `${reviewCount} review${reviewCount !== 1 ? "s" : ""}` : "No reviews"})
+                  ({reviewCount > 0 ? (reviewCount === 1 ? t("courseCard.reviewsCount", { count: reviewCount }) : t("courseCard.reviewsCountPlural", { count: reviewCount })) : "No reviews"})
                 </span>
               </>
             ) : (
-              <span style={{ color: "var(--text-light)", fontWeight: "500", fontSize: "12px" }}>New Course</span>
+              <span style={{ color: "var(--text-light)", fontWeight: "500", fontSize: "12px" }}>{t("courseCard.newCourse")}</span>
             )}
           </div>
 
           <span style={{ fontSize: "12px", color: "var(--text-light)", display: "flex", alignItems: "center", gap: "4px" }}>
-            <Clock size={13} /> Self-paced
+            <Clock size={13} /> {t("courseCard.selfPaced")}
           </span>
         </div>
 
@@ -127,10 +129,10 @@ export default function CourseCard({ course, enrolledIds = [] }) {
         <div className="course-footer-row">
           <div>
             <span style={{ fontSize: "11px", color: "var(--text-muted)", display: "block", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-              Tuition
+              {t("courseCard.tuition")}
             </span>
             {isFree ? (
-              <span className="price-tag free">FREE</span>
+              <span className="price-tag free">{t("common.free")}</span>
             ) : (
               <span className="price-tag tnum">
                 {Number(course.price).toLocaleString("vi-VN")} <span style={{ fontSize: "13px", fontWeight: "600", color: "var(--text-muted)" }}>VND</span>
@@ -144,7 +146,7 @@ export default function CourseCard({ course, enrolledIds = [] }) {
               to={`/my-courses?courseId=${course.id}`}
               style={{ padding: "8px 14px", fontSize: "13px" }}
             >
-              <PlayCircle size={14} /> Resume
+              <PlayCircle size={14} /> {t("courseCard.resumeBtn")}
             </Link>
           ) : (
             <Link
@@ -152,7 +154,7 @@ export default function CourseCard({ course, enrolledIds = [] }) {
               to={`/courses/${course.id}`}
               style={{ padding: "8px 14px", fontSize: "13px" }}
             >
-              Explore <ArrowRight size={14} />
+              {t("courseCard.exploreBtn")} <ArrowRight size={14} />
             </Link>
           )}
         </div>

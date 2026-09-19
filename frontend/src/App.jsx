@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "./context/AuthContext.jsx";
 import { useCart } from "./context/CartContext.jsx";
+import { useLanguage } from "./context/LanguageContext.jsx";
 import ThemeToggle from "./components/ThemeToggle.jsx";
+import LanguageToggle from "./components/LanguageToggle.jsx";
 import BackToTop from "./components/BackToTop.jsx";
 import {
   Menu,
@@ -24,6 +26,7 @@ import {
 export default function App() {
   const { user, logout } = useAuth();
   const { cartCount } = useCart();
+  const { t } = useLanguage();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -84,22 +87,22 @@ export default function App() {
           <div className="nav-links desktop-only">
             <NavLink to="/" end>
               <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                <Compass size={16} /> Explore
+                <Compass size={16} /> {t("nav.explore")}
               </span>
             </NavLink>
 
             {user && (
               <NavLink to="/my-courses">
                 <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <BookOpen size={16} /> My Learning
+                  <BookOpen size={16} /> {t("nav.myLearning")}
                 </span>
               </NavLink>
             )}
 
             {user && (
-              <NavLink to="/cart" className="cart-nav-link">
+              <NavLink to="/cart" className="cart-nav-link" title={t("nav.cartItemsTooltip", { count: cartCount })}>
                 <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <ShoppingCart size={16} /> Cart
+                  <ShoppingCart size={16} /> {t("nav.cart")}
                 </span>
                 {cartCount > 0 && (
                   <span className="cart-count-badge">{cartCount}</span>
@@ -110,7 +113,7 @@ export default function App() {
             {user?.role === "INSTRUCTOR" && (
               <NavLink to="/instructor">
                 <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <GraduationCap size={16} /> Instructor Hub
+                  <GraduationCap size={16} /> {t("nav.instructorStudio")}
                 </span>
               </NavLink>
             )}
@@ -118,7 +121,7 @@ export default function App() {
             {user?.role === "ADMIN" && (
               <NavLink to="/admin">
                 <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <ShieldCheck size={16} /> Admin Portal
+                  <ShieldCheck size={16} /> {t("nav.adminDashboard")}
                 </span>
               </NavLink>
             )}
@@ -126,10 +129,10 @@ export default function App() {
             {!user ? (
               <div style={{ display: "flex", alignItems: "center", gap: "10px", marginLeft: "8px" }}>
                 <NavLink className="btn nav-btn-login" to="/login">
-                  <LogIn size={15} /> Sign In
+                  <LogIn size={15} /> {t("nav.logIn")}
                 </NavLink>
                 <NavLink className="btn nav-btn-register" to="/register">
-                  <UserPlus size={15} /> Get Started
+                  <UserPlus size={15} /> {t("nav.register")}
                 </NavLink>
               </div>
             ) : (
@@ -146,20 +149,24 @@ export default function App() {
                 <button
                   className="btn nav-btn-logout"
                   onClick={logout}
-                  title="Sign out of your account"
+                  title={t("nav.logOut")}
                   style={{ padding: "0 12px", height: "38px" }}
                 >
-                  <LogOut size={15} /> Logout
+                  <LogOut size={15} /> {t("nav.logOut")}
                 </button>
               </div>
             )}
+
+            {/* Language Switcher Button (EN / VI) */}
+            <LanguageToggle />
 
             {/* Theme Toggle Button (Light/Dark mode) */}
             <ThemeToggle />
           </div>
 
-          {/* Mobile Right Controls: Theme Toggle & Burger Menu */}
+          {/* Mobile Right Controls: Language, Theme & Burger Menu */}
           <div className="mobile-only" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <LanguageToggle showLabel={false} />
             <ThemeToggle />
             <button
               className="mobile-menu-toggle"
@@ -195,30 +202,30 @@ export default function App() {
             <div className="sidebar-links">
               <NavLink to="/" end onClick={() => setIsSidebarOpen(false)}>
                 <Compass size={18} style={{ display: "inline", verticalAlign: "middle", marginRight: "8px" }} />
-                Explore Courses
+                {t("nav.explore")}
               </NavLink>
               {user && (
                 <NavLink to="/my-courses" onClick={() => setIsSidebarOpen(false)}>
                   <BookOpen size={18} style={{ display: "inline", verticalAlign: "middle", marginRight: "8px" }} />
-                  My Learning
+                  {t("nav.myLearning")}
                 </NavLink>
               )}
               {user && (
                 <NavLink to="/cart" onClick={() => setIsSidebarOpen(false)}>
                   <ShoppingCart size={18} style={{ display: "inline", verticalAlign: "middle", marginRight: "8px" }} />
-                  Shopping Cart {cartCount > 0 && <span className="cart-count-badge" style={{ marginLeft: "4px" }}>{cartCount}</span>}
+                  {t("nav.cart")} {cartCount > 0 && <span className="cart-count-badge" style={{ marginLeft: "4px" }}>{cartCount}</span>}
                 </NavLink>
               )}
               {user?.role === "INSTRUCTOR" && (
                 <NavLink to="/instructor" onClick={() => setIsSidebarOpen(false)}>
                   <GraduationCap size={18} style={{ display: "inline", verticalAlign: "middle", marginRight: "8px" }} />
-                  Instructor Hub
+                  {t("nav.instructorStudio")}
                 </NavLink>
               )}
               {user?.role === "ADMIN" && (
                 <NavLink to="/admin" onClick={() => setIsSidebarOpen(false)}>
                   <ShieldCheck size={18} style={{ display: "inline", verticalAlign: "middle", marginRight: "8px" }} />
-                  Admin Portal
+                  {t("nav.adminDashboard")}
                 </NavLink>
               )}
 
@@ -232,7 +239,7 @@ export default function App() {
                     onClick={() => setIsSidebarOpen(false)}
                     style={{ width: "100%", justifyContent: "center" }}
                   >
-                    <LogIn size={16} /> Sign In
+                    <LogIn size={16} /> {t("nav.logIn")}
                   </NavLink>
                   <NavLink
                     className="btn nav-btn-register"
@@ -240,7 +247,7 @@ export default function App() {
                     onClick={() => setIsSidebarOpen(false)}
                     style={{ width: "100%", justifyContent: "center" }}
                   >
-                    <UserPlus size={16} /> Get Started
+                    <UserPlus size={16} /> {t("nav.register")}
                   </NavLink>
                 </div>
               ) : (
@@ -260,7 +267,7 @@ export default function App() {
                       setIsSidebarOpen(false);
                     }}
                   >
-                    <LogOut size={16} /> Sign Out
+                    <LogOut size={16} /> {t("nav.logOut")}
                   </button>
                 </div>
               )}
@@ -286,7 +293,7 @@ export default function App() {
                 <span>CourseHub</span>
               </div>
               <p style={{ maxWidth: "340px", fontSize: "14px", lineHeight: "1.6", color: "var(--text-muted)" }}>
-                Curated learning platform designed for modern engineers and creators. Hands-on projects with verified certifications.
+                {t("footer.tagline")}
               </p>
               <div style={{ display: "flex", gap: "8px", marginTop: "16px", flexWrap: "wrap" }}>
                 <span className="badge" style={{ fontSize: "11px" }}>PostgreSQL</span>
@@ -317,7 +324,7 @@ export default function App() {
             </div>
 
             <div className="footer-col">
-              <h5>Chương Trình Đào Tạo</h5>
+              <h5>{t("footer.tracksHeading")}</h5>
               <ul className="footer-links">
                 <li><Link to="/#catalog">Frontend Engineering</Link></li>
                 <li><Link to="/#catalog">Backend &amp; Native SQL</Link></li>
@@ -327,21 +334,21 @@ export default function App() {
             </div>
 
             <div className="footer-col">
-              <h5>Tài Nguyên Miễn Phí</h5>
+              <h5>{t("footer.platformHeading")}</h5>
               <ul className="footer-links">
-                <li><a href="/#career-pathways">Lộ Trình Tự Học 4 Cấp Độ</a></li>
-                <li><a href="/#diagnostic-section">Khảo Sát Định Hướng Kỹ Sư</a></li>
-                <li><a href="https://github.com/tranhohoangvu/coursehub-lms" target="_blank" rel="noreferrer">Kho Mã Nguồn GitHub</a></li>
-                <li><Link to="/my-courses">Tra Cứu Chứng Chỉ</Link></li>
+                <li><a href="/#career-pathways">{t("footer.quickPathways")}</a></li>
+                <li><a href="/#diagnostic-section">{t("home.careerAssessmentBtn")}</a></li>
+                <li><Link to="/#catalog">{t("footer.quickCatalog")}</Link></li>
+                <li><Link to="/my-courses">{t("footer.quickClassroom")}</Link></li>
               </ul>
             </div>
 
             <div className="footer-col">
-              <h5>Cam Kết &amp; Hỗ Trợ</h5>
+              <h5>{t("footer.legalHeading")}</h5>
               <ul className="footer-links">
-                <li><Link to="/my-courses">Phòng Học Trực Tuyến</Link></li>
-                <li><Link to="/instructor">Dành Cho Giảng Viên</Link></li>
-                <li><a href="https://github.com/tranhohoangvu/coursehub-lms" target="_blank" rel="noreferrer">Báo Lỗi &amp; Đóng Góp</a></li>
+                <li><Link to="/my-courses">{t("classroom.viewCertificate")}</Link></li>
+                <li><Link to="/instructor">{t("nav.instructorStudio")}</Link></li>
+                <li><a href="https://github.com/tranhohoangvu/coursehub-lms" target="_blank" rel="noreferrer">{t("footer.legalSecurity")}</a></li>
                 <li><span style={{ fontSize: "13px", color: "var(--text-light)" }}>Hotline: 097 468 97 61</span></li>
               </ul>
             </div>
@@ -352,7 +359,7 @@ export default function App() {
               <span className="footer-status-dot" />
               <span>All systems operational</span>
               <span style={{ color: "#475569", margin: "0 8px" }}>·</span>
-              © {new Date().getFullYear()} <strong style={{ color: "#ffffff", marginLeft: "4px" }}>CourseHub</strong>. All rights reserved.
+              {t("footer.copyright", { year: new Date().getFullYear() })}
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "#94a3b8" }}>
               Crafted with <Heart size={14} style={{ color: "#f43f5e" }} /> by Hoang Vu

@@ -4,6 +4,7 @@ import { api } from "../api/client.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useCart } from "../context/CartContext.jsx";
 import { useToast } from "../context/ToastContext.jsx";
+import { useLanguage } from "../context/LanguageContext.jsx";
 import {
   Star,
   ShoppingCart,
@@ -29,6 +30,7 @@ function getYouTubeId(url) {
 }
 
 export default function CourseDetail() {
+  const { t } = useLanguage();
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -72,7 +74,7 @@ export default function CourseDetail() {
       setAddingToCart(true);
       await api("/cart/items", { method: "POST", body: JSON.stringify({ courseId: id }) });
       await refreshCartCount();
-      showToast("Course added to your cart!", "success");
+      showToast(t("courseDetail.addedToast"), "success");
     } catch (err) {
       showToast(err.message, "error");
     } finally {
@@ -84,7 +86,7 @@ export default function CourseDetail() {
     e.preventDefault();
     try {
       await api(`/courses/${id}/reviews`, { method: "POST", body: JSON.stringify(review) });
-      showToast("Thank you! Review submitted.", "success");
+      showToast(t("courseDetail.thankYouToast"), "success");
       loadCourse();
       setReview({ rating: 5, comment: "" });
     } catch (err) {
@@ -122,7 +124,7 @@ export default function CourseDetail() {
             marginBottom: "16px"
           }}
         ></div>
-        <p style={{ fontWeight: "600" }}>Loading course details...</p>
+        <p style={{ fontWeight: "600" }}>{t("courseDetail.loadingDetails")}</p>
       </div>
     );
   }
@@ -156,7 +158,7 @@ export default function CourseDetail() {
             padding: 0
           }}
         >
-          <ArrowLeft size={16} /> Back
+          <ArrowLeft size={16} /> {t("courseDetail.back")}
         </button>
       </div>
 
@@ -167,11 +169,11 @@ export default function CourseDetail() {
             {course.category?.name || "Software Engineering"}
           </span>
           <span className="badge cyan" style={{ fontSize: "11px" }}>
-            <Sparkles size={12} /> Bestseller
+            <Sparkles size={12} /> {t("courseDetail.bestseller")}
           </span>
           {isEnrolled && (
             <span className="badge success" style={{ fontSize: "11px" }}>
-              <CheckCircle2 size={12} /> Enrolled
+              <CheckCircle2 size={12} /> {t("courseDetail.enrolledBadge")}
             </span>
           )}
         </div>
@@ -186,17 +188,17 @@ export default function CourseDetail() {
           <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
             <Star size={16} fill="#fbbf24" style={{ color: "#fbbf24" }} />
             <strong>{avgRating || "New"}</strong>
-            <span style={{ color: "#94a3b8" }}>({course.reviews?.length || 0} reviews)</span>
+            <span style={{ color: "#94a3b8" }}>{t("courseDetail.reviewsCount", { count: course.reviews?.length || 0 })}</span>
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
             <User size={16} style={{ color: "#38bdf8" }} />
-            <span>Instructor: <strong>{course.instructor?.name || "Expert Mentor"}</strong></span>
+            <span>{t("courseDetail.instructorLabel")} <strong>{course.instructor?.name || "Expert Mentor"}</strong></span>
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
             <BookOpen size={16} style={{ color: "#a855f7" }} />
-            <span>{course.lessons?.length || 0} Lessons</span>
+            <span>{t("courseDetail.lessonsCount", { count: course.lessons?.length || 0 })}</span>
           </div>
         </div>
       </div>
@@ -208,10 +210,10 @@ export default function CourseDetail() {
           {/* What You'll Learn Checklist Card */}
           <div className="what-you-learn-box">
             <h3 style={{ fontSize: "18px", fontWeight: "800", color: "var(--text-main)", marginBottom: "4px" }}>
-              What you'll master in this course
+              {t("courseDetail.whatYoullLearn")}
             </h3>
             <p style={{ fontSize: "13.5px", color: "var(--text-muted)", margin: 0 }}>
-              Key takeaways and engineering capabilities you will acquire
+              {t("courseDetail.whatYoullLearnSubtitle")}
             </p>
 
             <div className="learn-checklist-grid">
@@ -238,10 +240,10 @@ export default function CourseDetail() {
           <div style={{ marginBottom: "40px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "16px" }}>
               <h2 style={{ margin: 0, fontSize: "22px", fontWeight: "800" }}>
-                Curriculum &amp; Lessons ({course.lessons?.length || 0})
+                {t("courseDetail.curriculumTitle", { count: course.lessons?.length || 0 })}
               </h2>
               <span style={{ fontSize: "13px", color: "var(--text-muted)", fontWeight: "600" }}>
-                {previewLessons.length > 0 ? `${previewLessons.length} Free Previews` : "Interactive Syllabus"}
+                {previewLessons.length > 0 ? t("courseDetail.freePreviewsCount", { count: previewLessons.length }) : t("courseDetail.interactiveSyllabus")}
               </span>
             </div>
 
@@ -249,7 +251,7 @@ export default function CourseDetail() {
               {!course.lessons || course.lessons.length === 0 ? (
                 <div className="card" style={{ textAlign: "center", padding: "32px", color: "var(--text-muted)" }}>
                   <BookOpen size={32} style={{ margin: "0 auto 12px auto", color: "#cbd5e1" }} />
-                  <p style={{ margin: 0 }}>No lessons published for this course yet.</p>
+                  <p style={{ margin: 0 }}>{t("courseDetail.noLessons")}</p>
                 </div>
               ) : (
                 course.lessons.map((lesson) => {
@@ -270,7 +272,7 @@ export default function CourseDetail() {
                             </strong>
                             {isPreviewLesson && (
                               <span className="badge success" style={{ fontSize: "10px", padding: "2px 8px" }}>
-                                Free Preview
+                                {t("courseDetail.freePreviewBadge")}
                               </span>
                             )}
                           </div>
@@ -302,7 +304,7 @@ export default function CourseDetail() {
                             onClick={() => setPreviewLesson(isActive ? null : lesson)}
                           >
                             <PlayCircle size={14} style={{ color: "var(--primary)" }} />
-                            {isActive ? "Close" : "Preview"}
+                            {isActive ? t("courseDetail.closePreviewBtn") : t("courseDetail.previewBtn")}
                           </button>
                         ) : (
                           <PlayCircle size={18} style={{ color: "#cbd5e1" }} />
@@ -319,10 +321,10 @@ export default function CourseDetail() {
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "16px" }}>
               <h2 style={{ margin: 0, fontSize: "22px", fontWeight: "800" }}>
-                Student Reviews &amp; Ratings
+                {t("courseDetail.reviewsTitle")}
               </h2>
               <span style={{ fontSize: "13px", color: "var(--text-muted)", fontWeight: "600" }}>
-                {course.reviews?.length || 0} Ratings
+                {t("courseDetail.ratingsCount", { count: course.reviews?.length || 0 })}
               </span>
             </div>
 
@@ -330,7 +332,7 @@ export default function CourseDetail() {
               {!course.reviews || course.reviews.length === 0 ? (
                 <div className="card" style={{ padding: "32px", textAlign: "center", color: "var(--text-muted)", borderStyle: "dashed" }}>
                   <MessageSquare size={32} style={{ margin: "0 auto 12px auto", color: "#cbd5e1" }} />
-                  <p style={{ margin: 0, fontWeight: "600" }}>No reviews yet. Be the first learner to leave a rating!</p>
+                  <p style={{ margin: 0, fontWeight: "600" }}>{t("courseDetail.noReviews")}</p>
                 </div>
               ) : (
                 course.reviews.map((r) => (
@@ -357,14 +359,14 @@ export default function CourseDetail() {
             {/* Write a Review Card — only show if enrolled */}
             {user && isEnrolled && (
               <div className="card" style={{ marginTop: "32px", background: "var(--bg-surface)", border: "1px solid var(--border-color)" }}>
-                <h3 style={{ fontSize: "17px", fontWeight: "800", marginBottom: "4px" }}>Leave Your Review</h3>
+                <h3 style={{ fontSize: "17px", fontWeight: "800", marginBottom: "4px" }}>{t("courseDetail.leaveReviewTitle")}</h3>
                 <p style={{ fontSize: "13px", color: "var(--text-muted)", marginBottom: "20px" }}>
-                  Share your experience with fellow learners.
+                  {t("courseDetail.leaveReviewSubtitle")}
                 </p>
 
                 <form className="form" onSubmit={submitReview}>
                   <div className="form-group">
-                    <label className="form-label">Your Rating</label>
+                    <label className="form-label">{t("courseDetail.yourRating")}</label>
                     <div style={{ display: "flex", gap: "8px", margin: "4px 0" }}>
                       {[1, 2, 3, 4, 5].map((star) => {
                         const isLit = (hoverRating || review.rating) >= star;
@@ -400,18 +402,18 @@ export default function CourseDetail() {
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Your Feedback</label>
+                    <label className="form-label">{t("courseDetail.yourFeedback")}</label>
                     <textarea
                       className="input"
                       required
                       value={review.comment}
                       onChange={(e) => setReview({ ...review, comment: e.target.value })}
-                      placeholder="What did you enjoy the most about this course?"
+                      placeholder={t("courseDetail.feedbackPlaceholder")}
                     />
                   </div>
 
                   <button className="btn" style={{ justifySelf: "start" }}>
-                    <Send size={15} /> Submit Feedback
+                    <Send size={15} /> {t("courseDetail.submitFeedback")}
                   </button>
                 </form>
               </div>
@@ -421,7 +423,7 @@ export default function CourseDetail() {
             {user && !isEnrolled && (
               <div style={{ marginTop: "24px", padding: "16px", background: "var(--primary-light)", borderRadius: "var(--radius-md)", fontSize: "13.5px", color: "var(--primary-dark)" }}>
                 <GraduationCap size={16} style={{ display: "inline", marginRight: "6px", verticalAlign: "middle" }} />
-                Enroll in this course to leave a review and access all lessons.
+                {t("courseDetail.enrollToReview")}
               </div>
             )}
           </div>
@@ -444,11 +446,11 @@ export default function CourseDetail() {
 
             <div style={{ marginBottom: "20px" }}>
               <span style={{ fontSize: "12px", color: "var(--text-muted)", display: "block", fontWeight: "600", textTransform: "uppercase" }}>
-                Total Tuition
+                {t("courseDetail.totalTuition")}
               </span>
               {isFree ? (
                 <span className="price-tag free" style={{ fontSize: "26px", display: "inline-block", marginTop: "4px" }}>
-                  FREE
+                  {t("common.free")}
                 </span>
               ) : (
                 <div style={{ display: "flex", alignItems: "baseline", gap: "8px", marginTop: "4px" }}>
@@ -467,7 +469,7 @@ export default function CourseDetail() {
                 className="btn success btn-glow"
                 style={{ width: "100%", height: "48px", fontSize: "15px" }}
               >
-                <PlayCircle size={18} /> Go to Classroom
+                <PlayCircle size={18} /> {t("courseDetail.goToClassroom")}
               </Link>
             ) : user ? (
               <div style={{ display: "grid", gap: "10px" }}>
@@ -478,20 +480,20 @@ export default function CourseDetail() {
                   disabled={addingToCart}
                 >
                   <ShoppingCart size={18} />
-                  {addingToCart ? "Adding..." : "Add to Cart"}
+                  {addingToCart ? t("courseDetail.adding") : t("courseDetail.addToCart")}
                 </button>
                 <Link
                   to="/cart"
                   className="btn secondary"
                   style={{ width: "100%", height: "44px", fontSize: "14px" }}
                 >
-                  Go to Checkout
+                  {t("courseDetail.goToCheckout")}
                 </Link>
               </div>
             ) : (
               <div style={{ background: "var(--primary-light)", border: "1px solid var(--border-color)", padding: "16px", borderRadius: "var(--radius-md)", textAlign: "center" }}>
                 <p style={{ fontSize: "13.5px", color: "var(--text-main)", margin: "0 0 12px 0", fontWeight: "600" }}>
-                  Sign in or create an account to enroll in this course.
+                  {t("courseDetail.signInToEnrollPrompt")}
                 </p>
                 <Link
                   to="/login"
@@ -499,7 +501,7 @@ export default function CourseDetail() {
                   className="btn"
                   style={{ width: "100%", height: "44px", fontSize: "14px", justifyContent: "center" }}
                 >
-                  Sign In to Enroll
+                  {t("courseDetail.signInToEnrollBtn")}
                 </Link>
               </div>
             )}
@@ -510,19 +512,19 @@ export default function CourseDetail() {
             <div style={{ display: "grid", gap: "14px", fontSize: "13.5px", color: "var(--text-muted)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                 <ShieldCheck size={18} style={{ color: "var(--primary)", flexShrink: 0 }} />
-                <span>30-Day Money-Back Guarantee</span>
+                <span>{t("courseDetail.guarantee")}</span>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                 <Clock size={18} style={{ color: "var(--primary)", flexShrink: 0 }} />
-                <span>Full Lifetime Access</span>
+                <span>{t("courseDetail.lifetimeAccess")}</span>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                 <Award size={18} style={{ color: "var(--accent-gold)", flexShrink: 0 }} />
-                <span>Certificate of Completion</span>
+                <span>{t("courseDetail.certificate")}</span>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                 <BookOpen size={18} style={{ color: "var(--primary)", flexShrink: 0 }} />
-                <span>Access on Mobile, Tablet &amp; Desktop</span>
+                <span>{t("courseDetail.multiDevice")}</span>
               </div>
             </div>
           </div>

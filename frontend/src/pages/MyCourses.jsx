@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { api } from "../api/client.js";
 import { useToast } from "../context/ToastContext.jsx";
+import { useLanguage } from "../context/LanguageContext.jsx";
 import {
   BookOpen, CheckCircle2, PlayCircle, ArrowLeft, ArrowRight,
   Download, Award, Sparkles, Search, RotateCcw, Check,
@@ -125,6 +126,7 @@ function ClassroomWorkspace({
   toggleLessonCompletion,
   saveResumeLesson
 }) {
+  const { t } = useLanguage();
   const course = activeCourseItem.course;
   const lessons = course.lessons || [];
   const completedLessons = lessons.filter((l) => l.completed).length;
@@ -167,7 +169,7 @@ function ClassroomWorkspace({
       <div className="classroom-header">
         <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
           <button className="btn secondary" style={{ alignSelf: "flex-start", padding: "6px 14px", fontSize: "13px" }} onClick={() => setSearchParams({})}>
-            <ArrowLeft size={14} /> Back to My Courses
+            <ArrowLeft size={14} /> {t("classroom.backToMyCourses")}
           </button>
           <h1 style={{ margin: 0, fontSize: "22px", fontWeight: "800", letterSpacing: "-0.5px" }}>{course.title}</h1>
         </div>
@@ -175,20 +177,20 @@ function ClassroomWorkspace({
         <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
           {/* Keyboard hint */}
           <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "var(--text-muted)", background: "var(--bg-subtle)", padding: "6px 12px", borderRadius: "var(--radius-full)", border: "1px solid var(--border-color)" }}>
-            <Keyboard size={13} /> ← → to navigate lessons
+            <Keyboard size={13} /> {t("classroom.keyboardHint")}
           </div>
 
           {/* Progress widget */}
           <div style={{ minWidth: "240px", background: "var(--bg-surface)", padding: "12px 18px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)", boxShadow: "var(--shadow-xs)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", fontWeight: "700", marginBottom: "6px" }}>
-              <span>Progress</span>
+              <span>{t("classroom.progress")}</span>
               <span style={{ color: isGraduated ? "var(--success)" : "var(--primary)" }}>{progressPercent}%</span>
             </div>
             <div className="progress-track">
               <div className="progress-fill" style={{ width: `${progressPercent}%`, background: "var(--primary)" }} />
             </div>
             <div style={{ fontSize: "11.5px", color: "var(--text-muted)", marginTop: "4px", textAlign: "right" }}>
-              {completedLessons}/{totalLessons} lessons
+              {t("classroom.lessonsCount", { completed: completedLessons, total: totalLessons })}
             </div>
           </div>
         </div>
@@ -202,22 +204,22 @@ function ClassroomWorkspace({
               <Award size={24} />
             </div>
             <div>
-              <strong style={{ fontSize: "16px", display: "block" }}>🎉 Congratulations on Graduating!</strong>
-              <span style={{ fontSize: "13.5px", opacity: 0.9 }}>You have successfully completed all lessons in this curriculum.</span>
+              <strong style={{ fontSize: "16px", display: "block" }}>{t("classroom.graduatedTitle")}</strong>
+              <span style={{ fontSize: "13.5px", opacity: 0.9 }}>{t("classroom.graduatedSubtitle")}</span>
             </div>
           </div>
           <button
             className="btn-download-cert"
             onClick={() => printCertificate(course.title, userName)}
           >
-            <Printer size={16} /> Download Certificate
+            <Printer size={16} /> {t("classroom.downloadCertificate")}
           </button>
         </div>
       )}
 
       {lessons.length === 0 ? (
         <div className="card" style={{ textAlign: "center", padding: "48px 24px", color: "var(--text-muted)" }}>
-          <p>No lessons published yet for this course.</p>
+          <p>{t("courseDetail.noLessons")}</p>
         </div>
       ) : (
         <div className="detail-grid">
@@ -249,7 +251,7 @@ function ClassroomWorkspace({
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "16px", flexWrap: "wrap", marginBottom: "20px" }}>
                   <div>
                     <span style={{ fontSize: "12px", color: "var(--primary)", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                      Lesson {currentLesson.order} of {totalLessons}
+                      {t("classroom.lessonOrder", { order: currentLesson.order, total: totalLessons })}
                     </span>
                     <h2 style={{ margin: "2px 0 0 0", fontSize: "22px", fontWeight: "800" }}>{currentLesson.title}</h2>
                   </div>
@@ -257,17 +259,17 @@ function ClassroomWorkspace({
                     {currentLesson.completed ? (
                       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                         <span className="badge success" style={{ padding: "8px 14px", fontSize: "13px" }}>
-                          <CheckCircle2 size={16} /> Completed
+                          <CheckCircle2 size={16} /> {t("classroom.completedBadge")}
                         </span>
                         <button className="btn secondary" style={{ padding: "8px 14px", fontSize: "13px", color: "var(--danger)", borderColor: "var(--danger-light)" }}
                           onClick={() => toggleLessonCompletion(course.id, currentLesson.id, true)}>
-                          Reset
+                          {t("classroom.resetProgress")}
                         </button>
                       </div>
                     ) : (
                       <button className="btn success" style={{ padding: "8px 18px", fontSize: "14px" }}
                         onClick={() => toggleLessonCompletion(course.id, currentLesson.id, false)}>
-                        <Check size={16} /> Mark as Complete
+                        <Check size={16} /> {t("classroom.markAsComplete")}
                       </button>
                     )}
                   </div>
@@ -275,9 +277,9 @@ function ClassroomWorkspace({
 
                 <div className="divider" style={{ margin: "20px 0" }} />
 
-                <h3 style={{ fontSize: "16px", fontWeight: "700", marginBottom: "10px" }}>Lesson Notes &amp; Explanation</h3>
+                <h3 style={{ fontSize: "16px", fontWeight: "700", marginBottom: "10px" }}>{t("classroom.notesTitle")}</h3>
                 <p style={{ whiteSpace: "pre-wrap", color: "var(--text-muted)", fontSize: "14.5px", lineHeight: "1.75", marginBottom: "24px" }}>
-                  {currentLesson.content || "Follow along with the instructions and video above."}
+                  {currentLesson.content || t("classroom.defaultNotes")}
                 </p>
 
                 {currentLesson.resourceUrl && (
@@ -285,12 +287,12 @@ function ClassroomWorkspace({
                     <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                       <FileText size={24} style={{ color: "var(--primary)" }} />
                       <div>
-                        <strong style={{ display: "block", fontSize: "14px" }}>Downloadable Lesson Assets</strong>
-                        <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>Source code, lecture notes, or cheat-sheets</span>
+                        <strong style={{ display: "block", fontSize: "14px" }}>{t("classroom.assetsTitle")}</strong>
+                        <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>{t("classroom.assetsSubtitle")}</span>
                       </div>
                     </div>
                     <a href={currentLesson.resourceUrl} target="_blank" rel="noopener noreferrer" className="btn secondary" style={{ fontSize: "12.5px", padding: "8px 14px" }}>
-                      <Download size={14} /> Download
+                      <Download size={14} /> {t("classroom.downloadBtn")}
                     </a>
                   </div>
                 )}
@@ -300,18 +302,18 @@ function ClassroomWorkspace({
                   {prevLesson ? (
                     <button className="btn secondary" style={{ fontSize: "13.5px" }}
                       onClick={() => setSearchParams({ courseId: activeCourseId, lessonId: prevLesson.id })}>
-                      <ArrowLeft size={15} /> Previous: Lesson {prevLesson.order}
+                      <ArrowLeft size={15} /> {t("classroom.prevLesson", { order: prevLesson.order })}
                     </button>
                   ) : <div />}
 
                   {nextLesson ? (
                     <button className="btn" style={{ fontSize: "13.5px" }}
                       onClick={() => setSearchParams({ courseId: activeCourseId, lessonId: nextLesson.id })}>
-                      Next: Lesson {nextLesson.order} <ArrowRight size={15} />
+                      {t("classroom.nextLesson", { order: nextLesson.order })} <ArrowRight size={15} />
                     </button>
                   ) : (
                     <span style={{ fontSize: "13px", color: "var(--text-muted)", fontWeight: "600" }}>
-                      🎉 Final Lesson Reached
+                      {t("classroom.finalLesson")}
                     </span>
                   )}
                 </div>
@@ -324,9 +326,9 @@ function ClassroomWorkspace({
             <div className="card" style={{ padding: "20px", position: "sticky", top: "96px" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px", paddingBottom: "12px", borderBottom: "1px solid var(--border-color)" }}>
                 <span style={{ fontSize: "14px", fontWeight: "700", display: "flex", alignItems: "center", gap: "6px" }}>
-                  <Layers size={16} /> Course Syllabus
+                  <Layers size={16} /> {t("classroom.syllabusTitle")}
                 </span>
-                <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>{totalLessons} lessons</span>
+                <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>{t("classroom.totalLessonsCount", { count: totalLessons })}</span>
               </div>
 
               <div style={{ display: "grid", gap: "6px", maxHeight: "60vh", overflowY: "auto", paddingRight: "4px" }}>
@@ -356,7 +358,7 @@ function ClassroomWorkspace({
                         </span>
                       </div>
                       {lesson.isPreview && (
-                        <span className="badge success" style={{ fontSize: "9px", padding: "2px 6px", marginLeft: "6px", flexShrink: 0 }}>Preview</span>
+                        <span className="badge success" style={{ fontSize: "9px", padding: "2px 6px", marginLeft: "6px", flexShrink: 0 }}>{t("classroom.previewBadge")}</span>
                       )}
                     </div>
                   );
@@ -371,6 +373,7 @@ function ClassroomWorkspace({
 }
 
 export default function MyCourses() {
+  const { t } = useLanguage();
   const { showToast } = useToast();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -428,7 +431,7 @@ export default function MyCourses() {
           }
         )
       );
-      showToast(isCompleted ? "Marked as incomplete." : "🎉 Lesson completed!", "success");
+      showToast(isCompleted ? t("classroom.lessonIncompleteToast") : t("classroom.lessonCompletedToast"), "success");
     } catch (err) {
       showToast(err.message, "error");
     }
@@ -453,7 +456,7 @@ export default function MyCourses() {
             }}
           />
           <p style={{ color: "var(--text-muted)", fontSize: "14px", fontWeight: "600" }}>
-            Loading classroom...
+            {t("classroom.loadingClassroom")}
           </p>
         </div>
       );
@@ -464,16 +467,16 @@ export default function MyCourses() {
       return (
         <div className="card" style={{ textAlign: "center", padding: "64px 24px", maxWidth: "600px", margin: "40px auto" }}>
           <BookOpen size={48} style={{ color: "var(--text-muted)", margin: "0 auto 16px" }} />
-          <h2 style={{ fontSize: "20px", fontWeight: "800", marginBottom: "8px" }}>Course not found in your learning list</h2>
+          <h2 style={{ fontSize: "20px", fontWeight: "800", marginBottom: "8px" }}>{t("classroom.courseNotFound")}</h2>
           <p style={{ color: "var(--text-muted)", fontSize: "14px", marginBottom: "24px" }}>
-            You might not be enrolled in this course yet, or it has been removed.
+            {t("classroom.courseNotFoundSubtitle")}
           </p>
           <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
             <button className="btn secondary" onClick={() => setSearchParams({})}>
-              Back to My Courses
+              {t("classroom.backToMyCourses")}
             </button>
             <Link to="/" className="btn">
-              Explore Courses
+              {t("classroom.exploreCoursesBtn")}
             </Link>
           </div>
         </div>
@@ -499,17 +502,17 @@ export default function MyCourses() {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: "16px", marginBottom: "28px" }}>
         <div>
-          <h1 style={{ margin: "0 0 6px 0", fontSize: "28px", fontWeight: "800", letterSpacing: "-0.6px" }}>My Learning Journey</h1>
-          <p style={{ margin: 0, fontSize: "14px", color: "var(--text-muted)" }}>Track your progress, resume classroom lectures, and earn course certificates.</p>
+          <h1 style={{ margin: "0 0 6px 0", fontSize: "28px", fontWeight: "800", letterSpacing: "-0.6px" }}>{t("classroom.myJourneyTitle")}</h1>
+          <p style={{ margin: 0, fontSize: "14px", color: "var(--text-muted)" }}>{t("classroom.myJourneySubtitle")}</p>
         </div>
         <div style={{ display: "flex", gap: "12px" }}>
           <div className="card" style={{ padding: "8px 16px", display: "flex", alignItems: "center", gap: "8px" }}>
             <Layers size={16} style={{ color: "var(--primary)" }} />
-            <span style={{ fontSize: "13px", fontWeight: "700" }}>{totalCourses} Enrolled</span>
+            <span style={{ fontSize: "13px", fontWeight: "700" }}>{t("classroom.enrolledCount", { count: totalCourses })}</span>
           </div>
           <div className="card" style={{ padding: "8px 16px", display: "flex", alignItems: "center", gap: "8px" }}>
             <Award size={16} style={{ color: "#10b981" }} />
-            <span style={{ fontSize: "13px", fontWeight: "700" }}>{completedCoursesCount} Completed</span>
+            <span style={{ fontSize: "13px", fontWeight: "700" }}>{t("classroom.completedCount", { count: completedCoursesCount })}</span>
           </div>
         </div>
       </div>
@@ -519,11 +522,11 @@ export default function MyCourses() {
           <div style={{ width: "64px", height: "64px", borderRadius: "50%", background: "var(--primary-light)", color: "var(--primary)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px auto" }}>
             <BookOpen size={30} />
           </div>
-          <h2 style={{ fontSize: "22px", fontWeight: "800", marginBottom: "8px" }}>No enrolled courses yet</h2>
+          <h2 style={{ fontSize: "22px", fontWeight: "800", marginBottom: "8px" }}>{t("classroom.emptyTitle")}</h2>
           <p style={{ color: "var(--text-muted)", fontSize: "14px", marginBottom: "24px", lineHeight: "1.6" }}>
-            Discover our curated catalogue of cutting-edge technology courses and start building your portfolio today.
+            {t("classroom.emptySubtitle")}
           </p>
-          <Link className="btn btn-glow" to="/"><Sparkles size={16} /> Explore Course Marketplace</Link>
+          <Link className="btn btn-glow" to="/"><Sparkles size={16} /> {t("classroom.exploreCatalog")}</Link>
         </div>
       ) : loading ? (
         <MyCoursesSkeleton />
@@ -533,11 +536,11 @@ export default function MyCourses() {
           <div className="search-container" style={{ marginBottom: "32px", maxWidth: "540px" }}>
             <div className="search-input-wrapper">
               <Search size={18} style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", color: "var(--text-light)" }} />
-              <input type="text" placeholder="Search enrolled courses..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+              <input type="text" placeholder={t("classroom.searchPlaceholder")} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
             </div>
             {searchQuery && (
               <button className="btn secondary" onClick={() => setSearchQuery("")} style={{ fontSize: "13px", padding: "0 16px" }}>
-                <RotateCcw size={13} /> Clear
+                <RotateCcw size={13} /> {t("classroom.clearSearch")}
               </button>
             )}
           </div>
@@ -545,8 +548,8 @@ export default function MyCourses() {
           {filteredItems.length === 0 ? (
             <div className="card" style={{ textAlign: "center", padding: "48px 24px", color: "var(--text-muted)" }}>
               <Search size={32} style={{ margin: "0 auto 12px auto", color: "#cbd5e1" }} />
-              <h3 style={{ color: "var(--text-main)", marginBottom: "6px" }}>No courses match "{searchQuery}"</h3>
-              <button className="btn secondary" style={{ marginTop: "12px" }} onClick={() => setSearchQuery("")}>Reset</button>
+              <h3 style={{ color: "var(--text-main)", marginBottom: "6px" }}>{t("classroom.noMatch", { query: searchQuery })}</h3>
+              <button className="btn secondary" style={{ marginTop: "12px" }} onClick={() => setSearchQuery("")}>{t("classroom.resetFilter")}</button>
             </div>
           ) : (
             <div style={{ display: "grid", gap: "24px" }}>
@@ -586,7 +589,7 @@ export default function MyCourses() {
                                 style={{ padding: "8px 14px", fontSize: "12.5px", color: "var(--primary)", borderColor: "var(--border-color)" }}
                                 onClick={() => printCertificate(item.course.title, "Student")}
                               >
-                                <Printer size={13} /> Certificate
+                                <Printer size={13} /> {t("classroom.certificateBtn")}
                               </button>
                             )}
                             <button
@@ -594,7 +597,7 @@ export default function MyCourses() {
                               style={{ padding: "8px 18px", fontSize: "13.5px" }}
                               onClick={() => setSearchParams({ courseId: item.course.id, lessonId: resumeLesson?.id || "" })}
                             >
-                              <PlayCircle size={16} /> {savedLesson ? "Resume" : "Start"} Classroom
+                              <PlayCircle size={16} /> {savedLesson ? t("classroom.resumeClassroom") : t("classroom.startClassroom")}
                             </button>
                           </div>
                         </div>
@@ -606,7 +609,7 @@ export default function MyCourses() {
                         <div style={{ background: "var(--bg-subtle)", padding: "12px 16px", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)" }}>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px", fontSize: "12.5px" }}>
                             <span style={{ fontWeight: "700", color: isFinished ? "#10b981" : "var(--text-main)" }}>
-                              {isFinished ? "🏆 Completed!" : savedLesson ? `📍 Last: Lesson ${savedLesson.order}` : "In Progress"}
+                              {isFinished ? t("classroom.statusCompleted") : savedLesson ? t("classroom.statusLastLesson", { order: savedLesson.order }) : t("classroom.statusInProgress")}
                             </span>
                             <span style={{ fontWeight: "800", color: "var(--primary)" }}>{pct}%</span>
                           </div>
@@ -614,7 +617,7 @@ export default function MyCourses() {
                             <div className="progress-fill" style={{ width: `${pct}%` }} />
                           </div>
                           <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "4px" }}>
-                            {done} of {total} lessons finished
+                            {t("classroom.lessonsFinished", { done, total })}
                           </div>
                         </div>
                       </div>

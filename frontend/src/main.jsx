@@ -2,6 +2,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import App from "./App.jsx";
+import { LanguageProvider } from "./context/LanguageContext.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { CartProvider } from "./context/CartContext.jsx";
 import { ToastProvider } from "./context/ToastContext.jsx";
@@ -19,24 +20,26 @@ import "./style.css";
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
-      <AuthProvider>
-        <CartProvider>
-          <ToastProvider>
-            <Routes>
-              <Route path="/" element={<App />}>
-                <Route index element={<Home />} />
-                <Route path="login" element={<Login />} />
-                <Route path="register" element={<Register />} />
-                <Route path="courses/:id" element={<CourseDetail />} />
-                <Route path="cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
-                <Route path="my-courses" element={<ProtectedRoute><MyCourses /></ProtectedRoute>} />
-                <Route path="instructor" element={<ProtectedRoute allowedRoles={["INSTRUCTOR"]}><Instructor /></ProtectedRoute>} />
-                <Route path="admin" element={<ProtectedRoute allowedRoles={["ADMIN"]}><Admin /></ProtectedRoute>} />
-              </Route>
-            </Routes>
-          </ToastProvider>
-        </CartProvider>
-      </AuthProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <CartProvider>
+            <ToastProvider>
+              <Routes>
+                <Route path="/" element={<App />}>
+                  <Route index element={<Home />} />
+                  <Route path="login" element={<Login />} />
+                  <Route path="register" element={<Register />} />
+                  <Route path="courses/:id" element={<CourseDetail />} />
+                  <Route path="cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+                  <Route path="my-courses" element={<ProtectedRoute><MyCourses /></ProtectedRoute>} />
+                  <Route path="instructor" element={<ProtectedRoute allowedRoles={["INSTRUCTOR"]}><Instructor /></ProtectedRoute>} />
+                  <Route path="admin" element={<ProtectedRoute allowedRoles={["ADMIN"]}><Admin /></ProtectedRoute>} />
+                </Route>
+              </Routes>
+            </ToastProvider>
+          </CartProvider>
+        </AuthProvider>
+      </LanguageProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

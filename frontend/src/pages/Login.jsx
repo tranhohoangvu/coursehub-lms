@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useToast } from "../context/ToastContext.jsx";
+import { useLanguage } from "../context/LanguageContext.jsx";
 import {
   LogIn,
   Mail,
@@ -16,6 +17,7 @@ import {
 } from "lucide-react";
 
 export default function Login() {
+  const { t } = useLanguage();
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -80,15 +82,15 @@ export default function Login() {
         </div>
 
         <h2 style={{ fontSize: "24px", fontWeight: "800", marginBottom: "6px", textAlign: "center", letterSpacing: "-0.5px" }}>
-          Welcome Back
+          {t("auth.welcomeBack")}
         </h2>
         <p style={{ fontSize: "14px", color: "var(--text-muted)", textAlign: "center", marginBottom: "28px" }}>
-          Log in to your CourseHub account to continue learning
+          {t("auth.loginSubtitle")}
         </p>
 
         <form className="form" id="login-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label" htmlFor="login-email">Email Address</label>
+            <label className="form-label" htmlFor="login-email">{t("auth.emailAddress")}</label>
             <div style={{ position: "relative" }}>
               <Mail size={16} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
               <input
@@ -106,7 +108,7 @@ export default function Login() {
           </div>
 
           <div className="form-group">
-            <label className="form-label" htmlFor="login-password">Password</label>
+            <label className="form-label" htmlFor="login-password">{t("auth.password")}</label>
             <div style={{ position: "relative" }}>
               <Lock size={16} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
               <input
@@ -152,18 +154,18 @@ export default function Login() {
             {loading ? (
               <>
                 <Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} />
-                Authenticating...
+                {t("auth.authenticating")}
               </>
             ) : (
-              "Sign In to Account"
+              t("auth.signInBtn")
             )}
           </button>
         </form>
 
         <div style={{ marginTop: "24px", textAlign: "center", fontSize: "14px", color: "var(--text-muted)" }}>
-          Don't have an account?{" "}
+          {t("auth.noAccount")}{" "}
           <Link to="/register" style={{ color: "var(--primary)", fontWeight: "700" }}>
-            Create one for free
+            {t("auth.createOne")}
           </Link>
         </div>
 
@@ -171,7 +173,7 @@ export default function Login() {
         <div style={{ marginTop: "28px", paddingTop: "20px", borderTop: "1px solid var(--border-color)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "10px", fontSize: "12.5px", fontWeight: "700", color: "var(--text-main)" }}>
             <Sparkles size={14} style={{ color: "var(--primary)" }} />
-            <span>One-Click Demo Accounts (auto-login):</span>
+            <span>{t("auth.oneClickDemo")}</span>
           </div>
 
           <div style={{ display: "grid", gap: "8px" }}>
@@ -183,7 +185,7 @@ export default function Login() {
             >
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                 <User size={14} style={{ color: "#0284c7" }} />
-                <strong style={{ fontSize: "12.5px" }}>Student Demo</strong>
+                <strong style={{ fontSize: "12.5px" }}>{t("auth.studentDemo")}</strong>
               </div>
               <span className="badge student" style={{ fontSize: "10px" }}>student@example.com</span>
             </div>
@@ -196,7 +198,7 @@ export default function Login() {
             >
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                 <GraduationCap size={14} style={{ color: "#86198f" }} />
-                <strong style={{ fontSize: "12.5px" }}>Instructor Demo</strong>
+                <strong style={{ fontSize: "12.5px" }}>{t("auth.instructorDemo")}</strong>
               </div>
               <span className="badge instructor" style={{ fontSize: "10px" }}>teacher@example.com</span>
             </div>
@@ -209,7 +211,7 @@ export default function Login() {
             >
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                 <ShieldCheck size={14} style={{ color: "#b45309" }} />
-                <strong style={{ fontSize: "12.5px" }}>Admin Demo</strong>
+                <strong style={{ fontSize: "12.5px" }}>{t("auth.adminDemo")}</strong>
               </div>
               <span className="badge admin" style={{ fontSize: "10px" }}>admin@example.com</span>
             </div>

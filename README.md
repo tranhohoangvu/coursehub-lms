@@ -67,6 +67,13 @@ This project showcases low-level database optimization, Zero-ORM native SQL arch
     *   `AdminEnrollmentsTab`: Real-time student enrollment audit table with disenrollment capabilities.
     *   `AdminModals`: Add/edit user, course, and enrollment dialogs.
 
+### 🌐 Bilingual Internationalization (EN 🇬🇧 / VI 🇻🇳)
+*   **Zero-Dependency i18n Architecture:** Lightweight custom `LanguageContext` replacing heavy third-party translation libraries while delivering instant, zero-reload language switching.
+*   **Complete Localization:** Full coverage across Home, Catalog, Course Detail, Learning Classroom, Shopping Cart, Instructor Studio, Admin Dashboard, and Authentication.
+*   **Parameter Interpolation & Fallbacks:** Dynamic template replacement (`{count}`, `{year}`) with automatic English fallback resolution.
+*   **HTML Lang Synchronization:** Auto-syncs `document.documentElement.lang` and persists user preferences in `localStorage`.
+*   **Accessible Language Switcher:** Global `LanguageToggle` button in both desktop header and mobile responsive drawer.
+
 ---
 
 ## 🛠️ Tech Stack
@@ -79,7 +86,8 @@ This project showcases low-level database optimization, Zero-ORM native SQL arch
 | **Validation** | Zod | Schema-based payload validation formatted to structured HTTP 400 errors |
 | **Security** | Helmet, express-rate-limit, Bcrypt | HTTP protection, brute-force mitigation, secure password hashing |
 | **Frontend** | React 19, Vite | Fast HMR, responsive dark/light mode, custom design system |
-| **Styling** | Vanilla CSS | Modern design tokens (Inter & JetBrains Mono), glassmorphism, responsive pagination controls |
+| **Styling & Fonts** | Vanilla CSS | Standardized font pairing (Inter & JetBrains Mono), glassmorphism, responsive UI |
+| **Internationalization** | Custom React `LanguageContext` | Zero-dependency, instantaneous EN/VI bilingual switching, `localStorage` synced |
 | **Testing** | Node.js Native Test Runner (`node:test`) | Fast, dependency-free automated integration test suite |
 
 ---

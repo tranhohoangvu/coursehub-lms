@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { api } from "../api/client.js";
 import { useCart } from "../context/CartContext.jsx";
 import { useToast } from "../context/ToastContext.jsx";
+import { useLanguage } from "../context/LanguageContext.jsx";
 import {
   ShoppingCart,
   Trash2,
@@ -15,6 +16,7 @@ import {
 } from "lucide-react";
 
 export default function Cart() {
+  const { t } = useLanguage();
   const { refreshCartCount } = useCart();
   const { showToast } = useToast();
   const [cart, setCart] = useState(null);
@@ -65,7 +67,7 @@ export default function Cart() {
         method: "POST",
         body: JSON.stringify({ couponCode: discountPercent > 0 ? couponCode : undefined }),
       });
-      setMessage(`Payment and enrollment successful! Order Reference #${order.id}`);
+      setMessage(t("cart.successNotice", { orderId: order.id }));
       await refreshCartCount();
       loadCart();
     } catch (err) {
@@ -89,8 +91,8 @@ export default function Cart() {
   if (loading) {
     return (
       <div>
-        <h1 style={{ margin: "0 0 6px 0", fontSize: "28px", fontWeight: "800", letterSpacing: "-0.6px" }}>Shopping Cart</h1>
-        <p style={{ margin: "0 0 28px 0", fontSize: "14px", color: "var(--text-muted)" }}>Review your selected courses before completing your enrollment.</p>
+        <h1 style={{ margin: "0 0 6px 0", fontSize: "28px", fontWeight: "800", letterSpacing: "-0.6px" }}>{t("cart.title")}</h1>
+        <p style={{ margin: "0 0 28px 0", fontSize: "14px", color: "var(--text-muted)" }}>{t("cart.subtitle")}</p>
         <div className="detail-grid">
           <div style={{ display: "grid", gap: "16px" }}>
             {Array.from({ length: 3 }).map((_, i) => (
@@ -132,10 +134,10 @@ export default function Cart() {
       {/* Header */}
       <div style={{ marginBottom: "28px" }}>
         <h1 style={{ margin: "0 0 6px 0", fontSize: "28px", fontWeight: "800", letterSpacing: "-0.6px" }}>
-          Shopping Cart
+          {t("cart.title")}
         </h1>
         <p style={{ margin: 0, fontSize: "14px", color: "var(--text-muted)" }}>
-          Review your selected courses before completing your enrollment.
+          {t("cart.subtitle")}
         </p>
       </div>
 
@@ -146,11 +148,11 @@ export default function Cart() {
             <CheckCircle2 size={24} style={{ color: "#10b981", flexShrink: 0 }} />
             <div>
               <strong style={{ display: "block", fontSize: "15px", marginBottom: "2px" }}>{message}</strong>
-              <span style={{ fontSize: "13px", opacity: 0.9 }}>You now have lifetime access to your newly enrolled courses.</span>
+              <span style={{ fontSize: "13px", opacity: 0.9 }}>{t("cart.successAccess")}</span>
             </div>
           </div>
           <Link to="/my-courses" className="btn-start-learning">
-            Start Learning Now <ArrowRight size={15} />
+            {t("cart.startLearning")} <ArrowRight size={15} />
           </Link>
         </div>
       )}
@@ -172,12 +174,12 @@ export default function Cart() {
           >
             <ShoppingCart size={30} />
           </div>
-          <h2 style={{ fontSize: "22px", fontWeight: "800", marginBottom: "8px" }}>Your cart is empty</h2>
+          <h2 style={{ fontSize: "22px", fontWeight: "800", marginBottom: "8px" }}>{t("cart.emptyTitle")}</h2>
           <p style={{ color: "var(--text-muted)", fontSize: "14px", marginBottom: "24px", lineHeight: "1.6" }}>
-            Explore our cutting-edge catalog and add top-tier developer courses to your playlist.
+            {t("cart.emptySubtitle")}
           </p>
           <Link className="btn btn-glow" to="/">
-            <Sparkles size={16} /> Explore Courses
+            <Sparkles size={16} /> {t("cart.exploreCourses")}
           </Link>
         </div>
       ) : (
@@ -229,13 +231,13 @@ export default function Cart() {
                       {item.course.title}
                     </Link>
                     <span style={{ fontSize: "12.5px", color: "var(--text-muted)" }}>
-                      By {item.course.instructor?.name || "Verified Instructor"}
+                      {t("cart.byInstructor", { name: item.course.instructor?.name || "Verified Instructor" })}
                     </span>
                   </div>
 
                   <div className="cart-item-actions" style={{ textAlign: "right", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "8px" }}>
                     {isFree ? (
-                      <span className="price-tag free" style={{ fontSize: "14px" }}>FREE</span>
+                      <span className="price-tag free" style={{ fontSize: "14px" }}>{t("common.free")}</span>
                     ) : (
                       <span className="price" style={{ fontSize: "17px", fontWeight: "800", color: "var(--text-main)" }}>
                         {Number(item.course.price).toLocaleString("vi-VN")}{" "}
@@ -247,9 +249,9 @@ export default function Cart() {
                       className="btn secondary"
                       style={{ padding: "6px 12px", fontSize: "12px", color: "var(--danger)", borderColor: "var(--danger-light)" }}
                       onClick={() => removeItem(item.courseId)}
-                      title="Remove from cart"
+                      title={t("cart.remove")}
                     >
-                      <Trash2 size={13} /> Remove
+                      <Trash2 size={13} /> {t("cart.remove")}
                     </button>
                   </div>
                 </div>
@@ -261,18 +263,18 @@ export default function Cart() {
           <div>
             <div className="card" style={{ padding: "28px" }}>
               <h2 style={{ fontSize: "19px", fontWeight: "800", margin: "0 0 18px 0", borderBottom: "1px solid var(--border-color)", paddingBottom: "14px" }}>
-                Order Summary
+                {t("cart.orderSummary")}
               </h2>
 
               <div style={{ display: "grid", gap: "12px", fontSize: "14px", color: "var(--text-muted)", marginBottom: "20px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span>Original Price ({cart.items.length} items)</span>
+                  <span>{t("cart.originalPrice", { count: cart.items.length })}</span>
                   <span>{rawTotal.toLocaleString("vi-VN")} VND</span>
                 </div>
 
                 {discountPercent > 0 && (
                   <div style={{ display: "flex", justifyContent: "space-between", color: "#10b981", fontWeight: "600" }}>
-                    <span>Coupon Discount ({discountPercent}%)</span>
+                    <span>{t("cart.couponDiscount", { percent: discountPercent })}</span>
                     <span>-{discountAmount.toLocaleString("vi-VN")} VND</span>
                   </div>
                 )}
@@ -280,7 +282,7 @@ export default function Cart() {
                 <div className="divider" style={{ margin: "8px 0" }}></div>
 
                 <div style={{ display: "flex", justifyContent: "space-between", color: "var(--text-main)", fontWeight: "800", fontSize: "17px" }}>
-                  <span>Total Due:</span>
+                  <span>{t("cart.totalDue")}</span>
                   <span className="price" style={{ fontSize: "20px" }}>
                     {finalTotal.toLocaleString("vi-VN")} VND
                   </span>
@@ -295,13 +297,13 @@ export default function Cart() {
                     type="text"
                     className="input"
                     style={{ paddingLeft: "36px", height: "40px", fontSize: "13px" }}
-                    placeholder="Promo: DISCOUNT50"
+                    placeholder={t("cart.couponPlaceholder")}
                     value={couponCode}
                     onChange={(e) => setCouponCode(e.target.value)}
                   />
                 </div>
                 <button type="submit" className="btn secondary" style={{ height: "40px", padding: "0 14px", fontSize: "13px" }}>
-                  Apply
+                  {t("cart.applyCoupon")}
                 </button>
               </form>
               {couponAppliedMsg && <p style={{ fontSize: "12px", color: "#10b981", fontWeight: "600", marginTop: "-12px", marginBottom: "16px" }}>{couponAppliedMsg}</p>}
@@ -314,12 +316,12 @@ export default function Cart() {
                 disabled={isCheckingOut}
               >
                 <CreditCard size={18} />
-                {isCheckingOut ? "Processing Payment..." : "Complete Enrollment"}
+                {isCheckingOut ? t("cart.processingPayment") : t("cart.completeEnrollment")}
               </button>
 
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", marginTop: "14px", fontSize: "12px", color: "var(--text-muted)" }}>
                 <Lock size={12} />
-                <span>256-Bit SSL Encrypted Checkout</span>
+                <span>{t("cart.secureNotice")}</span>
               </div>
             </div>
           </div>

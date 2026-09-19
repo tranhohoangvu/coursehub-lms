@@ -16,8 +16,10 @@ import AdminUsersTab from "./admin/AdminUsersTab.jsx";
 import AdminCoursesTab from "./admin/AdminCoursesTab.jsx";
 import AdminEnrollmentsTab from "./admin/AdminEnrollmentsTab.jsx";
 import AdminModals from "./admin/AdminModals.jsx";
+import { useLanguage } from "../context/LanguageContext.jsx";
 
 export default function Admin() {
+  const { t } = useLanguage();
   const { user: currentAdmin } = useAuth();
   
   // Data lists state
@@ -452,16 +454,16 @@ export default function Admin() {
       {/* Nav Tabs */}
       <div className="tab-bar" style={{ marginBottom: "24px" }}>
         <button className={`tab-btn ${activeTab === "overview" ? "active" : ""}`} onClick={() => handleTabChange("overview")}>
-          <LayoutDashboard size={16} /> Overview
+          <LayoutDashboard size={16} /> {t("admin.tabOverview")}
         </button>
         <button className={`tab-btn ${activeTab === "users" ? "active" : ""}`} onClick={() => handleTabChange("users")}>
-          <Users size={16} /> Users <span className="tab-count">{users.length}</span>
+          <Users size={16} /> {t("admin.tabUsers")} <span className="tab-count">{users.length}</span>
         </button>
         <button className={`tab-btn ${activeTab === "courses" ? "active" : ""}`} onClick={() => handleTabChange("courses")}>
-          <BookOpen size={16} /> Courses <span className="tab-count">{courses.length}</span>
+          <BookOpen size={16} /> {t("admin.tabCourses")} <span className="tab-count">{courses.length}</span>
         </button>
         <button className={`tab-btn ${activeTab === "enrollments" ? "active" : ""}`} onClick={() => handleTabChange("enrollments")}>
-          <GraduationCap size={16} /> Enrollments <span className="tab-count">{enrollments.length}</span>
+          <GraduationCap size={16} /> {t("admin.tabEnrollments")} <span className="tab-count">{enrollments.length}</span>
         </button>
       </div>
 

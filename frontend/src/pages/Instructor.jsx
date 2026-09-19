@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { api } from "../api/client.js";
 import { useToast } from "../context/ToastContext.jsx";
+import { useLanguage } from "../context/LanguageContext.jsx";
 import {
   GraduationCap, BookPlus, ListPlus, CheckCircle2, Plus,
   Pencil, Trash2, ChevronDown, ChevronUp, Eye, EyeOff,
@@ -47,6 +48,7 @@ function StepIndicator({ current, steps }) {
 }
 
 export default function Instructor() {
+  const { t } = useLanguage();
   const { showToast } = useToast();
 
   // Step wizard: 0=Course Info, 1=Add Lessons, 2=Done/My Courses
@@ -79,7 +81,11 @@ export default function Instructor() {
   const [categories, setCategories] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const STEPS = ["Course Info", "Build Lessons", "My Courses"];
+  const STEPS = [
+    t("instructor.step1"),
+    t("instructor.step2"),
+    t("instructor.step3")
+  ];
 
   // Load categories and instructor's courses on mount
   async function loadMyCourses() {
@@ -213,10 +219,10 @@ export default function Instructor() {
           <div style={{ width: "36px", height: "36px", borderRadius: "var(--radius-sm)", background: "var(--primary-light)", color: "var(--primary)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <GraduationCap size={20} />
           </div>
-          <h1 style={{ margin: 0, fontSize: "28px", fontWeight: "800", letterSpacing: "-0.6px" }}>Instructor Teaching Studio</h1>
+          <h1 style={{ margin: 0, fontSize: "28px", fontWeight: "800", letterSpacing: "-0.6px" }}>{t("instructor.studioTitle")}</h1>
         </div>
         <p style={{ margin: 0, fontSize: "14px", color: "var(--text-muted)" }}>
-          Publish interactive developer courses, build video curriculum, and share resources with students worldwide.
+          {t("instructor.studioSubtitle")}
         </p>
       </div>
 

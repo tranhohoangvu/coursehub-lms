@@ -6,6 +6,7 @@ import CourseCard from "../components/CourseCard.jsx";
 import SkeletonCard from "../components/SkeletonCard.jsx";
 import NumberTicker from "../components/NumberTicker.jsx";
 import Pagination from "../components/Pagination.jsx";
+import { useLanguage } from "../context/LanguageContext.jsx";
 import {
   Search,
   Sparkles,
@@ -103,6 +104,7 @@ const DIAGNOSTIC_TRACKS = {
 export default function Home() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [courses, setCourses] = useState([]);
   const [enrolledIds, setEnrolledIds] = useState([]);
   const [q, setQ] = useState("");
@@ -281,23 +283,21 @@ export default function Home() {
           <div className="hero-left-col">
             <div className="hero-pill-tag">
               <Sparkles size={13} className="hero-pill-star" />
-              <span>Enterprise-Grade Engineering Learning Platform</span>
+              <span>{t("home.heroTag")}</span>
             </div>
 
             <h1 className="hero-editorial-title">
-              Master Practical Software Engineering on Real-World Systems.
+              {t("home.heroTitle")}
             </h1>
 
-            <p className="hero-editorial-desc">
-              Intensive engineering curriculum covering real-world architecture, <strong>PostgreSQL Native</strong> performance, modern full-stack design, and production readiness.
-            </p>
+            <p className="hero-editorial-desc" dangerouslySetInnerHTML={{ __html: t("home.heroDesc") }} />
 
             {/* Integrated Quick Search Bar directly in Hero */}
             <div className="hero-search-integrated-box" style={{ margin: "16px 0 20px 0", maxWidth: "100%" }}>
               <Search size={16} style={{ color: "var(--primary)", flexShrink: 0 }} />
               <input
                 type="text"
-                placeholder="Search courses, skills (React, PostgreSQL, Docker, Node.js...)..."
+                placeholder={t("home.heroSearchPlaceholder")}
                 value={q}
                 onChange={(e) => {
                   setQ(e.target.value);
@@ -317,7 +317,7 @@ export default function Home() {
                   <RotateCcw size={12} />
                 </button>
               ) : (
-                <kbd className="catalog-search-shortcut" title="Press / to search">
+                <kbd className="catalog-search-shortcut" title={t("nav.searchShortcutTip")}>
                   /
                 </kbd>
               )}
@@ -326,7 +326,7 @@ export default function Home() {
             {/* Dual CTA Buttons */}
             <div className="hero-cta-buttons">
               <a href="#catalog" className="btn hero-primary-pill">
-                <span>Explore Courses</span>
+                <span>{t("home.exploreCoursesBtn")}</span>
                 <ArrowRight size={15} />
               </a>
               <button
@@ -335,15 +335,15 @@ export default function Home() {
                 onClick={() => handleSelectSkillTrack("diagnostic")}
               >
                 <Compass size={14} style={{ color: "var(--primary)" }} />
-                <span>Career Assessment Roadmap</span>
+                <span>{t("home.careerAssessmentBtn")}</span>
               </button>
             </div>
 
             {/* Micro Trust Row */}
             <div className="hero-trust-row">
-              <div className="trust-item"><CheckCircle2 size={15} className="trust-check" /> <span>100% Real-World Codebases</span></div>
-              <div className="trust-item"><CheckCircle2 size={15} className="trust-check" /> <span>Rigorous Code Reviews</span></div>
-              <div className="trust-item"><CheckCircle2 size={15} className="trust-check" /> <span>Verifiable Digital Certificates</span></div>
+              <div className="trust-item"><CheckCircle2 size={15} className="trust-check" /> <span>{t("home.trustItem1")}</span></div>
+              <div className="trust-item"><CheckCircle2 size={15} className="trust-check" /> <span>{t("home.trustItem2")}</span></div>
+              <div className="trust-item"><CheckCircle2 size={15} className="trust-check" /> <span>{t("home.trustItem3")}</span></div>
             </div>
           </div>
 
@@ -357,7 +357,7 @@ export default function Home() {
               />
               <div className="hero-visual-badge">
                 <span className="hero-visual-dot" />
-                <span>PostgreSQL Native · 4.2ms Query Execution</span>
+                <span>{t("home.queryBadge")}</span>
               </div>
             </div>
           </div>
@@ -367,9 +367,9 @@ export default function Home() {
       {/* Credibility Trust Bar */}
       <div className="credibility-strip">
         <div className="credibility-intro">
-          <span className="credibility-badge">Engineering Excellence</span>
+          <span className="credibility-badge">{t("home.credibilityBadge")}</span>
           <span className="credibility-title">
-            Industry-standard curriculum engineered for enterprise scalability
+            {t("home.credibilityTitle")}
           </span>
         </div>
         <div className="credibility-partners">
@@ -402,11 +402,11 @@ export default function Home() {
           <div>
             <div className="section-tag-pill">
               <Compass size={13} />
-              <span>Skill Specializations &amp; Practice Tracks</span>
+              <span>{t("home.bentoTag")}</span>
             </div>
-            <h2 className="section-heading-lg">Hands-on Mastery — Enterprise Engineering Standards</h2>
+            <h2 className="section-heading-lg">{t("home.bentoTitle")}</h2>
             <p className="section-sub-text">
-              Curriculum organized by technical domain. Select a track to filter matching courses below.
+              {t("home.bentoSub")}
             </p>
           </div>
           <button
@@ -416,7 +416,7 @@ export default function Home() {
             onClick={() => handleSelectSkillTrack("diagnostic")}
           >
             <Target size={14} style={{ color: "var(--primary)" }} />
-            <span>Roadmap Assessment</span>
+            <span>{t("home.roadmapBtn")}</span>
           </button>
         </div>
 
@@ -434,12 +434,12 @@ export default function Home() {
               </div>
               <span className="skill-card-tag pro">PRO TRACK</span>
             </div>
-            <h3 className="skill-card-title">Frontend Engineering</h3>
+            <h3 className="skill-card-title">{t("home.trackFrontendTitle")}</h3>
             <p className="skill-card-desc">
-              Master React 19, modern hooks, clean component architecture, and 60fps rendering optimizations.
+              {t("home.trackFrontendDesc")}
             </p>
             <div className="skill-card-footer">
-              <span>Filter Frontend Courses</span>
+              <span>{t("home.trackFrontendAction")}</span>
               <ArrowUpRight size={16} className="skill-card-arrow" />
             </div>
           </div>
@@ -457,12 +457,12 @@ export default function Home() {
               </div>
               <span className="skill-card-tag highlight">ZERO ORM</span>
             </div>
-            <h3 className="skill-card-title">Backend &amp; Native SQL</h3>
+            <h3 className="skill-card-title">{t("home.trackBackendTitle")}</h3>
             <p className="skill-card-desc">
-              Build resilient REST APIs, optimize native PostgreSQL queries without ORM translation overhead, and configure robust pools.
+              {t("home.trackBackendDesc")}
             </p>
             <div className="skill-card-footer">
-              <span>Filter Backend Courses</span>
+              <span>{t("home.trackBackendAction")}</span>
               <ArrowUpRight size={16} className="skill-card-arrow" />
             </div>
           </div>
@@ -480,12 +480,12 @@ export default function Home() {
               </div>
               <span className="skill-card-tag">SYSTEM DESIGN</span>
             </div>
-            <h3 className="skill-card-title">Database Architecture</h3>
+            <h3 className="skill-card-title">{t("home.trackDbTitle")}</h3>
             <p className="skill-card-desc">
-              Design 3NF relational schemas, analyze EXPLAIN plans, implement B-Tree indexes, and manage ACID transactions.
+              {t("home.trackDbDesc")}
             </p>
             <div className="skill-card-footer">
-              <span>Filter Database Courses</span>
+              <span>{t("home.trackDbAction")}</span>
               <ArrowUpRight size={16} className="skill-card-arrow" />
             </div>
           </div>
@@ -503,12 +503,12 @@ export default function Home() {
               </div>
               <span className="skill-card-tag pro">PRODUCTION</span>
             </div>
-            <h3 className="skill-card-title">DevOps &amp; Cloud Deploy</h3>
+            <h3 className="skill-card-title">{t("home.trackDevopsTitle")}</h3>
             <p className="skill-card-desc">
-              Containerize apps with Docker, configure automated CI/CD pipelines, and deploy securely on Cloud platforms.
+              {t("home.trackDevopsDesc")}
             </p>
             <div className="skill-card-footer">
-              <span>View DevOps Pathway</span>
+              <span>{t("home.trackDevopsAction")}</span>
               <ArrowUpRight size={16} className="skill-card-arrow" />
             </div>
           </div>
@@ -526,12 +526,12 @@ export default function Home() {
               </div>
               <span className="skill-card-tag highlight">CAREER READY</span>
             </div>
-            <h3 className="skill-card-title">Full-Stack Mastery</h3>
+            <h3 className="skill-card-title">{t("home.trackPracticeTitle")}</h3>
             <p className="skill-card-desc">
-              Ship end-to-end LMS and E-Commerce platforms with Role-Based Access Control, persistent carts, and mock checkout.
+              {t("home.trackPracticeDesc")}
             </p>
             <div className="skill-card-footer">
-              <span>Explore All Courses</span>
+              <span>{t("home.trackPracticeAction")}</span>
               <ArrowUpRight size={16} className="skill-card-arrow" />
             </div>
           </div>
@@ -550,12 +550,12 @@ export default function Home() {
               </div>
               <span className="skill-card-tag highlight">FREE ASSESS</span>
             </div>
-            <h3 className="skill-card-title">Skill Diagnostic</h3>
+            <h3 className="skill-card-title">{t("home.diagTitle")}</h3>
             <p className="skill-card-desc">
-              Take a 30-second assessment to unlock a personalized engineering roadmap aligned with your immediate goals.
+              {t("home.diagSub")}
             </p>
             <div className="skill-card-footer" style={{ color: "#10B981" }}>
-              <span>Start Assessment</span>
+              <span>{t("home.careerAssessmentBtn")}</span>
               <ArrowUpRight size={16} className="skill-card-arrow" />
             </div>
           </div>
@@ -575,10 +575,10 @@ export default function Home() {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px", marginBottom: "16px" }}>
           <div>
             <h2 style={{ margin: "0 0 4px 0", fontSize: "24px", fontWeight: "800", letterSpacing: "-0.5px" }}>
-              Explore Specialized Curriculum
+              {t("home.catalogHeading")}
             </h2>
             <p style={{ margin: 0, fontSize: "14px", color: "var(--text-muted)" }}>
-              {loading ? "Loading curriculum catalog..." : `Showing ${filteredCourses.length} specialized courses`}
+              {loading ? t("common.loading") : t("home.catalogSub")}
             </p>
           </div>
 
@@ -589,7 +589,7 @@ export default function Home() {
               <input
                 id="catalog-search"
                 type="text"
-                placeholder="Search by course title..."
+                placeholder={t("home.catalogSearchPlaceholder")}
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 aria-label="Search courses"
@@ -603,7 +603,7 @@ export default function Home() {
                   <RotateCcw size={12} />
                 </button>
               ) : (
-                <kbd className="catalog-search-shortcut" title="Press / to focus search">
+                <kbd className="catalog-search-shortcut" title={t("nav.searchShortcutTip")}>
                   /
                 </kbd>
               )}
@@ -619,10 +619,10 @@ export default function Home() {
                 onChange={(e) => setSortBy(e.target.value)}
                 aria-label="Sort courses"
               >
-                <option value="newest">Newest Releases</option>
-                <option value="rating">Highest Rated</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
+                <option value="newest">{t("home.catalogSortNewest")}</option>
+                <option value="rating">{t("home.catalogSortRating")}</option>
+                <option value="price-asc">{t("home.catalogSortPriceAsc")}</option>
+                <option value="price-desc">{t("home.catalogSortPriceDesc")}</option>
               </select>
             </div>
 
@@ -648,7 +648,7 @@ export default function Home() {
               onClick={() => setSelectedCategory(cat)}
             >
               {CATEGORY_ICONS[cat] ?? <Layers size={14} />}
-              {cat}
+              {cat === "All" ? t("common.all") : cat}
             </button>
           ))}
         </div>
@@ -678,13 +678,13 @@ export default function Home() {
               <Search size={28} />
             </div>
             <h3 style={{ fontSize: "20px", fontWeight: "800", color: "var(--text-main)", marginBottom: "8px" }}>
-              No matching courses found
+              {t("home.noCoursesFound")}
             </h3>
             <p style={{ color: "var(--text-muted)", fontSize: "14px", marginBottom: "24px", lineHeight: "1.6" }}>
-              No courses match your current search query or filter criteria. Try selecting another category or resetting filters.
+              {t("home.noCoursesFoundDesc")}
             </p>
             <button className="btn" onClick={handleReset}>
-              View all courses
+              {t("home.clearFiltersBtn")}
             </button>
           </div>
         ) : (
@@ -712,13 +712,13 @@ export default function Home() {
           <div style={{ marginBottom: "16px" }}>
             <div className="section-tag-pill">
               <Layers size={13} />
-              <span>4-Stage Engineering Curriculum</span>
+              <span>{t("home.pathwaysTag")}</span>
             </div>
             <h3 style={{ fontSize: "22px", fontWeight: "800", color: "var(--text-main)", margin: "4px 0 6px 0" }}>
-              Comprehensive Developer Roadmap
+              {t("home.pathwaysTitle")}
             </h3>
             <p style={{ fontSize: "13.5px", color: "var(--text-muted)", margin: 0, lineHeight: "1.5" }}>
-              From foundational software concepts to resilient cloud architecture and production deployments.
+              {t("home.pathwaysSub")}
             </p>
           </div>
 
@@ -730,10 +730,10 @@ export default function Home() {
                 <span style={{ fontSize: "11px", color: "var(--text-light)" }}><Clock size={11} /> 4-6 weeks</span>
               </div>
               <h4 style={{ fontSize: "15px", fontWeight: "700", margin: "0 0 6px 0", color: "var(--text-main)" }}>
-                Core Engineering &amp; Modern JavaScript
+                {t("home.level1Title")}
               </h4>
               <p style={{ fontSize: "12.5px", color: "var(--text-muted)", margin: 0, lineHeight: "1.4" }}>
-                Algorithm thinking, ES6+ patterns, DOM API, semantic HTML5/CSS3, and team Git workflows.
+                {t("home.level1Desc")}
               </p>
             </div>
 
@@ -744,10 +744,10 @@ export default function Home() {
                 <span style={{ fontSize: "11px", color: "var(--text-light)" }}><Clock size={11} /> 6-8 weeks</span>
               </div>
               <h4 style={{ fontSize: "15px", fontWeight: "700", margin: "0 0 6px 0", color: "var(--text-main)" }}>
-                React 19 Apps &amp; RESTful API Engine
+                {t("home.level2Title")}
               </h4>
               <p style={{ fontSize: "12.5px", color: "var(--text-muted)", margin: 0, lineHeight: "1.4" }}>
-                Single-page apps with React 19, clean Node.js / Express backend services, and PostgreSQL schemas.
+                {t("home.level2Desc")}
               </p>
             </div>
 
@@ -758,10 +758,10 @@ export default function Home() {
                 <span style={{ fontSize: "11px", color: "var(--text-light)" }}><Clock size={11} /> 6-8 weeks</span>
               </div>
               <h4 style={{ fontSize: "15px", fontWeight: "700", margin: "0 0 6px 0", color: "var(--text-main)" }}>
-                Native PostgreSQL &amp; Multi-Tier Security
+                {t("home.level3Title")}
               </h4>
               <p style={{ fontSize: "12.5px", color: "var(--text-muted)", margin: 0, lineHeight: "1.4" }}>
-                Sub-5ms native SQL queries, EXPLAIN ANALYZE execution plans, JWT stateless auth, and Bcrypt hashing.
+                {t("home.level3Desc")}
               </p>
             </div>
 
@@ -772,10 +772,10 @@ export default function Home() {
                 <span style={{ fontSize: "11px", color: "var(--text-light)" }}><Clock size={11} /> 4-6 weeks</span>
               </div>
               <h4 style={{ fontSize: "15px", fontWeight: "700", margin: "0 0 6px 0", color: "var(--text-main)" }}>
-                Cloud Native, DevOps &amp; System Design
+                {t("home.level4Title")}
               </h4>
               <p style={{ fontSize: "12.5px", color: "var(--text-muted)", margin: 0, lineHeight: "1.4" }}>
-                Docker containerization, automated CI/CD pipelines, cloud deployment, and portfolio showcase polish.
+                {t("home.level4Desc")}
               </p>
             </div>
           </div>
@@ -786,9 +786,9 @@ export default function Home() {
           <div className="bento-card bento-hero-card" style={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
             <div>
               <div className="bento-badge">PRODUCTION ENGINE ARCHITECTURE</div>
-              <h3 className="bento-card-title">Interactive SQL Native &amp; Zero-ORM Lab</h3>
+              <h3 className="bento-card-title">{t("home.sandboxTitle")}</h3>
               <p className="bento-card-desc">
-                Experience raw query speeds on native PostgreSQL without the overhead of heavy ORM translation layers.
+                {t("home.sandboxSub")}
               </p>
 
               <div className="bento-code-snippet">
@@ -808,7 +808,7 @@ export default function Home() {
                     title="Simulate optimized native query execution"
                   >
                     <Play size={12} fill="currentColor" />
-                    <span>{isQueryRunning ? "Executing..." : "Run Query"}</span>
+                    <span>{isQueryRunning ? t("home.sandboxRunning") : t("home.sandboxRunBtn")}</span>
                   </button>
                 </div>
                 <pre className={isQueryRunning ? "code-executing" : ""}>
@@ -828,10 +828,10 @@ ORDER BY rating DESC;`}</code>
                     <span className={`status-dot ${isQueryRunning ? "pulsing-amber" : "green"}`} />
                     <span>
                       {isQueryRunning ? (
-                        "Executing query via pg connection pool..."
+                        t("home.sandboxRunning")
                       ) : (
                         <>
-                          Executed in <strong className="tnum">{queryMetrics.time}ms</strong> · Pool: <span className="tnum">{queryMetrics.pool}</span> · Hit: <span className="tnum">{queryMetrics.hit}</span>
+                          {t("home.sandboxMetricExec")}: <strong className="tnum">{queryMetrics.time}ms</strong> · {t("home.sandboxMetricPool")}: <span className="tnum">{queryMetrics.pool}</span> · {t("home.sandboxMetricHit")}: <span className="tnum">{queryMetrics.hit}</span>
                         </>
                       )}
                     </span>
@@ -849,24 +849,24 @@ ORDER BY rating DESC;`}</code>
         </div>
       </section>
 
-      {/* 5. Interactive Career Diagnostic Consultation (TID Consultation Banner) */}
+      {/* 5. Interactive Career Diagnostic Consultation */}
       <section id="diagnostic-section" className="diagnostic-section" style={{ scrollMarginTop: "90px" }}>
         <div className="diagnostic-grid">
           {/* Left Column: Form Question Selection */}
           <div>
             <div className="section-tag-pill">
               <Sparkles size={13} />
-              <span>Personalized Engineering Roadmap</span>
+              <span>{t("home.diagTag")}</span>
             </div>
             <h2 style={{ fontSize: "26px", fontWeight: "800", color: "var(--text-main)", margin: "0 0 8px 0" }}>
-              Discover Your Targeted Curriculum Path
+              {t("home.diagTitle")}
             </h2>
             <p style={{ fontSize: "14px", color: "var(--text-muted)", lineHeight: "1.5", margin: "0 0 20px 0" }}>
-              Select your immediate technical goal to receive an art-directed study syllabus from CourseHub mentors.
+              {t("home.diagSub")}
             </p>
 
             {/* Question 1: Goal */}
-            <div className="diagnostic-question-title">Your Primary Engineering Objective:</div>
+            <div className="diagnostic-question-title">{t("home.diagCurrentFocus")}:</div>
             <div className="diagnostic-chip-group">
               <button
                 type="button"
@@ -882,7 +882,7 @@ ORDER BY rating DESC;`}</code>
                 onClick={() => setDiagnosticGoal("fullstack")}
               >
                 <Zap size={14} />
-                Full-Stack Production Engineer
+                {t("home.diagGoalFullstack")}
               </button>
               <button
                 type="button"
@@ -890,7 +890,7 @@ ORDER BY rating DESC;`}</code>
                 onClick={() => setDiagnosticGoal("backend")}
               >
                 <Server size={14} />
-                Backend &amp; High-Perf SQL
+                {t("home.diagGoalBackend")}
               </button>
               <button
                 type="button"
@@ -939,7 +939,7 @@ ORDER BY rating DESC;`}</code>
               className="btn diagnostic-cta-btn"
               onClick={() => handleSelectSkillTrack(DIAGNOSTIC_TRACKS[diagnosticGoal]?.targetCategory || "All")}
             >
-              <span>Start this Learning Track</span>
+              <span>{t("home.exploreCoursesBtn")}</span>
               <ArrowRight size={15} />
             </button>
           </div>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useToast } from "../context/ToastContext.jsx";
+import { useLanguage } from "../context/LanguageContext.jsx";
 import {
   UserPlus,
   User,
@@ -29,6 +30,7 @@ function getPasswordStrength(password) {
 }
 
 export default function Register() {
+  const { t } = useLanguage();
   const { register } = useAuth();
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -78,15 +80,15 @@ export default function Register() {
         </div>
 
         <h2 style={{ fontSize: "24px", fontWeight: "800", marginBottom: "6px", textAlign: "center", letterSpacing: "-0.5px" }}>
-          Create Free Account
+          {t("auth.createAccount")}
         </h2>
         <p style={{ fontSize: "14px", color: "var(--text-muted)", textAlign: "center", marginBottom: "28px" }}>
-          Join thousands of engineers learning high-demand tech skills
+          {t("auth.registerSubtitle")}
         </p>
 
         <form className="form" id="register-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label" htmlFor="register-name">Full Name</label>
+            <label className="form-label" htmlFor="register-name">{t("auth.fullName")}</label>
             <div style={{ position: "relative" }}>
               <User size={16} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
               <input
@@ -103,7 +105,7 @@ export default function Register() {
           </div>
 
           <div className="form-group">
-            <label className="form-label" htmlFor="register-email">Email Address</label>
+            <label className="form-label" htmlFor="register-email">{t("auth.emailAddress")}</label>
             <div style={{ position: "relative" }}>
               <Mail size={16} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
               <input
@@ -121,7 +123,7 @@ export default function Register() {
           </div>
 
           <div className="form-group">
-            <label className="form-label" htmlFor="register-password">Password</label>
+            <label className="form-label" htmlFor="register-password">{t("auth.password")}</label>
             <div style={{ position: "relative" }}>
               <Lock size={16} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
               <input
@@ -182,18 +184,18 @@ export default function Register() {
             {loading ? (
               <>
                 <Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} />
-                Creating Account...
+                {t("auth.creatingAccount")}
               </>
             ) : (
-              "Create Free Account"
+              t("auth.signUpBtn")
             )}
           </button>
         </form>
 
         <div style={{ marginTop: "24px", textAlign: "center", fontSize: "14px", color: "var(--text-muted)" }}>
-          Already have an account?{" "}
+          {t("auth.haveAccount")}{" "}
           <Link to="/login" style={{ color: "var(--primary)", fontWeight: "700" }}>
-            Sign in here
+            {t("auth.signInLink")}
           </Link>
         </div>
 
