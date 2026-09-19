@@ -15,7 +15,7 @@ function printCertificate(courseName, userName) {
 <html>
 <head>
   <meta charset="UTF-8"/>
-  <title>Certificate of Completion — ${courseName}</title>
+  <title>Certificate of Completion - ${courseName}</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap');
     * { margin: 0; padding: 0; box-sizing: border-box; }

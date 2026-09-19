@@ -331,7 +331,7 @@ export default function Instructor() {
 
             {createdCourse && (
               <button className="btn" style={{ width: "100%", marginTop: "20px" }} onClick={() => { setStep(2); loadMyCourses(); }}>
-                Done — View My Courses →
+                Done - View My Courses →
               </button>
             )}
           </div>
