@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "./context/AuthContext.jsx";
 import { useCart } from "./context/CartContext.jsx";
 import ThemeToggle from "./components/ThemeToggle.jsx";
+import BackToTop from "./components/BackToTop.jsx";
 import {
   Menu,
   X,
@@ -356,6 +357,9 @@ export default function App() {
           </div>
         </div>
       </footer>
+
+      {/* Floating Back To Top Button */}
+      <BackToTop />
     </div>
   );
 }
