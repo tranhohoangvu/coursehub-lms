@@ -349,7 +349,6 @@ export default function App() {
                 <li><Link to="/my-courses">{t("classroom.viewCertificate")}</Link></li>
                 <li><Link to="/instructor">{t("nav.instructorStudio")}</Link></li>
                 <li><a href="https://github.com/tranhohoangvu/coursehub-lms" target="_blank" rel="noreferrer">{t("footer.legalSecurity")}</a></li>
-                <li><span style={{ fontSize: "13px", color: "var(--text-light)" }}>Hotline: 097 468 97 61</span></li>
               </ul>
             </div>
           </div>
