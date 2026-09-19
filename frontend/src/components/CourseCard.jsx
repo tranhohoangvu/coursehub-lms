@@ -36,9 +36,16 @@ export default function CourseCard({ course, enrolledIds = [] }) {
             e.target.src = "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80";
           }}
         />
-        <div className="course-thumbnail-overlay-badge">
+        <div className="course-thumbnail-overlay-badge" style={{ display: "flex", gap: "6px" }}>
           <span className="badge" style={{ background: "rgba(15, 23, 42, 0.75)", color: "#ffffff", backdropFilter: "blur(8px)", border: "1px solid rgba(255, 255, 255, 0.2)" }}>
             {course.category?.name || "Development"}
+          </span>
+          <span className="badge cyan" style={{ fontSize: "10.5px", padding: "2px 8px" }}>
+            {course.title?.toLowerCase().includes("advanced") || course.title?.toLowerCase().includes("architecture")
+              ? "Nâng Cao"
+              : course.title?.toLowerCase().includes("native")
+              ? "Thực Chiến"
+              : "Toàn Diện"}
           </span>
         </div>
 

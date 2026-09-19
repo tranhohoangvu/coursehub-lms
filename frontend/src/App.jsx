@@ -317,29 +317,32 @@ export default function App() {
             </div>
 
             <div className="footer-col">
-              <h5>Platform</h5>
+              <h5>Chương Trình Đào Tạo</h5>
               <ul className="footer-links">
-                <li><Link to="/">Browse Catalog</Link></li>
-                <li><Link to="/my-courses">My Learning</Link></li>
-                <li><Link to="/cart">Cart &amp; Checkout</Link></li>
+                <li><Link to="/#catalog">Frontend Engineering</Link></li>
+                <li><Link to="/#catalog">Backend &amp; Native SQL</Link></li>
+                <li><Link to="/#catalog">Database Architecture</Link></li>
+                <li><Link to="/#catalog">Full-Stack Mastery</Link></li>
               </ul>
             </div>
 
             <div className="footer-col">
-              <h5>Instructors</h5>
+              <h5>Tài Nguyên Miễn Phí</h5>
               <ul className="footer-links">
-                <li><Link to="/instructor">Teaching Studio</Link></li>
-                <li><Link to="/login">Instructor Login</Link></li>
-                <li><Link to="/register">Become a Mentor</Link></li>
+                <li><a href="/#career-pathways">Lộ Trình Tự Học 4 Cấp Độ</a></li>
+                <li><a href="/#diagnostic-section">Khảo Sát Định Hướng Kỹ Sư</a></li>
+                <li><a href="https://github.com/tranhohoangvu/coursehub-lms" target="_blank" rel="noreferrer">Kho Mã Nguồn GitHub</a></li>
+                <li><Link to="/my-courses">Tra Cứu Chứng Chỉ</Link></li>
               </ul>
             </div>
 
             <div className="footer-col">
-              <h5>Developer</h5>
+              <h5>Cam Kết &amp; Hỗ Trợ</h5>
               <ul className="footer-links">
-                <li><a href="https://github.com/tranhohoangvu/coursehub-lms" target="_blank" rel="noreferrer">GitHub Repository</a></li>
-                <li><a href="https://coursehub-lms.onrender.com" target="_blank" rel="noreferrer">Backend API</a></li>
-                <li><a href="https://supabase.com" target="_blank" rel="noreferrer">Supabase Cloud</a></li>
+                <li><Link to="/my-courses">Phòng Học Trực Tuyến</Link></li>
+                <li><Link to="/instructor">Dành Cho Giảng Viên</Link></li>
+                <li><a href="https://github.com/tranhohoangvu/coursehub-lms" target="_blank" rel="noreferrer">Báo Lỗi &amp; Đóng Góp</a></li>
+                <li><span style={{ fontSize: "13px", color: "var(--text-light)" }}>Hotline: 097 468 97 61</span></li>
               </ul>
             </div>
           </div>
