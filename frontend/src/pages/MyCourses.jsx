@@ -17,10 +17,10 @@ function printCertificate(courseName, userName) {
   <meta charset="UTF-8"/>
   <title>Certificate of Completion - ${courseName}</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
       background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
       display: flex; align-items: center; justify-content: center;
       min-height: 100vh; padding: 40px;

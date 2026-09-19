@@ -79,7 +79,7 @@ This project showcases low-level database optimization, Zero-ORM native SQL arch
 | **Validation** | Zod | Schema-based payload validation formatted to structured HTTP 400 errors |
 | **Security** | Helmet, express-rate-limit, Bcrypt | HTTP protection, brute-force mitigation, secure password hashing |
 | **Frontend** | React 19, Vite | Fast HMR, responsive dark/light mode, custom design system |
-| **Styling** | Vanilla CSS | Custom utility tokens, glassmorphism, responsive pagination controls |
+| **Styling** | Vanilla CSS | Modern design tokens (Inter & JetBrains Mono), glassmorphism, responsive pagination controls |
 | **Testing** | Node.js Native Test Runner (`node:test`) | Fast, dependency-free automated integration test suite |
 
 ---
